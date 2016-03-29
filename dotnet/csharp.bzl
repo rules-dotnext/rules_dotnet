@@ -14,8 +14,6 @@
 
 """CSharp bazel rules"""
 
-_MONO_UNIX_CSC = "/usr/local/bin/mcs"
-
 # TODO(jeremy): Windows when it's available.
 
 def _make_csc_flag(flag_start, flag_name, flag_value=None):
@@ -29,7 +27,7 @@ def _make_csc_deps(deps, extra_files=[]):
     if hasattr(dep, "target_type"):
       dep_type = getattr(dep, "target_type")
       if dep_type == "exe":
-        fail("You can't use a binary target as a dependency")
+        fail("You can't use a binary target as a dependency", "deps")
       if dep_type == "library":
         dlls += [dep.out]
         refs += [dep.name]
@@ -94,14 +92,18 @@ def _make_csc_arglist(ctx, output, depinfo, extra_refs=[]):
 
   return args
 
-_NUNIT_LAUNCHER_SCRIPT = """#!/bin/bash
+_NUNIT_LAUNCHER_SCRIPT = """\
+#!/bin/bash
+
 cd $0.runfiles
+
 # TODO(jeremy): This is a gross and fragile hack.
 # We should be able to do better than this.
 for l in {libs}; do
     ln -s -f $l $(basename $l)
 done
-/usr/local/bin/mono {nunit_exe} {libs} "$@"
+
+{mono_exe} {nunit_exe} {libs} "$@"
 """
 
 def _make_nunit_launcher(ctx, depinfo, output):
@@ -109,27 +111,34 @@ def _make_nunit_launcher(ctx, depinfo, output):
           [d.short_path for d in depinfo.transitive_dlls])
 
   content = _NUNIT_LAUNCHER_SCRIPT.format(
+      mono_exe=ctx.file.mono.path,
       nunit_exe=ctx.files._nunit_exe[0].path,
       libs=" ".join(libs))
 
   ctx.file_action(output=ctx.outputs.executable, content=content)
 
-_LAUNCHER_SCRIPT = """#!/bin/bash
+_LAUNCHER_SCRIPT = """\
+#!/bin/bash
+
 cd $0.runfiles
+
 # TODO(jeremy): This is a gross and fragile hack.
 # We should be able to do better than this.
 ln -s -f {exe} $(basename {exe})
 for l in {libs}; do
     ln -s -f $l $(basename $l)
 done
-/usr/local/bin/mono $(basename {exe}) "$@"
+
+{mono_exe} $(basename {exe}) "$@"
 """
 
 def _make_launcher(ctx, depinfo, output):
   libs = ([d.short_path for d in depinfo.dlls] +
           [d.short_path for d in depinfo.transitive_dlls])
 
-  content = _LAUNCHER_SCRIPT.format(exe=output.short_path, libs=" ".join(libs))
+  content = _LAUNCHER_SCRIPT.format(mono_exe=ctx.file.mono.path,
+                                    exe=output.short_path,
+                                    libs=" ".join(libs))
   ctx.file_action(output=ctx.outputs.executable, content=content)
 
 def _csc_get_output(ctx):
@@ -154,7 +163,8 @@ def _csc_compile_action(ctx, assembly, all_outputs, collected_inputs,
                       extra_refs=[]):
   csc_args = _make_csc_arglist(ctx, assembly, collected_inputs.depinfo,
                                extra_refs=extra_refs)
-  command_script = " ".join([ctx.attr.csc] + csc_args + collected_inputs.srcs)
+  command_script = " ".join([ctx.file.csc.path] + csc_args +
+                            collected_inputs.srcs)
 
   ctx.action(
       inputs = list(collected_inputs.inputs),
@@ -232,11 +242,38 @@ def _cs_nunit_run_impl(ctx):
                 transitive_dlls = depinfo.dlls,
                 runfiles=runfiles)
 
+def _find_and_symlink(repository_ctx, binary, env_variable):
+  if env_variable in repository_ctx.os.environ:
+    return repository_ctx.path(repository_ctx.os.environ[env_variable])
+  else:
+    found_binary = repository_ctx.which(binary)
+    if found_binary == None:
+      fail("Cannot find %s. Either correct your path or set the %s " +
+           "environment variable.")
+    repository_ctx.symlink(found_binary, binary)
+
+_TOOLCHAIN_BUILD = """\
+package(default_visibility = ["//visibility:public"])
+
+filegroup(
+    name = "mono_bin",
+    srcs = ["mono"],
+)
+
+filegroup(
+    name = "csc_bin",
+    srcs = ["mcs"],
+)
+"""
+
+def _csharp_autoconf(repository_ctx):
+  _find_and_symlink(repository_ctx, "mono", "MONO")
+  _find_and_symlink(repository_ctx, "mcs", "CSC")
+  repository_ctx.file("BUILD", _TOOLCHAIN_BUILD)
+
 _COMMON_ATTRS = {
     # configuration fragment that specifies
     "_flag_start": attr.string(default="-"),
-    # where the csharp compiler is.
-    "csc": attr.string(default=_MONO_UNIX_CSC),
     # code dependencies for this rule.
     # all dependencies must provide an out field.
     "deps": attr.label_list(providers=["out", "target_type"]),
@@ -250,6 +287,13 @@ _COMMON_ATTRS = {
     "warn": attr.int(default=4),
     # define preprocessor symbols.
     # TODO(jeremy): "define": attr.string_list(),
+    # The mono binary and csharp compiler.
+    "mono": attr.label(default=Label("//external:mono"),
+                       single_file=True,
+                       executable=True),
+    "csc": attr.label(default=Label("//external:csc"),
+                      single_file=True,
+                      executable=True),
 }
 
 _LIB_ATTRS = {
@@ -280,50 +324,95 @@ _BIN_OUTPUTS = {
 
 csharp_library = rule(
     implementation = _csc_compile_impl,
-    attrs = _COMMON_ATTRS + _LIB_ATTRS,
+    attrs = dict(_COMMON_ATTRS.items() + _LIB_ATTRS.items()),
     outputs = _LIB_OUTPUTS,
 )
+"""Builds a C# .NET library and its corresponding documentation.
+
+Args:
+  name: A unique name for this rule.
+  srcs: C# `.cs` or `.resx` files.
+  deps: Dependencies for this rule
+  warn: Compiler warning level for this library. (Defaults to 4).
+  csc: Override the default C# compiler.
+
+    **Note:** This attribute may be removed in future versions.
+"""
 
 csharp_binary = rule(
     implementation = _csc_compile_impl,
-    attrs = _COMMON_ATTRS + _EXE_ATTRS,
+    attrs = dict(_COMMON_ATTRS.items() + _EXE_ATTRS.items()),
     outputs = _BIN_OUTPUTS,
     executable = True,
 )
+"""Builds a C# .NET binary.
+
+Args:
+  name: A unique name for this rule.
+  srcs: C# `.cs` or `.resx` files.
+  deps: Dependencies for this rule
+  main_class: Name of class with `main()` method to use as entry point.
+  warn: Compiler warning level for this library. (Defaults to 4).
+  csc: Override the default C# compiler.
+
+    **Note:** This attribute may be removed in future versions.
+"""
 
 csharp_nunit_test = rule(
     implementation = _cs_nunit_run_impl,
     executable = True,
-    attrs = _COMMON_ATTRS + _LIB_ATTRS +_NUNIT_ATTRS,
+    attrs = dict(_COMMON_ATTRS.items() + _LIB_ATTRS.items() +
+                 _NUNIT_ATTRS.items()),
     outputs = _LIB_OUTPUTS,
     test = True,
 )
+"""Builds a C# .NET test binary that uses the [NUnit](http://nunit.org) unit
+testing framework.
 
-NUNIT_BUILD_FILE = """
-filegroup(
-    name = "nunit_exe",
-    srcs = ["NUnit-2.6.4/bin/nunit-console.exe"],
-    visibility = ["//visibility:public"],
-)
+Args:
+  name: A unique name for this rule.
+  srcs: C# `.cs` or `.resx` files.
+  deps: Dependencies for this rule
+  warn: Compiler warning level for this library. (Defaults to 4).
+  csc: Override the default C# compiler.
 
-filegroup(
-    name = "nunit_exe_libs",
-    srcs = glob(["NUnit-2.6.4/bin/lib/*.dll"]),
-    visibility = ["//visibility:public"],
-)
-
-filegroup(
-    name = "nunit_framework",
-    srcs = glob(["NUnit-2.6.4/bin/framework/*.dll"]),
-    visibility = ["//visibility:public"],
-)
+    **Note:** This attribute may be removed in future versions.
 """
 
+csharp_autoconf = repository_rule(
+    implementation = _csharp_autoconf,
+    local = True,
+)
+
+def csharp_configure():
+  """Finds the mono and mcs binaries installed on the local system and sets
+  up an external repository to use the local toolchain.
+
+  To use the local Mono toolchain installed on your system, add the following
+  to your WORKSPACE file:
+
+  ```python
+  csharp_configure()
+  ```
+  """
+  csharp_autoconf(name = "local_config_csharp")
+
+  native.bind(
+      name = "mono",
+      actual = "@local_config_csharp//:mono_bin",
+  )
+
+  native.bind(
+      name = "csc",
+      actual = "@local_config_csharp//:csc_bin",
+  )
+
 def csharp_repositories():
+  """Adds the repository rules needed for using the C# rules."""
   native.new_http_archive(
       name = "nunit",
       url = "https://github.com/nunit/nunitv2/releases/download/2.6.4/NUnit-2.6.4.zip",
       sha256 = "1bd925514f31e7729ccde40a38a512c2accd86895f93465f3dfe6d0b593d7170",
       type = "zip",
-      build_file_content = NUNIT_BUILD_FILE,
+      build_file = "dotnet/nunit.BUILD",
   )
