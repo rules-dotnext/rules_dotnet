@@ -14,6 +14,8 @@
 
 """CSharp bazel rules"""
 
+_MONO_UNIX_BIN = "/usr/local/bin/mono"
+
 # TODO(jeremy): Windows when it's available.
 
 def _make_csc_flag(flag_start, flag_name, flag_value=None):
@@ -31,6 +33,9 @@ def _make_csc_deps(deps, extra_files=[]):
       if dep_type == "library":
         dlls += [dep.out]
         refs += [dep.name]
+      if dep_type == "library_set":
+        dlls += dep.out
+        refs += [d.basename for d in dep.out]
       if dep.transitive_dlls:
         transitive_dlls += dep.transitive_dlls
 
@@ -300,6 +305,11 @@ _LIB_ATTRS = {
     "_target_type": attr.string(default="library")
 }
 
+_NUGET_ATTRS = {
+    "srcs": attr.label_list(allow_files = FileType([".dll"])),
+    "_target_type": attr.string(default="library_set")
+}
+
 _EXE_ATTRS = {
     "_target_type": attr.string(default="exe"),
     # main class to use as entry point.
@@ -377,6 +387,112 @@ Args:
   csc: Override the default C# compiler.
 
     **Note:** This attribute may be removed in future versions.
+"""
+
+def _dll_import_impl(ctx):
+  inputs = set(ctx.files.srcs)
+  return struct(
+    name = ctx.label.name,
+    target_type = ctx.attr._target_type,
+    out = inputs,
+    dlls = inputs,
+    transitive_dlls = set([]),
+  )
+
+dll_import = rule(
+  implementation = _dll_import_impl,
+  attrs = _NUGET_ATTRS,
+)
+
+csharp_autoconf = repository_rule(
+    implementation = _csharp_autoconf,
+    local = True,
+)
+
+def csharp_configure():
+  """Finds the mono and mcs binaries installed on the local system and sets
+  up an external repository to use the local toolchain.
+
+  To use the local Mono toolchain installed on your system, add the following
+  to your WORKSPACE file:
+
+  ```python
+  csharp_configure()
+  ```
+  """
+  csharp_autoconf(name = "local_config_csharp")
+
+  native.bind(
+      name = "mono",
+      actual = "@local_config_csharp//:mono_bin",
+  )
+
+  native.bind(
+      name = "csc",
+      actual = "@local_config_csharp//:csc_bin",
+  )
+
+def _nuget_package_impl(repository_ctx):
+  # figure out the output_path
+  package = repository_ctx.attr.package
+  output_dir = repository_ctx.path("")
+
+  # assemble our nuget command
+  nuget_cmd = [
+    repository_ctx.attr.nuget_bin_path,
+    "install",
+    "-Version", repository_ctx.attr.version,
+    "-OutputDirectory", output_dir,
+  ]
+  # add the sources from our source list to the command
+  for source in repository_ctx.attr.package_sources:
+    nuget_cmd += ["-Source", source]
+
+  # Lastly we add the nuget package name.
+  nuget_cmd += [repository_ctx.attr.package]
+  # execute nuget download.
+  repository_ctx.execute(nuget_cmd)
+  # TODO(jeremy): report errors if there were any
+
+  tpl_file = Label("@io_bazel_rules_dotnet//dotnet:NUGET_BUILD.tpl")
+  # add the BUILD file
+  repository_ctx.template(
+    "BUILD",
+    tpl_file,
+    {"%{package}": repository_ctx.name,
+     "%{output_dir}": "%s" % output_dir})
+
+# This rule is a repository rule and is only usable in WORKSPACE files.
+# due to some limitations of repository_rules it does require you to
+# tell it where your nuget.exe is located. You may want to manage that binary
+# in your repository as a result.
+nuget_package = repository_rule(
+  implementation=_nuget_package_impl,
+  #local=False,
+  attrs={
+    # TODO(jeremy): use repository_ctx.which("mono") in the impl?
+    "mono_bin_path":attr.string(default=_MONO_UNIX_BIN),
+    # Location of the nuget exe
+    "nuget_bin_path":attr.string(default="/usr/local/bin/nuget"),
+    # Sources to download the nuget packages from
+    "package_sources":attr.string_list(),
+    # The name of the nuget package
+    "package":attr.string(mandatory=True),
+    # The version of the nuget package
+    "version":attr.string(mandatory=True),
+    # content of the BUILD file for this external resource.
+  })
+"""Fetches a nuget package as an external dependency.
+
+This rule is a repository rule and is only usable in WORKSPACE files.
+due to some current limitations of repository_rules it does require you to
+tell it where your nuget.exe is located. You may want to manage that binary
+in your repository as a result.
+
+Args:
+  package_sources: list of sources to use for nuget package feeds.
+  package: name of the nuget package.
+  version: version of the nuget package (e.g. 0.1.2)
 """
 
 csharp_autoconf = repository_rule(
