@@ -182,7 +182,7 @@ def _csc_compile_action(ctx, assembly, all_outputs, collected_inputs,
 
 def _cs_runfiles(ctx, outputs, depinfo):
   return ctx.runfiles(
-      files = outputs,
+      files = outputs + [ctx.file.mono],
       transitive_files = set(depinfo.dlls + depinfo.transitive_dlls) or None)
 
 def _csc_compile_impl(ctx):
@@ -489,5 +489,7 @@ def csharp_repositories():
       url = "https://github.com/nunit/nunitv2/releases/download/2.6.4/NUnit-2.6.4.zip",
       sha256 = "1bd925514f31e7729ccde40a38a512c2accd86895f93465f3dfe6d0b593d7170",
       type = "zip",
+      # This is a little weird but is necessary for the build file reference to
+      # work when Workspaces import this using a repository rule.
       build_file = str(Label("//dotnet:nunit.BUILD")),
   )
