@@ -8,6 +8,8 @@
     <li><a href="#csharp_library">csharp_library</a></li>
     <li><a href="#csharp_binary">csharp_binary</a></li>
     <li><a href="#csharp_nunit_test">csharp_nunit_test</a></li>
+    <li><a href="#nuget_package">nuget_package</a></li>
+    <li><a href="#dll_import">dll_import</a></li>
   </ul>
 </div>
 
@@ -43,7 +45,6 @@ nuget_package(
   name = "some_name",
   package = "Some.Package",
   version = "0.1.2",
-)
 )
 ```
 
@@ -84,7 +85,7 @@ csharp_nunit_test(
 )
 ```
 
-### nuget\_repository
+### nuget\_package
 
 In the WORKSPACE file for your project record a nuget dependency like so.
 This is a repository rule so it will not work unless it is in a workspace
@@ -95,6 +96,20 @@ nuget_package(
     name="ndesk_options",
     package="NDesk.Options",
     version="0.2.1",
+)
+```
+
+### dll\_import
+
+Add a collection of dotnet assembly dll's to be used as a dependency.
+
+```python
+dll_import(
+    name="some_lib",
+    srcs=[
+      "Some.dll"
+      "Some.Other.dll",
+    ]
 )
 ```
 
