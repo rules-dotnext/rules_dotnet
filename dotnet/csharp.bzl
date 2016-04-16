@@ -129,12 +129,12 @@ cd $0.runfiles
 
 # TODO(jeremy): This is a gross and fragile hack.
 # We should be able to do better than this.
-ln -s -f {exe} $(basename {exe})
+ln -s -f {workspace}/{exe} $(basename {exe})
 for l in {libs}; do
-    ln -s -f $l $(basename $l)
+    ln -s -f {workspace}/$l $(basename {workspace}/$l)
 done
 
-{mono_exe} $(basename {exe}) "$@"
+{workspace}/{mono_exe} $(basename {exe}) "$@"
 """
 
 def _make_launcher(ctx, depinfo, output):
@@ -142,6 +142,7 @@ def _make_launcher(ctx, depinfo, output):
           [d.short_path for d in depinfo.transitive_dlls])
 
   content = _LAUNCHER_SCRIPT.format(mono_exe=ctx.file.mono.path,
+                                    workspace=ctx.workspace_name,
                                     exe=output.short_path,
                                     libs=" ".join(libs))
   ctx.file_action(output=ctx.outputs.executable, content=content)
@@ -180,10 +181,14 @@ def _csc_compile_action(ctx, assembly, all_outputs, collected_inputs,
       progress_message = (
           "Compiling " + ctx.label.package + ":" + ctx.label.name))
 
-def _cs_runfiles(ctx, outputs, depinfo):
+def _cs_runfiles(ctx, outputs, depinfo, add_mono=False):
+  mono_file = []
+  if add_mono:
+    mono_file = [ctx.file.mono]
+  transitive_files = set(depinfo.dlls + depinfo.transitive_dlls + mono_file) or None
   return ctx.runfiles(
-      files = outputs + [ctx.file.mono],
-      transitive_files = set(depinfo.dlls + depinfo.transitive_dlls) or None)
+      files = outputs,
+      transitive_files = set(depinfo.dlls + depinfo.transitive_dlls + [ctx.file.mono]) or None)
 
 def _csc_compile_impl(ctx):
   if hasattr(ctx.outputs, "csc_lib") and hasattr(ctx.outputs, "csc_exe"):
