@@ -428,7 +428,7 @@ def _nuget_package_impl(repository_ctx):
   repository_ctx.execute(nuget_cmd)
   # TODO(jeremy): report errors if there were any
 
-  tpl_file = Label("@io_bazel_rules_dotnet//dotnet:NUGET_BUILD.tpl")
+  tpl_file = Label("//dotnet:NUGET_BUILD.tpl")
   # add the BUILD file
   repository_ctx.template(
     "BUILD",
