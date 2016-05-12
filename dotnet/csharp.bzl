@@ -254,6 +254,7 @@ def _cs_nunit_run_impl(ctx):
                 runfiles=runfiles)
 
 def _find_and_symlink(repository_ctx, binary, env_variable):
+  #repository_ctx.file("bin/empty")
   if env_variable in repository_ctx.os.environ:
     return repository_ctx.path(repository_ctx.os.environ[env_variable])
   else:
@@ -261,7 +262,7 @@ def _find_and_symlink(repository_ctx, binary, env_variable):
     if found_binary == None:
       fail("Cannot find %s. Either correct your path or set the " % binary +
            "%s environment variable." % env_variable)
-    repository_ctx.symlink(found_binary, binary)
+    repository_ctx.symlink(found_binary, "bin/%s" % binary)
 
 def _csharp_autoconf(repository_ctx):
   _find_and_symlink(repository_ctx, "mono", "MONO")
@@ -270,7 +271,7 @@ def _csharp_autoconf(repository_ctx):
 package(default_visibility = ["//visibility:public"])
 exports_files(["mono", "mcs"])
 """
-  repository_ctx.file("BUILD", toolchain_build)
+  repository_ctx.file("bin/BUILD", toolchain_build)
 
 _COMMON_ATTRS = {
     # configuration fragment that specifies
@@ -290,13 +291,13 @@ _COMMON_ATTRS = {
     # TODO(jeremy): "define": attr.string_list(),
     # The mono binary and csharp compiler.
     "mono": attr.label(
-        default = Label("@local_config_csharp//:mono"),
+        default = Label("@mono//bin:mono"),
         allow_files = True,
         single_file = True,
         executable = True,
     ),
     "csc": attr.label(
-        default = Label("@local_config_csharp//:mcs"),
+        default = Label("@mono//bin:mcs"),
         allow_files = True,
         single_file = True,
         executable = True,
@@ -474,20 +475,45 @@ csharp_autoconf = repository_rule(
     local = True,
 )
 
-def csharp_configure():
-  """Finds the mono and mcs binaries installed on the local system and sets
-  up an external repository to use the local toolchain.
+def _mono_osx_repository_impl(repository_ctx):
+  # TODO(jwall): The below is necessary due to bug:
+  #   https://github.com/bazelbuild/bazel/issues/1235.
+  #   when that bug is fixed the below should be removed.
+  repository_ctx.file(repository_ctx.path("empty"))
 
-  To use the local Mono toolchain installed on your system, add the following
-  to your WORKSPACE file:
+  download_output = repository_ctx.path("")
+  # download the package
+  repository_ctx.download_and_extract(
+    "http://bazel-mirror.storage.googleapis.com/download.mono-project.com/archive/4.2.3/macos-10-x86/MonoFramework-MDK-4.2.3.4.macos10.xamarin.x86.tar.gz",
+    download_output,
+    "a7afb92d4a81f17664a040c8f36147e57a46bb3c33314b73ec737ad73608e08b",
+    "", "mono")
 
-  ```python
-  csharp_configure()
-  ```
-  """
-  csharp_autoconf(name = "local_config_csharp")
+  # now we create the build file.
+  toolchain_build = """
+package(default_visibility = ["//visibility:public"])
+exports_files(["mono", "mcs"])
+"""
+  repository_ctx.file("bin/BUILD", toolchain_build)
 
-def csharp_repositories():
+def _mono_repository_impl(repository_ctx):
+  if repository_ctx.attr.use_local:
+    _csharp_autoconf(repository_ctx)
+  elif repository_ctx.os.name.find("mac") != -1:
+    _mono_osx_repository_impl(repository_ctx)
+  else:
+    #if nothing else works look for a local version of mono
+    _csharp_autoconf(repository_ctx)
+
+mono_package = repository_rule(
+  implementation = _mono_repository_impl,
+  attrs = {
+    "use_local": attr.bool(default=False),
+  },
+  local = True,
+)
+
+def csharp_repositories(use_local_mono=False):
   """Adds the repository rules needed for using the C# rules."""
   native.new_http_archive(
       name = "nunit",
@@ -498,3 +524,4 @@ def csharp_repositories():
       # work when Workspaces import this using a repository rule.
       build_file = str(Label("//dotnet:nunit.BUILD")),
   )
+  mono_package(name="mono", use_local=use_local_mono)
