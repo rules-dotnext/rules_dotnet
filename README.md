@@ -34,7 +34,7 @@ git_repository(
 load(
     "@io_bazel_rules_dotnet//dotnet:csharp.bzl",
     "csharp_repositories",
-    nuget_package
+    "nuget_package",
 )
 
 csharp_repositories(use_local_mono = True)
@@ -93,7 +93,7 @@ file.
 
 ```python
 nuget_package(
-    name="ndesk_options",
+    name="ndesk_options", # referenced via path @ndesk_options//:ndesk_options
     package="NDesk.Options",
     version="0.2.1",
 )
