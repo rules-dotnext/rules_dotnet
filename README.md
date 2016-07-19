@@ -119,6 +119,8 @@ dll_import(
 - .Net Modules
 - Conditionally building documentation.
 - Pulling Mono in through a mono.WORKSPACE file.
+  - Still need to implement this for linux.
+- Multiple target framework support for nuget packages.
 
 ## Future nice to haves:
 
