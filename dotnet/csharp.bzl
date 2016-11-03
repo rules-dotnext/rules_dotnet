@@ -135,9 +135,9 @@ _LAUNCHER_SCRIPT = """\
 
 set -e
 
-if [[ -e "$0.runfiles" ]]; then
-  cd $0.runfiles/{workspace}
-fi
+RUNFILES=$0.runfiles/{workspace}
+
+pushd $RUNFILES
 
 # Create top-level symlinks for .exe and lib files.
 # TODO(jeremy): This is a gross and fragile hack.
@@ -153,7 +153,9 @@ for l in {libs}; do
     fi
 done
 
-{mono_exe} $(basename {exe}) "$@"
+popd
+
+$RUNFILES/{mono_exe} $RUNFILES/$(basename {exe}) "$@"
 """
 
 def _make_launcher(ctx, depinfo, output):
