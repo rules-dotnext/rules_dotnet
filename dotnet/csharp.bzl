@@ -440,13 +440,12 @@ def _nuget_package_impl(repository_ctx,
   mono = repository_ctx.path(repository_ctx.attr.mono_exe)
   nuget = repository_ctx.path(repository_ctx.attr.nuget_exe)
 
-  # assemble our nuget command.
+  # assemble our nuget command
   nuget_cmd = [
     mono,
     "--config", "%s/../etc/mono/config" % mono.dirname,
     nuget,
     "install",
-    "-Verbosity", repository_ctx.attr.verbosity,
     "-Version", repository_ctx.attr.version,
     "-OutputDirectory", output_dir,
   ]
@@ -481,11 +480,6 @@ _nuget_package_attrs = {
   "package":attr.string(mandatory=True),
   # The version of the nuget package
   "version":attr.string(mandatory=True),
-  # The verbosity level
-  "verbosity": attr.string(
-    values=["normal", "quiet", "detailed"],
-    default="normal",
-  ),
   # Reference to the mono binary
   "mono_exe":attr.label(
     executable=True,
@@ -544,68 +538,21 @@ csharp_autoconf = repository_rule(
     local = True,
 )
 
-
-def _execute(repository_ctx, args, fail_on_error = True, print_stdout = False):
-  result = repository_ctx.execute(args)
-  if result.return_code and fail_on_error:
-    fail("%s failed (%s): %s" % (" ".join(args), result.return_code, result.stderr))
-  if print_stdout:
-    print("%s stdout: %s" % (" ".join(args), result.stdout))
-  return result
-
-
 def _mono_osx_repository_impl(repository_ctx):
   download_output = repository_ctx.path("")
-  pkgutil = repository_ctx.which("pkgutil")
-  if not pkgutil:
-    fail("pkgutil not found in PATH")
-  tar = repository_ctx.which("tar")
-  if not tar:
-    fail("tar not found in PATH")
+  # download the package
+  repository_ctx.download_and_extract(
+    "http://bazel-mirror.storage.googleapis.com/download.mono-project.com/archive/4.2.3/macos-10-x86/MonoFramework-MDK-4.2.3.4.macos10.xamarin.x86.tar.gz",
+    download_output,
+    "a7afb92d4a81f17664a040c8f36147e57a46bb3c33314b73ec737ad73608e08b",
+    "", "mono")
 
-  # Download the package (353MB)
-  repository_ctx.download(
-    "https://download.mono-project.com/archive/4.8.1/macos-10-universal/MonoFramework-MDK-4.8.1.0.macos10.xamarin.universal.pkg",
-    "mono.pkg",
-    "5f1ee8314e3b61e2c81fc95cae4c6610a467adc2bb1299ab44c9b4a568bc0efd")
-
-  # Extract it with pkgutil (macos only)
-  _execute(repository_ctx, ["pkgutil", "--expand", "mono.pkg", "mono"])
-
-  # Untar the embedded 'Payload' blob to ./Library/...
-  _execute(repository_ctx, ["tar", "-xf", "mono/mono.pkg/Payload"])
-
-  # Remove prior symlink if it exists (should only be during development of this function!)
-  #_execute(repository_ctx, ["rm", "bin"])
-
-  # Link Library/.../bin here.
-  repository_ctx.symlink("Library/Frameworks/Mono.framework/Versions/4.8.1/bin", "bin")
-
-  # Cleanup 704MB of disk
-  _execute(repository_ctx, ["rm", "-rf", "mono/", "mono.pkg"])
-
-  # The mcs script file has inappropriate paths... Overwrite it manually.
-  # Here's the version we are about to overwrite.
-  # #!/bin/sh
-  # export PATH=$PATH:/Library/Frameworks/Mono.framework/Versions/4.8.1/bin
-  # export PKG_CONFIG_PATH=/Library/Frameworks/Mono.framework/External/pkgconfig:/Library/Frameworks/Mono.framework/Versions/4.8.1/lib/pkgconfig:/Library/Frameworks/Mono.framework/Versions/4.8.1/share/pkgconfig:$PKG_CONFIG_PATH
-  # exec /Library/Frameworks/Mono.framework/Versions/4.8.1/bin/mono $MONO_OPTIONS /Library/Frameworks/Mono.framework/Versions/4.8.1/lib/mono/4.5/mcs.exe "$@"
-
-  repository_ctx.file("bin/mcs", """#!/bin/sh
-script_dir=$(dirname $0)
-export PATH=$PATH:$script_dir
-export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$script_dir/../../../External/pkgconfig:$script_dir/../lib/pkgconfig:$script_dir/../share/pkgconfig
-exec $script_dir/mono $MONO_OPTIONS $script_dir/../lib/mono/4.5/mcs.exe "$@"
-""", executable = True)
-
-
-  # Finally, create the build file.
+  # now we create the build file.
   toolchain_build = """
 package(default_visibility = ["//visibility:public"])
 exports_files(["mono", "mcs"])
 """
   repository_ctx.file("bin/BUILD", toolchain_build)
-
 
 def _mono_repository_impl(repository_ctx):
   use_local = repository_ctx.os.environ.get(
@@ -616,7 +563,6 @@ def _mono_repository_impl(repository_ctx):
     _mono_osx_repository_impl(repository_ctx)
   else:
     fail("Unsupported operating system: %s" % repository_ctx.os.name)
-
 
 mono_package = repository_rule(
   implementation = _mono_repository_impl,
@@ -641,9 +587,9 @@ def csharp_repositories(use_local_mono=False):
 
   native.new_http_archive(
       name = "nuget",
-      url = "https://github.com/mono/nuget-binary/archive/fb441016aa5d878e34da79665c3e677c9fef8a00.zip", # Mar 15, 2017
-      sha256 = "90484e1d01181f59f41d91d3524f955904ac857b26a45798f8799a8144932e9c",
-      strip_prefix = "nuget-binary-fb441016aa5d878e34da79665c3e677c9fef8a00",
+      url = "https://github.com/mono/nuget-binary/archive/0811ba888a80aaff66a93a4c98567ce904ab2663.zip", # Sept 6, 2016
+      sha256 = "28323d23b7e6e02d3ba8892f525a1457ad23adb7e3a48908d37c1b5ae37519f6",
+      strip_prefix = "nuget-binary-0811ba888a80aaff66a93a4c98567ce904ab2663",
       type = "zip",
       build_file_content = """
       package(default_visibility = ["//visibility:public"])
