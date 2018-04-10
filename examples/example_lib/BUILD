@@ -1,3 +1,4 @@
+'''
 load("//dotnet:csharp.bzl", "csharp_library")
 
 csharp_library(
@@ -12,3 +13,4 @@ csharp_library(
         "//examples/example_transitive_lib:TransitiveClass",
     ],
 )
+'''

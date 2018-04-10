@@ -1,3 +1,4 @@
+'''
 load("//dotnet:csharp.bzl", "csharp_binary")
 
 csharp_binary(
@@ -10,3 +11,4 @@ csharp_binary(
         "//examples/example_lib:MyClass",
     ],
 )
+'''

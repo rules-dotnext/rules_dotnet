@@ -1,0 +1,18 @@
+load(
+    ":toolchains.bzl",
+    "declare_constraints",
+    "declare_toolchains",
+)
+
+package(default_visibility = ["//visibility:public"])
+
+declare_toolchains()
+
+declare_constraints()
+
+genrule(
+    name="test",
+    srcs=["@dotnet_sdk//:bin"],
+    outs=["ala.txt"],
+    cmd="echo rule"
+)

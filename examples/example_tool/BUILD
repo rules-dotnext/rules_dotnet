@@ -1,3 +1,4 @@
+'''
 load("//dotnet:csharp.bzl", "csharp_binary")
 
 csharp_binary(
@@ -32,3 +33,4 @@ genrule(
     ],
     cmd = "$(location :hello_tool) $(OUTS)",
 )
+'''

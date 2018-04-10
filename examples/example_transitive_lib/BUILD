@@ -1,3 +1,4 @@
+'''
 load("//dotnet:csharp.bzl", "csharp_library")
 
 csharp_library(
@@ -8,3 +9,4 @@ csharp_library(
     ],
     visibility = ["//visibility:public"],
 )
+'''

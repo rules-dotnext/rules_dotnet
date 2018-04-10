@@ -21,6 +21,12 @@ before_install:
       OS=darwin
     else
       sysctl kernel.unprivileged_userns_clone=1
+      sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+      sudo apt install apt-transport-https
+      echo "deb https://download.mono-project.com/repo/ubuntu stable-trusty main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+      sudo apt update
+      sudo apt install mono-devel
+      export RULES_DOTNET_USE_LOCAL_MONO=true
       OS=linux
     fi
     if [[ "${V}" == "HEAD" ]]; then
@@ -43,14 +49,17 @@ before_install:
     chmod +x install.sh
     ./install.sh --user
     rm -f install.sh
+
 script:
   - |
+    echo $RULES_DOTNET_USE_LOCAL_MONO 
     bazel \
       --output_base=$HOME/.cache/bazel \
       --batch \
       --host_jvm_args=-Xmx500m \
       --host_jvm_args=-Xms500m \
       test \
+      -s \
       --config=ci \
       --experimental_repository_cache="$HOME/.bazel_repository_cache" \
       --local_resources=400,1,1.0 \

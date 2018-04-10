@@ -1,3 +1,4 @@
+'''
 load("//dotnet:csharp.bzl", "csharp_nunit_test")
 
 csharp_nunit_test(
@@ -9,3 +10,4 @@ csharp_nunit_test(
         "//examples/example_lib:MyClass",
     ],
 )
+'''
