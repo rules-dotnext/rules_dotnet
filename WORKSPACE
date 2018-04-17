@@ -1,8 +1,8 @@
 workspace(name = "io_bazel_rules_dotnet")
 
-load("//dotnet/toolchain:toolchains.bzl", "dotnet_register_toolchains")
+load("//dotnet:defs.bzl", "dotnet_register_toolchains")
 
-dotnet_register_toolchains()
+dotnet_register_toolchains("host")
 
 
 #dotnet_repositories()

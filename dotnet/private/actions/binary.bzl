@@ -1,44 +1,19 @@
-# Copyright 2014 The Bazel Authors. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+load(
+    "@io_bazel_rules_dotnet//dotnet/private:actions/assembly.bzl",
+    "emit_assembly",
+)
 
-
-def emit_binary(go,
+def emit_binary(dotnet,
     name = "",
-    source = None,
-    executable = None):
-  """See dotnet/toolchains.rst#binary for full documentation."""
+    srcs = None,
+    deps = None,
+    out = None):
 
-  if name == "" and executable == None:
-    fail("either name or executable must be set")
-
-  archive = go.archive(go, source)
-  if not executable:
-    extension = go.exe_extension
-    if go.mode.link == LINKMODE_C_SHARED:
-      name = "lib" + name # shared libraries need a "lib" prefix in their name
-      extension = go.shared_extension
-    elif go.mode.link == LINKMODE_C_ARCHIVE:
-      extension = ARCHIVE_EXTENSION
-    executable = go.declare_file(go, name=name, ext=extension)
-  go.link(go,
-      archive=archive,
-      test_archives=test_archives,
-      executable=executable,
-      gc_linkopts=gc_linkopts,
-      linkstamp=linkstamp,
-      version_file=version_file,
-      info_file=info_file,
+  return emit_assembly(
+    dotnet = dotnet,
+    name = name,
+    srcs = srcs,
+    deps = deps,
+    out = out,
+    executable = True
   )
-
-  return archive, executable

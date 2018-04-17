@@ -1,7 +1,6 @@
-'''
-load("//dotnet:csharp.bzl", "csharp_library")
+load("@io_bazel_rules_dotnet//dotnet/private:rules/library.bzl", "dotnet_library")
 
-csharp_library(
+dotnet_library(
     name = "TransitiveClass",
     srcs = [
         "Properties/AssemblyInfo.cs",
@@ -9,4 +8,3 @@ csharp_library(
     ],
     visibility = ["//visibility:public"],
 )
-'''

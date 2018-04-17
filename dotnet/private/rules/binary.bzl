@@ -1,0 +1,42 @@
+load(
+    "@io_bazel_rules_dotnet//dotnet/private:context.bzl",
+    "dotnet_context",
+)
+
+load(
+    "@io_bazel_rules_dotnet//dotnet/private:providers.bzl",
+    "DotnetLibrary",
+)
+
+
+def _dotnet_binary_impl(ctx):
+  """dotnet_binary_impl emits actions for compiling dotnet executable assembly."""
+  dotnet = dotnet_context(ctx)
+  name = ctx.label.name
+ 
+  executable = dotnet.binary(dotnet,
+      name = name,
+      srcs = ctx.attr.srcs,
+      deps = ctx.attr.deps,
+      out = ctx.attr.out,
+  )
+  return [
+      DefaultInfo(
+          files = depset([executable.result]),
+          #runfiles = runfiles,
+          executable = executable.result,
+      ),
+  ]
+  
+dotnet_binary = rule(
+    _dotnet_binary_impl,
+    attrs = {
+        "deps": attr.label_list(providers=[DotnetLibrary]),
+        # source files for this target.
+        "srcs": attr.label_list(allow_files = FileType([".cs", ".resx"])),        
+        "out": attr.string(),
+        "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))
+    },
+    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
+    executable = True,
+)

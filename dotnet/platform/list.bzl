@@ -22,7 +22,10 @@ def declare_config_settings():
   for impl in DOTNETIMPL:
     native.config_setting(
         name = impl,
-        constraint_values = ["//dotnet/toolchain:" + impl],
+        #constraint_values = ["//dotnet/toolchain:" + impl],
+        values = {
+            "compilation_mode": impl
+        }
     )
   for os in DOTNETOS:
     native.config_setting(

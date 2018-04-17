@@ -6,3 +6,10 @@ filegroup(
     "bin/*",
   ]),
 )
+
+filegroup(
+  name = "lib",
+  srcs = glob([
+    "lib/**/*",
+  ]),
+)

@@ -12,6 +12,7 @@ load(
     "//dotnet/platform:list.bzl",
     "DOTNETARCH",
     "DOTNETOS",
+    "DOTNETIMPL",
     "DOTNETIMPL_OS_ARCH",
 )
 
@@ -41,34 +42,29 @@ def _generate_toolchains():
 _toolchains = _generate_toolchains()
 
 
-_label_prefix = "@io_bazel_rules_go//go/toolchain:"
+_label_prefix = "@io_bazel_rules_dotnet//dotnet/toolchain:"
 
 def dotnet_register_toolchains(dotnet_version=DEFAULT_VERSION):
-  dotnet_local_sdk(
-      name = "dotnet_sdk",
-      path = "c:/Program Files/mono",
-  )
   """See /dotnet/toolchains.rst#dostnet-register-toolchains for full documentation."""
-  '''
-  if "go_sdk" not in native.existing_rules():
-    if go_version in SDK_REPOSITORIES:
-      go_download_sdk(
-          name = "go_sdk",
-          sdks = SDK_REPOSITORIES[go_version],
+  if "dotnet_download_sdk" not in native.existing_rules() and "dotnet_host_sdk" not in native.existing_rules() and "dotnet_local_sdk" not in native.existing_rules():
+    if dotnet_version in SDK_REPOSITORIES:
+      dotnet_download_sdk(
+          name = "dotnet_sdk",
+          sdks = SDK_REPOSITORIES[dotnet_version],
       )
-    elif go_version == "host":
-      go_host_sdk(
-          name = "go_sdk"
+    elif dotnet_version == "host":
+      dotnet_host_sdk(
+          name = "dotnet_sdk"
       )
     else:
-      fail("Unknown go version {}".format(go_version))
+      fail("Unknown dotnet version {}".format(dotnet_version))
 
   # Use the final dictionaries to register all the toolchains
   for toolchain in _toolchains:
     name = _label_prefix + toolchain["name"]
     native.register_toolchains(name)
 
-'''
+
 def declare_constraints():
   for os, constraint in DOTNETOS.items():
     if constraint:
@@ -92,6 +88,14 @@ def declare_constraints():
           name = arch,
           constraint_setting = "@bazel_tools//platforms:cpu",
       )
+  native.constraint_setting(name = "dotnetimpl")
+  for impl, constraint in DOTNETIMPL.items():
+      native.constraint_value(
+          name = impl,
+          constraint_setting = ":dotnetimpl",
+      )
+
+
   for impl, os, arch in DOTNETIMPL_OS_ARCH:
     native.platform(
         name = impl + "_" + os + "_" + arch,

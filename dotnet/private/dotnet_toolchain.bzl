@@ -15,10 +15,12 @@
 Toolchain rules used by dotnet.
 """
 
+load("@io_bazel_rules_dotnet//dotnet/private:actions/binary.bzl", "emit_binary")
+load("@io_bazel_rules_dotnet//dotnet/private:actions/library.bzl", "emit_library")
+
 '''
 load("@io_bazel_rules_go//go/private:actions/archive.bzl", "emit_archive")
 load("@io_bazel_rules_go//go/private:actions/asm.bzl", "emit_asm")
-load("@io_bazel_rules_go//go/private:actions/binary.bzl", "emit_binary")
 load("@io_bazel_rules_go//go/private:actions/compile.bzl", "emit_compile")
 load("@io_bazel_rules_go//go/private:actions/cover.bzl", "emit_cover")
 load("@io_bazel_rules_go//go/private:actions/link.bzl", "emit_link")
@@ -32,7 +34,8 @@ def _dotnet_toolchain_impl(ctx):
       default_dotnetos = ctx.attr.dotnetos,
       default_dotnetarch = ctx.attr.dotnetarch,
       actions = struct(
-#          pack = emit_pack,
+          binary = emit_binary,
+          library = emit_library,
       ),
       flags = struct(
           compile = (),
@@ -52,9 +55,10 @@ _dotnet_toolchain = rule(
 def dotnet_toolchain(name, host, constraints=[], **kwargs):
   """See dotnet/toolchains.rst#dotnet-toolchain for full documentation."""
 
-  impl, os, arch = host.partition("_")
+  elems = host.split("_")
+  impl, os, arch = elems[0], elems[1], elems[2]
   host_constraints = constraints + [
-    "@io_bazel_rules_dotnet//dotnet/toolchain:" + impl,
+    #"@io_bazel_rules_dotnet//dotnet/toolchain:" + impl,
     "@io_bazel_rules_dotnet//dotnet/toolchain:" + os,
     "@io_bazel_rules_dotnet//dotnet/toolchain:" + arch,
   ]
@@ -73,6 +77,6 @@ def dotnet_toolchain(name, host, constraints=[], **kwargs):
       name = name,
       toolchain_type = "@io_bazel_rules_dotnet//dotnet:toolchain",
       exec_compatible_with = host_constraints,
-      target_compatible_with = host_constraints,
+      #target_compatible_with = host_constraints,
       toolchain = ":"+impl_name,
   )

@@ -1,16 +1,18 @@
-load("@io_bazel_rules_dotnet//dotnet/private:common.bzl", "executable_extension", "bat_extension")
+load("@io_bazel_rules_dotnet//dotnet/private:common.bzl", "executable_extension", "bat_extension", "paths")
 
 def _dotnet_host_sdk_impl(ctx):
   mono, mcs = _detect_host_sdk(ctx)
   _sdk_build_file(ctx)
   bin = ctx.path(mcs).dirname
   ctx.symlink(bin, "bin")
+  lib = paths.join("{}".format(ctx.path(mcs).dirname), "../lib")
+  ctx.symlink(lib, "lib")
+  
 
 dotnet_host_sdk = repository_rule(
     implementation = _dotnet_host_sdk_impl, 
     local=True,
 )
-
 
 def _dotnet_download_sdk_impl(ctx):
   if ctx.os.name == 'linux':
@@ -38,7 +40,10 @@ dotnet_download_sdk = repository_rule(
 
 def _dotnet_local_sdk_impl(ctx):
   _sdk_build_file(ctx)
-  ctx.symlink(ctx.attr.path + "/bin", "bin")
+  bin = paths.join(ctx.attr.path, "/bin")
+  ctx.symlink(bin, "bin")
+  lib = paths.join(ctx.attr.path, "/lib")
+  ctx.symlink(lib, "lib")
 
 dotnet_local_sdk = repository_rule(
     _dotnet_local_sdk_impl,
@@ -46,48 +51,15 @@ dotnet_local_sdk = repository_rule(
         "path": attr.string(),
     },
 )
-'''
-def _go_sdk_impl(ctx):
-  urls = ctx.attr.urls
-  if ctx.attr.url:
-    print("DEPRECATED: use urls instead of url on go_sdk, {}".format(ctx.attr.url))
-    urls = [ctx.attr.url] + urls
-  if urls:
-    if ctx.attr.path:
-      fail("url and path cannot both be set on go_sdk, got {} and {}".format(urls, ctx.attr.path))
-    _sdk_build_file(ctx)
-    _remote_sdk(ctx, urls, ctx.attr.strip_prefix, ctx.attr.sha256)
-  elif ctx.attr.path:
-    print("DEPRECATED: go_sdk with a path, please use go_local_sdk")
-    _sdk_build_file(ctx)
-    _local_sdk(ctx, ctx.attr.path)
-  else:
-    print("DEPRECATED: go_sdk without path or urls, please use go_host_sdk")
-    path = _detect_host_sdk(ctx)
-    _sdk_build_file(ctx)
-    _local_sdk(ctx, path)
-  _prepare(ctx)
 
-go_sdk = repository_rule(
-    implementation = _go_sdk_impl,
-    attrs = {
-        "path": attr.string(),
-        "url": attr.string(),
-        "urls": attr.string_list(),
-        "strip_prefix": attr.string(default = "go"),
-        "sha256": attr.string(),
-    },
-)
-"""See /go/toolchains.rst#go-sdk for full documentation."""
+"""See /dotnet/toolchains.rst#dotnet-sdk for full documentation."""
 
-'''
 def _remote_sdk(ctx, urls, strip_prefix, sha256):
   ctx.download_and_extract(
       url = urls,
       stripPrefix = strip_prefix,
       sha256 = sha256,
   )
-
 def _sdk_build_file(ctx):
   ctx.file("ROOT")
   ctx.template("BUILD.bazel",

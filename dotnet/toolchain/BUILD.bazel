@@ -10,9 +10,3 @@ declare_toolchains()
 
 declare_constraints()
 
-genrule(
-    name="test",
-    srcs=["@dotnet_sdk//:bin"],
-    outs=["ala.txt"],
-    cmd="echo rule"
-)
