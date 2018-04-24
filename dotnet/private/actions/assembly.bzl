@@ -13,8 +13,8 @@ def _map_dep(deps):
   return [d[DotnetLibrary].result for d in deps]
 
 
-def _make_runner_arglist(ctx, deps, output, executable):
-  args = ctx.actions.args()
+def _make_runner_arglist(dotnet, deps, output, executable):
+  args = dotnet.actions.args()
 
   # /out:<file>
   args.add(format="/out:%s", value=output.path)
@@ -27,8 +27,9 @@ def _make_runner_arglist(ctx, deps, output, executable):
   # /target (exe for binary, library for lib, module for module)
   args.add(format="/target:%s", value=target)
 
-  # /fullpaths
   args.add("/fullpaths")
+  args.add("/noconfig")
+  args.add("/nostdlib")
 
   # /warn
   #args.add(format="/warn:%s", value=str(ctx.attr.warn))
@@ -47,6 +48,9 @@ def _make_runner_arglist(ctx, deps, output, executable):
   # /reference:filename[,filename2]
   if deps and len(deps)>0:
     args.add(format="/reference:%s", value=deps, map_fn=_map_dep)
+
+  args.add(format="/reference:%s", value=dotnet.stdlib)
+
   #if depinfo.refs or extra_refs:
   #  args.add(format="/reference:%s", value=depinfo.refs + extra_refs)
   #else:
@@ -116,7 +120,7 @@ def emit_assembly(dotnet,
   dotnet.actions.write(output = paramfile, content = runner_args)
 
   dotnet.actions.run(
-      inputs = attr_srcs + [paramfile] + _map_dep(deps),
+      inputs = attr_srcs + [paramfile] + _map_dep(deps) + [dotnet.stdlib],
       outputs = [result],
       executable = dotnet.runner,
       arguments = [dotnet.mcs.path, "@"+paramfile.path],

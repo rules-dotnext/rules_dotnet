@@ -34,6 +34,17 @@ def _get_dotnet_mcs(context_data):
     return f
   fail("Could not find mcs.exe in dotnet_sdk (bin, lib")
 
+def _get_dotnet_stdlib(context_data):
+  for f in context_data._lib.files:
+    basename = paths.basename(f.path)
+    if basename != "mscorlib.dll":
+      continue
+    dirname = paths.dirname(f.path)
+    if dirname.find("4.7-api")==-1:
+      continue
+    return f
+  fail("Could not find mscorlib in dotnet_sdk (lib)")
+
 def _declare_file(dotnet, path):
   return dotnet.actions.declare_file(path)
 
@@ -59,17 +70,19 @@ def dotnet_context(ctx, attr=None):
     ext = ".exe"
   runner = _get_dotnet_runner(context_data, ext)
   mcs = _get_dotnet_mcs(context_data)
+  stdlib = _get_dotnet_stdlib(context_data)
 
   return DotnetContext(
       # Fields
       label = ctx.label,
       toolchain = toolchain,
       actions = ctx.actions,
-      binary = toolchain.actions.binary,      
+      binary = toolchain.actions.binary,  
       library = toolchain.actions.library,
       exe_extension = ext,
       runner = runner,
       mcs = mcs,
+      stdlib = stdlib,
       declare_file = _declare_file,
       new_library = _new_library,
   )
