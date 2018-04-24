@@ -13,15 +13,15 @@ load(
 DotnetContext = provider()
 
 def _get_dotnet_runner(context_data, ext):
-  for f in context_data._bin.files:
+  for f in context_data._mono_bin.files:
     basename = paths.basename(f.path)
     if basename != "mono" + ext:
       continue
     return f
-  fail("Could not find mono executable in dotnet_sdk (bin)")
+  fail("Could not find mono executable in dotnet_sdk (mono_bin)")
 
 def _get_dotnet_mcs(context_data):
-  for f in context_data._bin.files:
+  for f in context_data._mcs_bin.files:
     basename = paths.basename(f.path)
     if basename != "mcs.exe":
       continue
@@ -32,7 +32,7 @@ def _get_dotnet_mcs(context_data):
     if basename != "mcs.exe":
       continue
     return f
-  fail("Could not find mcs.exe in dotnet_sdk (bin, lib")
+  fail("Could not find mcs.exe in dotnet_sdk (mcs_bin, lib")
 
 def _get_dotnet_stdlib(context_data):
   for f in context_data._lib.files:
@@ -43,20 +43,20 @@ def _get_dotnet_stdlib(context_data):
     if dirname.find("4.7-api")==-1:
       continue
     return f
-  fail("Could not find mscorlib in dotnet_sdk (lib)")
+  fail("Could not find mscorlib in dotnet_sdk (lib, 4.7.1-api)")
 
 def _declare_file(dotnet, path):
   return dotnet.actions.declare_file(path)
 
 
-def _new_library(dotnet, name=None, deps=None, **kwargs):
+def _new_library(dotnet, name=None, deps=None, transitive=None, **kwargs):
   return DotnetLibrary(
       name = dotnet.label.name if not name else name,
       label = dotnet.label,
       deps = deps,
+      transitive = transitive,
       **kwargs
   )
-
 
 def dotnet_context(ctx, attr=None):
   toolchain = ctx.toolchains["@io_bazel_rules_dotnet//dotnet:toolchain"]
@@ -85,20 +85,27 @@ def dotnet_context(ctx, attr=None):
       stdlib = stdlib,
       declare_file = _declare_file,
       new_library = _new_library,
+      workspace_name = ctx.workspace_name,
+      _ctx = ctx
   )
 
 def _dotnet_context_data(ctx):
   return struct(
-      _bin = ctx.attr._bin,
+      _mcs_bin = ctx.attr._mcs_bin,
+      _mono_bin = ctx.attr._mono_bin,
       _lib = ctx.attr._lib
   )
 
 dotnet_context_data = rule(
     _dotnet_context_data,
     attrs = {
-        "_bin": attr.label(
+        "_mcs_bin": attr.label(
             allow_files = True,
-            default="@dotnet_sdk//:bin",
+            default="@dotnet_sdk//:mcs_bin",
+        ),
+        "_mono_bin": attr.label(
+            allow_files = True,
+            default="@dotnet_sdk//:mono_bin",
         ),
         "_lib": attr.label(
             allow_files = True,

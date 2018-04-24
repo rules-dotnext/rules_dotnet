@@ -8,6 +8,10 @@ load(
     "DotnetLibrary",
 )
 
+load(
+    "@io_bazel_rules_dotnet//dotnet/private:rules/launcher_gen.bzl",
+    "dotnet_launcher_gen",
+)
 
 def _dotnet_binary_impl(ctx):
   """dotnet_binary_impl emits actions for compiling dotnet executable assembly."""
@@ -20,23 +24,38 @@ def _dotnet_binary_impl(ctx):
       deps = ctx.attr.deps,
       out = ctx.attr.out,
   )
+
+  transitive_files = [d.result for d in executable.transitive.to_list()]
+
   return [
       DefaultInfo(
           files = depset([executable.result]),
-          #runfiles = runfiles,
+          runfiles = ctx.runfiles(files = [dotnet.stdlib, dotnet.runner], transitive_files=depset(direct=transitive_files)),
           executable = executable.result,
       ),
   ]
   
-dotnet_binary = rule(
+_dotnet_binary = rule(
     _dotnet_binary_impl,
     attrs = {
         "deps": attr.label_list(providers=[DotnetLibrary]),
         # source files for this target.
         "srcs": attr.label_list(allow_files = FileType([".cs", ".resx"])),        
         "out": attr.string(),
-        "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))
+        "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data")),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
     executable = True,
 )
+
+def dotnet_binary(name, deps, srcs, out = None):
+    _dotnet_binary(name = "%s_exe" % name, deps = deps, srcs = srcs, out = out)
+    exe = ":%s_exe" % name
+    dotnet_launcher_gen(name = "%s_launcher" % name, exe = exe)
+
+    native.cc_binary(
+        name=name, 
+        srcs = [":%s_launcher" % name],
+        deps = ["@io_bazel_rules_dotnet//dotnet/tools/runner:lib"],
+        data = [exe],
+    )

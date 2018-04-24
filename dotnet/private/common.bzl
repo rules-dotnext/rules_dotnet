@@ -1,4 +1,5 @@
 load("//dotnet/private:skylib/lib/paths.bzl", "paths")
+load("//dotnet/private:skylib/lib/sets.bzl", "sets")
 
 
 def executable_extension(ctx):

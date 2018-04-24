@@ -1,6 +1,7 @@
 load(
     "@io_bazel_rules_dotnet//dotnet/private:common.bzl",
     "as_iterable",
+    "sets"
 )
 
 load(
@@ -45,7 +46,6 @@ def _make_runner_arglist(dotnet, deps, output, executable):
   #if libdirs:
   #  args.add(format="/lib:%s", value=libdirs)
 
-  # /reference:filename[,filename2]
   if deps and len(deps)>0:
     args.add(format="/reference:%s", value=deps, map_fn=_map_dep)
 
@@ -119,12 +119,22 @@ def emit_assembly(dotnet,
 
   dotnet.actions.write(output = paramfile, content = runner_args)
 
+  deps_files = _map_dep(deps)
   dotnet.actions.run(
-      inputs = attr_srcs + [paramfile] + _map_dep(deps) + [dotnet.stdlib],
+      inputs = attr_srcs + [paramfile] + deps_files + [dotnet.stdlib],
       outputs = [result],
       executable = dotnet.runner,
       arguments = [dotnet.mcs.path, "@"+paramfile.path],
       progress_message = (
           "Compiling " + dotnet.label.package + ":" + dotnet.label.name))
 
-  return dotnet.new_library(dotnet = dotnet, name = name, deps = deps, result = result)
+  deps_libraries = [d[DotnetLibrary] for d in deps]
+  transitive = sets.union(deps_libraries, *[a[DotnetLibrary].transitive for a in deps])
+
+  return dotnet.new_library(
+    dotnet = dotnet, 
+    name = name, 
+    deps = deps, 
+    transitive = transitive,
+    result = result)
+

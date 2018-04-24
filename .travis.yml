@@ -19,6 +19,7 @@ before_install:
   - |
     if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
       OS=darwin
+      brew install mono
     else
       sysctl kernel.unprivileged_userns_clone=1
       sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
@@ -52,18 +53,17 @@ before_install:
 
 script:
   - |
-    echo $RULES_DOTNET_USE_LOCAL_MONO 
     bazel \
       --output_base=$HOME/.cache/bazel \
       --batch \
       --host_jvm_args=-Xmx500m \
       --host_jvm_args=-Xms500m \
-      test \
+      run \
       -s \
       --config=ci \
       --experimental_repository_cache="$HOME/.bazel_repository_cache" \
       --local_resources=400,1,1.0 \
       --test_tag_filters=-dev \
-      //...
+      //examples/example_binary:hello
 notifications:
   email: false
