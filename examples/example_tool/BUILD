@@ -1,7 +1,6 @@
-'''
-load("//dotnet:csharp.bzl", "csharp_binary")
+load("@io_bazel_rules_dotnet//dotnet/private:rules/binary.bzl", "dotnet_binary")
 
-csharp_binary(
+dotnet_binary(
     name = "hello_tool",
     srcs = [
         "MyTool.cs",
@@ -33,4 +32,3 @@ genrule(
     ],
     cmd = "$(location :hello_tool) $(OUTS)",
 )
-'''

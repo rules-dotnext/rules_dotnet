@@ -40,10 +40,10 @@ def _get_dotnet_stdlib(context_data):
     if basename != "mscorlib.dll":
       continue
     dirname = paths.dirname(f.path)
-    if dirname.find("4.7-api")==-1:
+    if dirname.find(context_data._libVersion)==-1:
       continue
     return f
-  fail("Could not find mscorlib in dotnet_sdk (lib, 4.7.1-api)")
+  fail("Could not find mscorlib in dotnet_sdk (lib, %s)" % context_data._libVersion)
 
 def _declare_file(dotnet, path):
   return dotnet.actions.declare_file(path)
@@ -86,6 +86,8 @@ def dotnet_context(ctx, attr=None):
       declare_file = _declare_file,
       new_library = _new_library,
       workspace_name = ctx.workspace_name,
+      libVersion = context_data._libVersion,
+      lib = context_data._lib,
       _ctx = ctx
   )
 
@@ -93,7 +95,8 @@ def _dotnet_context_data(ctx):
   return struct(
       _mcs_bin = ctx.attr._mcs_bin,
       _mono_bin = ctx.attr._mono_bin,
-      _lib = ctx.attr._lib
+      _lib = ctx.attr._lib,
+      _libVersion = ctx.attr._libVersion,
   )
 
 dotnet_context_data = rule(
@@ -110,6 +113,9 @@ dotnet_context_data = rule(
         "_lib": attr.label(
             allow_files = True,
             default="@dotnet_sdk//:lib",
+        ),
+        "_libVersion": attr.string(
+            default="4.7-api",
         ),
     },
 )

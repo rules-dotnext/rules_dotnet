@@ -7,6 +7,7 @@ namespace example_tool
     {
         public static void Main(string[] args)
         {
+            Console.WriteLine("Invoked");
             if (args.Length == 0) {
                 Console.Error.WriteLine("No output files specified!");
                 Environment.Exit(1);
@@ -14,6 +15,7 @@ namespace example_tool
 
             var mc = new MyClass();
             foreach (string output_file in args) {
+                Console.WriteLine("Generating {0}", output_file);
                 System.IO.File.WriteAllText(output_file, mc.Message);
             }
         }
