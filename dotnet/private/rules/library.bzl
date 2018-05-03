@@ -19,6 +19,8 @@ def _dotnet_library_impl(ctx):
       srcs = ctx.attr.srcs,
       deps = ctx.attr.deps,
       out = ctx.attr.out,
+      defines = ctx.attr.defines,
+
   )
   return [
       library,
@@ -34,6 +36,7 @@ dotnet_library = rule(
         # source files for this target.
         "srcs": attr.label_list(allow_files = FileType([".cs", ".resx"])),        
         "out": attr.string(),
+        "defines": attr.string_list(),
         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],

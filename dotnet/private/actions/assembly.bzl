@@ -14,7 +14,7 @@ def _map_dep(deps):
   return [d[DotnetLibrary].result for d in deps]
 
 
-def _make_runner_arglist(dotnet, deps, output, executable):
+def _make_runner_arglist(dotnet, deps, output, executable, defines):
   args = dotnet.actions.args()
 
   # /out:<file>
@@ -51,6 +51,10 @@ def _make_runner_arglist(dotnet, deps, output, executable):
 
   args.add(format="/reference:%s", value=dotnet.stdlib)
 
+  if defines and len(defines)>0:
+    args.add(format="/define:%s", value=defines)
+
+
   #if depinfo.refs or extra_refs:
   #  args.add(format="/reference:%s", value=depinfo.refs + extra_refs)
   #else:
@@ -84,7 +88,8 @@ def emit_assembly(dotnet,
     srcs = None,
     deps = None,
     out = None,
-    executable = True):
+    executable = True,
+    defines = None):
   """See dotnet/toolchains.rst#binary for full documentation."""
 
   if name == "" and out == None:
@@ -99,7 +104,7 @@ def emit_assembly(dotnet,
   else:
     result = dotnet.declare_file(dotnet, path=out)  
     
-  runner_args = _make_runner_arglist(dotnet, deps, result, executable)
+  runner_args = _make_runner_arglist(dotnet, deps, result, executable, defines)
 
   attr_srcs = [f for t in srcs for f in as_iterable(t.files)]
   runner_args.add(attr_srcs)

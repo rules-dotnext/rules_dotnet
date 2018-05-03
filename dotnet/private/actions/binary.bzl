@@ -7,7 +7,8 @@ def emit_binary(dotnet,
     name = "",
     srcs = None,
     deps = None,
-    out = None):
+    out = None,
+    defines = None):
 
   return emit_assembly(
     dotnet = dotnet,
@@ -15,5 +16,6 @@ def emit_binary(dotnet,
     srcs = srcs,
     deps = deps,
     out = out,
-    executable = True
+    executable = True,
+    defines = defines,
   )

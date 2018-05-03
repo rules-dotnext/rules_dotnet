@@ -23,6 +23,7 @@ def _dotnet_binary_impl(ctx):
       srcs = ctx.attr.srcs,
       deps = ctx.attr.deps,
       out = ctx.attr.out,
+      defines = ctx.attr.defines,
   )
 
   transitive_files = [d.result for d in executable.transitive.to_list()]
@@ -42,14 +43,15 @@ _dotnet_binary = rule(
         # source files for this target.
         "srcs": attr.label_list(allow_files = FileType([".cs", ".resx"])),        
         "out": attr.string(),
+        "defines": attr.string_list(),
         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data")),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
     executable = True,
 )
 
-def dotnet_binary(name, deps, srcs, out = None):
-    _dotnet_binary(name = "%s_exe" % name, deps = deps, srcs = srcs, out = out)
+def dotnet_binary(name, deps, srcs, defines = None, out = None):
+    _dotnet_binary(name = "%s_exe" % name, deps = deps, srcs = srcs, out = out, defines = defines)
     exe = ":%s_exe" % name
     dotnet_launcher_gen(name = "%s_launcher" % name, exe = exe)
 
