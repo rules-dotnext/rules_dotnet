@@ -32,7 +32,22 @@ def _get_dotnet_mcs(context_data):
     if basename != "mcs.exe":
       continue
     return f
-  fail("Could not find mcs.exe in dotnet_sdk (mcs_bin, lib")
+  fail("Could not find mcs.exe in dotnet_sdk (mcs_bin, lib)")
+
+def _get_dotnet_resgen(context_data):
+  for f in context_data._mcs_bin.files:
+    basename = paths.basename(f.path)
+    if basename != "resgen.exe":
+      continue
+    return f
+
+  for f in context_data._lib.files:
+    basename = paths.basename(f.path)
+    if basename != "resgen.exe":
+      continue
+    return f
+
+  fail("Could not find resgen.exe in dotnet_sdk (mcs_bin, lib)")
 
 def _get_dotnet_stdlib(context_data):
   for f in context_data._lib.files:
@@ -71,6 +86,7 @@ def dotnet_context(ctx, attr=None):
   runner = _get_dotnet_runner(context_data, ext)
   mcs = _get_dotnet_mcs(context_data)
   stdlib = _get_dotnet_stdlib(context_data)
+  resgen = _get_dotnet_resgen(context_data)
 
   return DotnetContext(
       # Fields
@@ -83,6 +99,7 @@ def dotnet_context(ctx, attr=None):
       runner = runner,
       mcs = mcs,
       stdlib = stdlib,
+      resgen = resgen,
       declare_file = _declare_file,
       new_library = _new_library,
       workspace_name = ctx.workspace_name,
