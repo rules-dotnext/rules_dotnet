@@ -1,4 +1,5 @@
 load("@io_bazel_rules_dotnet//dotnet/private:rules/library.bzl", "dotnet_library")
+load("@io_bazel_rules_dotnet//dotnet/private:rules/resx.bzl", "dotnet_resx")
 
 dotnet_library(
     name = "nunit.core.interfaces",
@@ -45,6 +46,11 @@ dotnet_library(
         ":nunit.core.interfaces",
         ":nunit.core",
     ]
+)
+
+dotnet_resx(
+    name = "Transform",
+    src = "//dotnet/externals/nunit2/nunitv2:src/ClientUtilities/util/Transform.resx",
 )
 
 filegroup(

@@ -34,7 +34,7 @@ dotnet_library = rule(
     attrs = {
         "deps": attr.label_list(providers=[DotnetLibrary]),
         # source files for this target.
-        "srcs": attr.label_list(allow_files = FileType([".cs", ".resx"])),        
+        "srcs": attr.label_list(allow_files = FileType([".cs"])),        
         "out": attr.string(),
         "defines": attr.string_list(),
         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))

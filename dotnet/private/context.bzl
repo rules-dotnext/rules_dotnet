@@ -95,6 +95,7 @@ def dotnet_context(ctx, attr=None):
       actions = ctx.actions,
       binary = toolchain.actions.binary,  
       library = toolchain.actions.library,
+      resx = toolchain.actions.resx,
       exe_extension = ext,
       runner = runner,
       mcs = mcs,

@@ -17,16 +17,8 @@ Toolchain rules used by dotnet.
 
 load("@io_bazel_rules_dotnet//dotnet/private:actions/binary.bzl", "emit_binary")
 load("@io_bazel_rules_dotnet//dotnet/private:actions/library.bzl", "emit_library")
+load("@io_bazel_rules_dotnet//dotnet/private:actions/resx.bzl", "emit_resx")
 
-'''
-load("@io_bazel_rules_go//go/private:actions/archive.bzl", "emit_archive")
-load("@io_bazel_rules_go//go/private:actions/asm.bzl", "emit_asm")
-load("@io_bazel_rules_go//go/private:actions/compile.bzl", "emit_compile")
-load("@io_bazel_rules_go//go/private:actions/cover.bzl", "emit_cover")
-load("@io_bazel_rules_go//go/private:actions/link.bzl", "emit_link")
-load("@io_bazel_rules_go//go/private:actions/pack.bzl", "emit_pack")
-
-'''
 def _dotnet_toolchain_impl(ctx):
   return [platform_common.ToolchainInfo(
       name = ctx.label.name,
@@ -36,6 +28,7 @@ def _dotnet_toolchain_impl(ctx):
       actions = struct(
           binary = emit_binary,
           library = emit_library,
+          resx = emit_resx,
       ),
       flags = struct(
           compile = (),
