@@ -10,6 +10,7 @@ load(
 
 _TEMPLATE = """
 const char * Exe = "{}";
+const char * Nunit = "{}";
 """
 
 def _dotnet_launcher_gen_impl(ctx):
@@ -17,9 +18,12 @@ def _dotnet_launcher_gen_impl(ctx):
   dotnet = dotnet_context(ctx)
   name = ctx.label.name
   exe = ctx.attr.exe.files.to_list()[0]
-
+  nunit = ""
+  if ctx.attr.nunit:
+    nunit = ctx.attr.nunit.files.to_list()[0].path
+  
   generated_file = dotnet.declare_file(dotnet, "generated.c")
-  content = _TEMPLATE.format(exe.path)
+  content = _TEMPLATE.format(exe.path, nunit)
   dotnet.actions.write(output = generated_file, content = content, is_executable=False)
 
   return [
@@ -32,6 +36,7 @@ dotnet_launcher_gen = rule(
     _dotnet_launcher_gen_impl,
     attrs = {
         "exe": attr.label(),
+        "nunit": attr.label(),
         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data")),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],

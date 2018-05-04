@@ -24,10 +24,14 @@ def _dotnet_library_impl(ctx):
       defines = ctx.attr.defines,
 
   )
+
+  transitive_files = [d.result for d in library.transitive.to_list()]
+
   return [
       library,
       DefaultInfo(
           files = depset([library.result]),
+          runfiles = ctx.runfiles(files = [dotnet.stdlib, library.result], transitive_files=depset(direct=transitive_files)),
       ),
   ]
   

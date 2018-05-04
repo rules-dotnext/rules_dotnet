@@ -54,29 +54,32 @@ before_install:
 script:
   - |
     bazel \
-      --output_base=$HOME/.cache/bazel \
       --batch \
       --host_jvm_args=-Xmx500m \
       --host_jvm_args=-Xms500m \
       build \
       -s \
-      --config=ci \
-      --experimental_repository_cache="$HOME/.bazel_repository_cache" \
       --local_resources=400,1,1.0 \
-      --test_tag_filters=-dev \
       //...
   - |
     bazel \
-      --output_base=$HOME/.cache/bazel \
       --batch \
       --host_jvm_args=-Xmx500m \
       --host_jvm_args=-Xms500m \
       run \
       -s \
-      --config=ci \
-      --experimental_repository_cache="$HOME/.bazel_repository_cache" \
       --local_resources=400,1,1.0 \
-      --test_tag_filters=-dev \
       //examples/example_binary:hello
+  - |
+    bazel \
+      --batch \
+      --host_jvm_args=-Xmx500m \
+      --host_jvm_args=-Xms500m \
+      test \
+      -s \
+      --local_resources=400,1,1.0 \
+      --test_summary=detailed \
+      --test_output=all \
+      //...
 notifications:
   email: false
