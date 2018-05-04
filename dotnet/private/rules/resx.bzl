@@ -8,14 +8,16 @@ def _dotnet_resx_impl(ctx):
   dotnet = dotnet_context(ctx)
   name = ctx.label.name
  
-  result = dotnet.resx(dotnet,
+  resource = dotnet.resx(dotnet,
       name = name,
       src = ctx.attr.src,
+      identifier = ctx.attr.identifier,
       out = ctx.attr.out,
   )
   return [
+      resource,
       DefaultInfo(
-          files = depset([result]),
+          files = depset([resource.result]),
       ),
   ]
   
@@ -24,6 +26,7 @@ dotnet_resx = rule(
     attrs = {
         # source files for this target.
         "src": attr.label(allow_files = FileType([".resx"])),        
+        "identifier": attr.string(),
         "out": attr.string(),
         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))
     },

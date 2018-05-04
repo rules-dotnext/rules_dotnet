@@ -36,6 +36,7 @@ dotnet_library(
 dotnet_library(
     name = "nunit.util",
     srcs = [":NUnitCore_core_files"],
+    resources = [":Transform"],
     defines = ["CLR_4_0"],
     visibility = ["//visibility:public"],
     deps = [

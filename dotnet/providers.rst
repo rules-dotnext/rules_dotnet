@@ -54,3 +54,16 @@ This represents a compile dotnet binary.
 | library and all ``deps`` members transitively reachable through ``deps``.                        |
 +--------------------------------+-----------------------------------------------------------------+
 
+DotnetResource
+~~~~~~~~~~~~~
+
+DotnetResource is a provider that exposes a compiled resource (.resources file).
+
++--------------------------------+-----------------------------------------------------------------+
+| **Name**                       | **Type**                                                        |
++--------------------------------+-----------------------------------------------------------------+
+| :param:`identifer`             | :type:`string`                                                  |
++--------------------------------+-----------------------------------------------------------------+
+| The logical name for the resource; the name that is used to load the resource.                   | 
+| The default is the basename of the file name (no subfolder).                                     |
++--------------------------------+-----------------------------------------------------------------+

@@ -26,6 +26,7 @@ def _make_runner_arglist(dotnet, source, output):
 def emit_resx(dotnet,
     name = "",
     src = None,
+    identifier = None,
     out = None):
 
   if name == "" and out == None:
@@ -56,5 +57,9 @@ def emit_resx(dotnet,
       progress_message = (
           "Compiling resoources" + dotnet.label.package + ":" + dotnet.label.name))
 
-  return result
+  return dotnet.new_resource(
+    dotnet = dotnet, 
+    name = name, 
+    result = result,
+    identifier = identifier)
 

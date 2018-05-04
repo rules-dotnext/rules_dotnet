@@ -1,6 +1,7 @@
 load(
     "@io_bazel_rules_dotnet//dotnet/private:providers.bzl",
     "DotnetLibrary",
+    "DotnetResource",
 )
 
 load(
@@ -73,6 +74,15 @@ def _new_library(dotnet, name=None, deps=None, transitive=None, **kwargs):
       **kwargs
   )
 
+def _new_resource(dotnet, name, result, identifier=None, **kwargs):
+  return DotnetResource(
+      name = name,
+      label = dotnet.label,
+      result = result,
+      identifier = result.basename if not identifier else identifier,
+      **kwargs
+  )
+
 def dotnet_context(ctx, attr=None):
   toolchain = ctx.toolchains["@io_bazel_rules_dotnet//dotnet:toolchain"]
 
@@ -103,6 +113,7 @@ def dotnet_context(ctx, attr=None):
       resgen = resgen,
       declare_file = _declare_file,
       new_library = _new_library,
+      new_resource = _new_resource,
       workspace_name = ctx.workspace_name,
       libVersion = context_data._libVersion,
       lib = context_data._lib,

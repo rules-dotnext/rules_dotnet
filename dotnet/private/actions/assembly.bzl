@@ -7,14 +7,17 @@ load(
 load(
     "@io_bazel_rules_dotnet//dotnet/private:providers.bzl",
     "DotnetLibrary",
+    "DotnetResource",
 )
 
 
 def _map_dep(deps):
   return [d[DotnetLibrary].result for d in deps]
 
+def _map_resource(resources):
+  return [d[DotnetResource].result.path + "," + d[DotnetResource].identifier for d in resources]
 
-def _make_runner_arglist(dotnet, deps, output, executable, defines):
+def _make_runner_arglist(dotnet, deps, resources, output, executable, defines):
   args = dotnet.actions.args()
 
   # /out:<file>
@@ -54,16 +57,6 @@ def _make_runner_arglist(dotnet, deps, output, executable, defines):
   if defines and len(defines)>0:
     args.add(format="/define:%s", value=defines)
 
-
-  #if depinfo.refs or extra_refs:
-  #  args.add(format="/reference:%s", value=depinfo.refs + extra_refs)
-  #else:
-  #  args.add(extra_refs)
-
-  # /doc
-  #if hasattr(ctx.outputs, "doc_xml"):
-  #  args.add(format="/doc:%s", value=ctx.outputs.doc_xml.path)
-
   # /debug
   #debug = ctx.var.get("BINMODE", "") == "-dbg"
   #if debug:
@@ -71,6 +64,10 @@ def _make_runner_arglist(dotnet, deps, output, executable, defines):
 
   # /warnaserror
   # TODO(jeremy): /define:name[;name2]
+
+  if resources and len(resources)>0:
+    args.add(format="/resource:%s", value=resources, map_fn=_map_resource)
+
   # TODO(jeremy): /resource:filename[,identifier[,accesibility-modifier]]
 
   # /main:class
@@ -88,6 +85,7 @@ def emit_assembly(dotnet,
     srcs = None,
     deps = None,
     out = None,
+    resources = None,
     executable = True,
     defines = None):
   """See dotnet/toolchains.rst#binary for full documentation."""
@@ -104,7 +102,7 @@ def emit_assembly(dotnet,
   else:
     result = dotnet.declare_file(dotnet, path=out)  
     
-  runner_args = _make_runner_arglist(dotnet, deps, result, executable, defines)
+  runner_args = _make_runner_arglist(dotnet, deps, resources, result, executable, defines)
 
   attr_srcs = [f for t in srcs for f in as_iterable(t.files)]
   runner_args.add(attr_srcs)

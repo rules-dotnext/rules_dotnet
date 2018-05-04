@@ -6,6 +6,7 @@ load(
 load(
     "@io_bazel_rules_dotnet//dotnet/private:providers.bzl",
     "DotnetLibrary",
+    "DotnetResource",
 )
 
 
@@ -18,6 +19,7 @@ def _dotnet_library_impl(ctx):
       name = name,
       srcs = ctx.attr.srcs,
       deps = ctx.attr.deps,
+      resources = ctx.attr.resources,
       out = ctx.attr.out,
       defines = ctx.attr.defines,
 
@@ -33,7 +35,7 @@ dotnet_library = rule(
     _dotnet_library_impl,
     attrs = {
         "deps": attr.label_list(providers=[DotnetLibrary]),
-        # source files for this target.
+        "resources": attr.label_list(providers=[DotnetResource]),
         "srcs": attr.label_list(allow_files = FileType([".cs"])),        
         "out": attr.string(),
         "defines": attr.string_list(),
