@@ -1,4 +1,5 @@
 load("@io_bazel_rules_dotnet//dotnet/private:rules/library.bzl", "dotnet_library")
+load("@io_bazel_rules_dotnet//dotnet/private:rules/binary.bzl", "dotnet_binary")
 load("@io_bazel_rules_dotnet//dotnet/private:rules/resx.bzl", "dotnet_resx")
 
 dotnet_library(
@@ -35,7 +36,7 @@ dotnet_library(
 
 dotnet_library(
     name = "nunit.util",
-    srcs = [":NUnitCore_core_files"],
+    srcs = [":ClientUtilities_util_files"],
     resources = [":Transform"],
     defines = ["CLR_4_0"],
     visibility = ["//visibility:public"],
@@ -44,6 +45,7 @@ dotnet_library(
         "//dotnet/stdlib:System.Configuration.dll",
         "//dotnet/stdlib:System.Runtime.Remoting.dll",
         "//dotnet/stdlib:System.Drawing.dll",
+        "//dotnet/stdlib:System.Xml.dll",
         ":nunit.core.interfaces",
         ":nunit.core",
     ]
@@ -53,6 +55,32 @@ dotnet_resx(
     name = "Transform",
     src = "//dotnet/externals/nunit2/nunitv2:src/ClientUtilities/util/Transform.resx",
 )
+
+dotnet_library(
+    name = "nunit-console-runner",
+    srcs = [":ConsoleRunner_nunit_console_files"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//dotnet/stdlib:System.dll",
+        "//dotnet/stdlib:System.Xml.dll",
+        "//dotnet/stdlib:System.Drawing.dll",
+        ":nunit.core.interfaces",
+        ":nunit.core",
+        ":nunit.util",
+    ]
+)
+
+dotnet_binary(
+    name = "nunit-console-runner-exe",
+    srcs = [":ConsoleRunner_nunit_console_exe_files"],
+    deps = [
+        "//dotnet/stdlib:System.dll",
+        ":nunit-console-runner",
+        ":nunit.core",
+        ":nunit.util",
+    ]
+)
+
 
 filegroup(
   name = "common_assembly_info_files",
@@ -444,5 +472,23 @@ filegroup(
     "//dotnet/externals/nunit2/nunitv2:src/ClientUtilities/util/Services/ServiceManager.cs",
     "//dotnet/externals/nunit2/nunitv2:src/ClientUtilities/util/Services/SettingsService.cs",
     "//dotnet/externals/nunit2/nunitv2:src/ClientUtilities/util/Services/TestAgency.cs",
+  ]
+)
+
+filegroup(
+  name = "ConsoleRunner_nunit_console_files",
+  srcs = [":common_assembly_info_files",
+    "//dotnet/externals/nunit2/nunitv2:src/ConsoleRunner/nunit-console/ConsoleOptions.cs",
+    "//dotnet/externals/nunit2/nunitv2:src/ConsoleRunner/nunit-console/ConsoleUi.cs",
+    "//dotnet/externals/nunit2/nunitv2:src/ConsoleRunner/nunit-console/EventCollector.cs",
+    "//dotnet/externals/nunit2/nunitv2:src/ConsoleRunner/nunit-console/Runner.cs",
+    "//dotnet/externals/nunit2/nunitv2:src/ConsoleRunner/nunit-console/TestNameParser.cs",
+  ]
+)
+
+filegroup(
+  name = "ConsoleRunner_nunit_console_exe_files",
+  srcs = [":common_assembly_info_files",
+    "//dotnet/externals/nunit2/nunitv2:src/ConsoleRunner/nunit-console-exe/Class1.cs",
   ]
 )
