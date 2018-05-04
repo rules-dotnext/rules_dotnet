@@ -124,7 +124,7 @@ def emit_assembly(dotnet,
 
   deps_files = _map_dep(deps)
   dotnet.actions.run(
-      inputs = attr_srcs + [paramfile] + deps_files + [dotnet.stdlib],
+      inputs = attr_srcs + [paramfile] + deps_files + [dotnet.stdlib] + [r[DotnetResource].result for r in resources],
       outputs = [result],
       executable = dotnet.runner,
       arguments = [dotnet.mcs.path, "@"+paramfile.path],
