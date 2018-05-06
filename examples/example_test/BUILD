@@ -1,4 +1,4 @@
-load("@io_bazel_rules_dotnet//dotnet/private:rules/test.bzl", "dotnet_nunit_test")
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_nunit_test")
 
 dotnet_nunit_test(
     name = "MyTest",

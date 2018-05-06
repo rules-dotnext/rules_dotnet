@@ -1,8 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@io_bazel_rules_dotnet//dotnet/private:rules/library.bzl", "dotnet_library")
-load("@io_bazel_rules_dotnet//dotnet/private:rules/binary.bzl", "dotnet_binary")
-load("@io_bazel_rules_dotnet//dotnet/private:rules/resx.bzl", "dotnet_resx")
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_library", "dotnet_binary", "dotnet_resx")
 
 dotnet_library(
     name = "nunit.core.interfaces",

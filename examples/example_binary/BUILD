@@ -1,4 +1,4 @@
-load("@io_bazel_rules_dotnet//dotnet/private:rules/binary.bzl", "dotnet_binary")
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_binary")
 
 dotnet_binary(
     name = "hello",
