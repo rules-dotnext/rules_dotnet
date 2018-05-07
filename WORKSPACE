@@ -17,7 +17,7 @@ load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_import_library")
 
 dotnet_import_library(
     name = "npgsqllib",
-    src = "lib/net451/npgsql.dll"
+    src = "lib/net451/Npgsql.dll"
 )    
     """
 )
