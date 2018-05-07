@@ -41,3 +41,13 @@ load(
     dotnet_nunit_test = "dotnet_nunit_test"
 )
 
+load(
+    "@io_bazel_rules_dotnet//dotnet/private:rules/nuget.bzl", 
+    dotnet_nuget = "dotnet_nuget",
+    dotnet_nuget_new = "dotnet_nuget_new"
+)
+
+load(
+    "@io_bazel_rules_dotnet//dotnet/private:rules/import.bzl", 
+    dotnet_import_library = "dotnet_import_library"
+)

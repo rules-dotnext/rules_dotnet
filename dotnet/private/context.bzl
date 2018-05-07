@@ -6,7 +6,6 @@ load(
 
 load(
     "@io_bazel_rules_dotnet//dotnet/private:common.bzl",
-    "executable_extension",
     "paths",
 )
 
