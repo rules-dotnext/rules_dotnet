@@ -21,7 +21,7 @@ and then asking for a provider of a specific type.
 Design
 ------
 
-The Dotnet providers are designed primarily for the efficiency of the Dotnet rules, the information
+The Dotnet providers are designed primarily for the efficiency of the dotnet rules, the information
 they share is mostly there because it is required for the core rules to work.
 
 All the providers are designed to hold only immutable data. This is partly because its a cleaner
@@ -44,7 +44,7 @@ This represents a compile dotnet binary.
 +--------------------------------+-----------------------------------------------------------------+
 | **Name**                       | **Type**                                                        |
 +--------------------------------+-----------------------------------------------------------------+
-| :param:`deps`                | :type:`list of DotnetLibrary`                                     |
+| :param:`deps`                  | :type:`list of DotnetLibrary`                                   |
 +--------------------------------+-----------------------------------------------------------------+
 | The direct dependencies of this library.                                                         |
 +--------------------------------+-----------------------------------------------------------------+
@@ -55,7 +55,7 @@ This represents a compile dotnet binary.
 +--------------------------------+-----------------------------------------------------------------+
 
 DotnetResource
-~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 DotnetResource is a provider that exposes a compiled resource (.resources file).
 

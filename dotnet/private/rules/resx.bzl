@@ -25,7 +25,7 @@ dotnet_resx = rule(
     _dotnet_resx_impl,
     attrs = {
         # source files for this target.
-        "src": attr.label(allow_files = FileType([".resx"])),        
+        "src": attr.label(allow_files = FileType([".resx"]), mandatory=True),        
         "identifier": attr.string(),
         "out": attr.string(),
         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))

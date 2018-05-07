@@ -1,6 +1,18 @@
 Dotnet toolchains
 =================
-The design and implementation is heavily based on rules_go toolchains.
+.. _core: core.bzl
+.. _rules_go: https://github.com/bazelbuild/rules_go
+.. _go_toolchains: https://github.com/bazelbuild/rules_go/blob/master/go/toolchains.rst
+.. _DotnetLibrary: providers.bzl#DotnetLibrary
+.. _DotnetResource: providers.bzl#DotnetResource
+
+.. role:: param(kbd)
+.. role:: type(emphasis)
+.. role:: value(code)
+.. |mandatory| replace:: **mandatory value**
+
+
+The design and implementation is heavily based on rules_go_ `toolchains <go_toolchains_>`_.
 
 -----
 
@@ -17,13 +29,13 @@ At the bottom is the Mono MDK.
 This is always bound to ``@dotnet_sdk`` and can be referred to directly if needed, but in general
 you should always access it through the toolchain.
 
-The dotnet_download_sdk_, dotnet_host_sdk_ and dotnet_local_sdk_ family of rules are responsible for downloading
+The dotnet_download_sdk_ and dotnet_host_sdk_ family of rules are responsible for downloading
 these, and adding just enough of a build file to expose the contents to Bazel.
 
-If you don't do anything special, the Dotnet rules will download the most recent official SDK for
+If you don't do anything special, the dotnet rules will download the most recent official SDK for
 your host (if available).
-If you need a `forked version of Dotnet`_\, want to `control the version`_ or just use the
-`installed sdk`_ then it is easy to do, you just need to make sure you have bound the dotnet_sdk
+If you need a forked version of dotnet/mono, want to control the version or just use the
+installed sdk then it is easy to do, you just need to make sure you have bound the dotnet_sdk
 repository before you call dotnet_register_toolchains_.
 
 The toolchain
@@ -47,7 +59,7 @@ it's default name, the following toolchain labels (along with many others) will 
 
   @io_bazel_rules_dotnet//dotnet/toolchain:linux_amd64
   
-The toolchains are not usable until you register_ them.
+The toolchains are not usable until you register them.
 
 Registration
 ^^^^^^^^^^^^
@@ -61,7 +73,7 @@ toolchains by declaring and registering toolchains with the same constraints *be
 dotnet_register_toolchains_.
 
 If you wish to have more control over the toolchains you can instead just make direct
-calls to register_toolchains_ with only the toolchains you wish to install. You can see an
+calls to dotnet_register_toolchains_ with only the toolchains you wish to install. You can see an
 example of this in `limiting the available toolchains`_.
 
 
@@ -78,20 +90,22 @@ First, you have to declare that you want to consume the toolchain on the rule de
 The easiest way to do this is to use the dotnet_rule wrapper, which adds in the toolchain and some
 hidden attributes that it consumes.
 
-.. code:: bzl
+.. code:: python
 
-  load("@io_bazel_rules_dotnet//dotnet:def.bzl", "dotnet_context", "dotnet_rule")
+  load("@io_bazel_rules_dotnet//dotnet:def.bzl", "dotnet_context")
 
-  my_rule = dotnet_rule(
+  my_rule = rule(
       _my_rule_impl,
       attrs = {
           ...
-      },
-  )
+         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))
+     },
+     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
+ )
 
 And then in the rule body, you need to get the toolchain itself and use it's action generators.
 
-.. code:: bzl
+.. code:: python
 
   def _my_rule_impl(ctx):
     dotnet = dotnet_context(ctx)
@@ -108,7 +122,7 @@ This is an example of normal usage for the other examples to be compared against
 WORKSPACE
 ^^^^^^^^^
 
-.. code:: bzl
+.. code:: python
 
     load("@io_bazel_rules_dotnet//dotnet:def.bzl", "dotnet_rules_dependencies", "dotnet_register_toolchains")
 
@@ -117,7 +131,7 @@ WORKSPACE
 
 
 Forcing the Dotnet version
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You can select the version of the Mono to use by specifying it when you call
 dotnet_register_toolchains_ but you must use a value that matches a known toolchain.
@@ -125,7 +139,7 @@ dotnet_register_toolchains_ but you must use a value that matches a known toolch
 WORKSPACE
 ^^^^^^^^^
 
-.. code:: bzl
+.. code:: python
 
     load("@io_bazel_rules_dotnet//dotnet:def.bzl", "dotnet_rules_dependencies", "dotnet_register_toolchains")
 
@@ -142,7 +156,7 @@ toolchain.
 WORKSPACE
 ^^^^^^^^^
 
-.. code:: bzl
+.. code:: python
 
     load("@io_bazel_rules_dotnet//dotnet:def.bzl", "dotnet_rules_dependencies", "dotnet_register_toolchains")
 
@@ -160,7 +174,7 @@ just add it and register it before the normal ones.
 WORKSPACE
 ^^^^^^^^^
 
-.. code:: bzl
+.. code:: python
 
     load("@io_bazel_rules_dotnet//dotnet:def.bzl", "dotnet_rules_dependencies", "dotnet_register_toolchains", "dotnet_download_sdk")
 
@@ -176,7 +190,7 @@ WORKSPACE
 BUILD.bazel
 ^^^^^^^^^^^
 
-.. code:: bzl
+.. code:: python
 
     dotnet_toolchain(name="my_macos_toolchain", sdk="my_macos_sdk")
 
@@ -185,12 +199,12 @@ Limiting the available toolchains
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 If you wanted to only allow your project to be compiled on mac at Mono version 4.2.3,
-instead of calling go_register_toolchains you can put
+instead of calling dotnet_register_toolchains_ you can put
 
 WORKSPACE
 ^^^^^^^^^
 
-.. code:: bzl
+.. code:: python
 
     load("@io_bazel_rules_dotnet//dotnet:def.bzl", "dotnet_rules_dependencies")
 
@@ -217,7 +231,7 @@ Mono will be used.
 +--------------------------------+-----------------------------+-----------------------------------+
 | This specifies the Mono version to select.                                                       |
 | It will match the version specification of the toochain which for normal sdk toolchains is       |
-| also the string part of the `binary distribution`_ you want to use.                              |
+| also the string part of the binary distribution you want to use.                                 |
 | You can also use it to select the "host" sdk toolchain, or a custom toolchain with a             |
 | specialized version string.                                                                      |
 +--------------------------------+-----------------------------+-----------------------------------+
@@ -237,7 +251,7 @@ This downloads Mono for use in toolchains.
 +--------------------------------+-----------------------------+-----------------------------------+
 | :param:`urls`                  | :type:`string_list`         | :value:`official distributions`   |
 +--------------------------------+-----------------------------+-----------------------------------+
-| A list of mirror urls to the binary distribution of Mono. These must contain the `{}`        |
+| A list of mirror urls to the binary distribution of Mono. These must contain the `{}`            |
 | used to substitute the sdk filename being fetched (using `.format`.                              |
 +--------------------------------+-----------------------------+-----------------------------------+
 | :param:`strip_prefix`          | :type:`string`              | :value:`""`                       |
@@ -252,7 +266,7 @@ This downloads Mono for use in toolchains.
 |                                                                                                  |
 | As an example:                                                                                   |
 |                                                                                                  |
-| .. code:: bzl                                                                                    |
+| .. code:: python                                                                                 |
 |                                                                                                  |
 |     dotnet_download_sdk(                                                                         |
 |         name = "dotnet_sdk",                                                                     |
@@ -273,7 +287,7 @@ dotnet_host_sdk
 This detects the host Mono for use in toolchains.
 
 It searches the PATH. You can achive the same result by setting
-the version to "host" when registering toolchains to select the `installed sdk`_ so it should
+the version to "host" when registering toolchains to select the installed sdk so it should
 never be neccesary to use this feature directly.
 
 +--------------------------------+-----------------------------+-----------------------------------+
@@ -286,83 +300,23 @@ never be neccesary to use this feature directly.
 +--------------------------------+-----------------------------+-----------------------------------+
 
 
-dotnet_local_sdk
-~~~~~~~~~~~~~~~~
-
-This prepares a local path to use as the Mono in toolchains.
-
-+--------------------------------+-----------------------------+-----------------------------------+
-| **Name**                       | **Type**                    | **Default value**                 |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`name`                  | :type:`string`              | |mandatory|                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| A unique name for this sdk. This should almost always be :value:`dotnet_sdk` if you want the SDK |
-| to be used by toolchains.                                                                        |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`path`                  | :type:`string`              | :value:`""`                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| The local path to a pre-installed Mono. The path must contain the mcs binary, the tools it       |
-| invokes and the standard library sources.                                                        |
-+--------------------------------+-----------------------------+-----------------------------------+
-
-
-dotnet_toolchain
-~~~~~~~~~~~~~~~~
-
-This adds a toolchain of type :value:`"@io_bazel_rules_dotnet//dotnet:toolchain"`.
-
-+--------------------------------+-----------------------------+-----------------------------------+
-| **Name**                       | **Type**                    | **Default value**                 |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`name`                  | :type:`string`              | |mandatory|                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| A unique name for the toolchain.                                                                 |
-| You will need to use this name when registering the toolchain in the WORKSPACE.                  |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`target`                | :type:`string`              | |mandatory|                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| This specifies the target platform tuple for this toolchain.                                     |
-|                                                                                                  |
-| It should be in the form *OS*_*ARCH* (as used by Go) and is used for both names and constraint   |
-| matching.                                                                                        |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`host`                  | :type:`string`              | |mandatory|                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| This is the host platform tuple.                                                                 |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`sdk`                   | :type:`string`              | |mandatory|                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| This is the name of the SDK to use for this toolchain.                                           |
-| The SDK must have been registered using one of the `dotnet sdk rules`_.                          |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`constraints`           | :type:`label_list`          | :value:`[]`                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| This list is added to the host and or target constraints when declaring the toolchains.          |
-| It allows the declaration of additional constraints that must be matched for the toolchain to    |
-| be automatically selected.                                                                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`msc_flags`             | :type:`string_list`         | :value:`[]`                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| The compiler flags are directly exposed on the toolchain.                                        |
-| They can be used to specify target specific flags that mcs compiling actions should apply when   |
-| using this toolchain.                                                                            |
-+--------------------------------+-----------------------------+-----------------------------------+
-
 dotnet_context
-~~~~~~~~~~
+~~~~~~~~~~~~~~
 
 This collects the information needed to form and return a :type:`DotnetContext` from a rule ctx.
 It uses the attrbutes and the toolchains.
-It can only be used in the implementation of a rule that has the go toolchain attached and
-the dotnet context data as an attribute. To do this declare the rule using the dotnet_rule wrapper.
+It can only be used in the implementation of a rule that has the dotnet toolchain attached and
+the dotnet context data as an attribute. 
 
-.. code:: bzl
+.. code:: python
 
-  my_rule = dotnet_rule(
+  my_rule = rule(
       _my_rule_impl,
       attrs = {
           ...
+        "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))
       },
+      toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
   )
 
 
@@ -395,13 +349,14 @@ Methods
 * Action generators
 
   * library_
+  * binary_
+  * resx_
 
 * Helpers
 
-  * args_
   * declare_file_
-  * library_to_source_
   * new_library_
+  * new_resource_
 
 
 Fields
@@ -414,42 +369,138 @@ Fields
 +--------------------------------+-----------------------------------------------------------------+
 | The underlying toolchain. This should be considered an opaque type subject to change.            |
 +--------------------------------+-----------------------------------------------------------------+
-| :param:`mode`                  | :type:`Mode`                                                    |
+| :param:`exe_extension`         | :type:`string`                                                  |
 +--------------------------------+-----------------------------------------------------------------+
-| Controls the compilation setup affecting things like enabling profilers and sanitizers.          |
-| See `compilation modes`_ for more information about the allowed values.                          |
+| The suffix to use for all executables in this build mode. Mostly used when generating the output |
+| filenames of binary rules.                                                                       |
 +--------------------------------+-----------------------------------------------------------------+
-| :param:`mcs`                    | :type:`File`                                                   |
+| :param:`runner`                | :type:`File`                                                    |
 +--------------------------------+-----------------------------------------------------------------+
-| The main "mcs" binary used.                                                                      |
+| The "mono" binary used to run dotnet executables                                                 |
 +--------------------------------+-----------------------------------------------------------------+
-| :param:`stdlib`                | :type:`DotnetStdlib`                                            |
+| :param:`mcs`                   | :type:`File`                                                    |
 +--------------------------------+-----------------------------------------------------------------+
-| The standard library and tools to use in this build mode.                                        |
+| The main "mcs" (C# compiler) binary used.                                                        |
 +--------------------------------+-----------------------------------------------------------------+
-| :param:`sdk_files`             | :type:`list of File`                                            |
+| :param:`resgen`               | :type:`File`                                                    |
 +--------------------------------+-----------------------------------------------------------------+
-| This is the full set of files exposed by the sdk. You should never need this, it is mainly used  |
-| when compiling the standard library.                                                             |
+| The resource compiler (dotnet executable).                                                       |
++--------------------------------+-----------------------------------------------------------------+
+| :param:`stdlib`                | :type:`File`                                                    |
++--------------------------------+-----------------------------------------------------------------+
+| The standard library (mscorlib.dll) to use in the build.                                         |
++--------------------------------+-----------------------------------------------------------------+
+| :param:`libVersion`            | :type:`string`                                                  |
++--------------------------------+-----------------------------------------------------------------+
+| The mono library version to used. The default is 4.7-api                                         |
 +--------------------------------+-----------------------------------------------------------------+
 | :param:`actions`               | :type:`ctx.actions`                                             |
 +--------------------------------+-----------------------------------------------------------------+
 | The actions structure from the Bazel context, which has all the methods for building new         |
 | bazel actions.                                                                                   |
 +--------------------------------+-----------------------------------------------------------------+
-| :param:`exe_extension`         | :type:`String`                                                  |
+| :param:`lib`                   | :type:`label`                                                   |
 +--------------------------------+-----------------------------------------------------------------+
-| The suffix to use for all executables in this build mode. Mostly used when generating the output |
-| filenames of binary rules.                                                                       |
+| The label for directory with the selected libraryVersion assemblies                              |
 +--------------------------------+-----------------------------------------------------------------+
 
 
 library
 ~~~~~~~
 
-The library function adds an action that compiles the set of sources into binary.
+The library function adds an action that compiles the set of sources into assembly.
 
-It does not return anything.
+It returns DotnetLibrary_ provider.
+
++--------------------------------+--------------------------------+-----------------------------------+
+| **Name**                       | **Type**                       | **Default value**                 |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`dotnet`                | :type:`DotnetContext`          | |mandatory|                       |
++--------------------------------+--------------------------------+-----------------------------------+
+| This must be the same DotnetContext object you got this function from.                              |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`srcs`                  | :type:`File iterable`          | |mandatory|                       |
++--------------------------------+--------------------------------+-----------------------------------+
+| An iterable of source code artifacts.                                                               |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`deps`                  | :type:`DotnetLibrary iterable` | :value:`[]`                       |
++--------------------------------+--------------------------------+-----------------------------------+
+| An iterable of all directly imported libraries.                                                     |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`resources`             | :type:`DotnetResource iterable`| :value:`[]`                       |
++--------------------------------+--------------------------------+-----------------------------------+
+| An iterable of all directly imported libraries.                                                     |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`out`                   | :type:`string`                 | :value:`""`                       |
++--------------------------------+--------------------------------+-----------------------------------+
+| An alternative name of the output file                                                              |
++--------------------------------+--------------------------------+-----------------------------------+
+
+binary
+~~~~~~
+
+The function adds an action that compiles the set of sources into executable assembly.
+
+It returns DotnetLibrary_ provider.
+
++--------------------------------+--------------------------------+-----------------------------------+
+| **Name**                       | **Type**                       | **Default value**                 |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`dotnet`                | :type:`DotnetContext`          | |mandatory|                       |
++--------------------------------+--------------------------------+-----------------------------------+
+| This must be the same DotnetContext object you got this function from.                              |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`srcs`                  | :type:`File iterable`          | |mandatory|                       |
++--------------------------------+--------------------------------+-----------------------------------+
+| An iterable of source code artifacts.                                                               |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`deps`                  | :type:`DotnetLibrary iterable` | :value:`[]`                       |
++--------------------------------+--------------------------------+-----------------------------------+
+| An iterable of all directly imported libraries.                                                     |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`resources`             | :type:`DotnetResource iterable`| :value:`[]`                       |
++--------------------------------+--------------------------------+-----------------------------------+
+| An iterable of all directly imported libraries.                                                     |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`out`                   | :type:`string`                 | :value:`""`                       |
++--------------------------------+--------------------------------+-----------------------------------+
+| An alternative name of the output file                                                              |
++--------------------------------+--------------------------------+-----------------------------------+
+
+resx
+~~~~
+
+The function adds an action that compiles a single .resx file into .resources file.
+
+It returns DotnetResource_ provider.
+
++----------------------------+-----------------------------+---------------------------------------+
+| **Name**                   | **Type**                    | **Default value**                     |
++----------------------------+-----------------------------+---------------------------------------+
+| :param:`name`              | :type:`string`              | |mandatory|                           |
++----------------------------+-----------------------------+---------------------------------------+
+| A unique name for this rule.                                                                     |
++----------------------------+-----------------------------+---------------------------------------+
+| :param:`src`               | :type:`label`               | |mandatory|                           |
++----------------------------+-----------------------------+---------------------------------------+
+| The .resx source file that is transformed into .resources file.                                  |
+| Only :value:`.resx` files are permitted                                                          |
++----------------------------+-----------------------------+---------------------------------------+
+| :param:`identifer`         | :type:`string`              | :value:`""`                           |
++----------------------------+-----------------------------+---------------------------------------+
+| The logical name for the resource; the name that is used to load the resource.                   |
+| The default is the basename of the file name (no subfolder).                                     |
++----------------------------+-----------------------------+---------------------------------------+
+| :param:`out`               | :type:`string`              | :value:`""`                           |
++----------------------------+-----------------------------+---------------------------------------+
+| An alternative name of the output file                                                           |
++----------------------------+-----------------------------+---------------------------------------+
+
+
+declare_file
+~~~~~~~~~~~~
+
+This is the equivalent of ctx.actions.declare_file.
 
 +--------------------------------+-----------------------------+-----------------------------------+
 | **Name**                       | **Type**                    | **Default value**                 |
@@ -458,129 +509,63 @@ It does not return anything.
 +--------------------------------+-----------------------------+-----------------------------------+
 | This must be the same DotnetContext object you got this function from.                           |
 +--------------------------------+-----------------------------+-----------------------------------+
-| :param:`sources`               | :type:`File iterable`       | |mandatory|                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| An iterable of source code artifacts.                                                            |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`deps`                  | :type:`DotnetLibrary iterable`  | :value:`[]`                   |
-+--------------------------------+-----------------------------+-----------------------------------+
-| An iterable of all directly imported libraries.                                                  |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`out_lib`               | :type:`File`                | |mandatory|                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| The output file that should be produced.                                                         |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`extra_opts`            | :type:`string_list`         | :value:`[]`                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| Additional flags to pass to the compiler.                                                        |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`warn`                  | :type:`Int`                 | :value:`4`                        |
-+--------------------------------+-----------------------------+-----------------------------------+
-| Compiler warn level for this binary. (Defaults to 4.)                                            |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`main_class`            | :type:`string`              | :value:`""`                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| Name of class with main() method to use as entry point.                                          |
-+--------------------------------+-----------------------------+-----------------------------------+
-
-
-args
-~~~~
-
-This creates a new args object, using the ctx.args method, and the populates it with the standard
-arguments used by all the go toolchain builders.
-
-+--------------------------------+-----------------------------+-----------------------------------+
-| **Name**                       | **Type**                    | **Default value**                 |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`go`                    | :type:`GoContext`           | |mandatory|                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| This must be the same GoContext object you got this function from.                               |
-+--------------------------------+-----------------------------+-----------------------------------+
-
-declare_file
-~~~~~~~~~~~~
-
-This is the equivalent of ctx.actions.declare_file except it uses the current build mode to make
-the filename unique between configurations.
-
-+--------------------------------+-----------------------------+-----------------------------------+
-| **Name**                       | **Type**                    | **Default value**                 |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`go`                    | :type:`GoContext`           | |mandatory|                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| This must be the same GoContext object you got this function from.                               |
-+--------------------------------+-----------------------------+-----------------------------------+
 | :param:`path`                  | :type:`string`              | :value:`""`                       |
 +--------------------------------+-----------------------------+-----------------------------------+
 | A path for this file, including the basename of the file.                                        |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`ext`                   | :type:`string`              | :value:`""`                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| The extension to use for the file.                                                               |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`name`                  | :type:`string`              | :value:`""`                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| A name to use for this file. If path is not present, this becomes a prefix to the path.          |
-| If this is not set, the current rule name is used in it's place.                                 |
-+--------------------------------+-----------------------------+-----------------------------------+
-
-library_to_source
-~~~~~~~~~~~~~~~~~
-
-This is used to build a GoSource object for a given GoLibrary in the current build mode.
-
-+--------------------------------+-----------------------------+-----------------------------------+
-| **Name**                       | **Type**                    | **Default value**                 |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`go`                    | :type:`GoContext`           | |mandatory|                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| This must be the same GoContext object you got this function from.                               |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`attr`                  | :type:`ctx.attr`            | |mandatory|                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| The attributes of the rule being processed, in a normal rule implementation this would be        |
-| ctx.attr.                                                                                        |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`library`               | :type:`GoLibrary`           | |mandatory|                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| The GoLibrary_ that you want to build a GoSource_ object for in the current build mode.          |
-+--------------------------------+-----------------------------+-----------------------------------+
-| :param:`coverage_instrumented` | :type:`bool`                | |mandatory|                       |
-+--------------------------------+-----------------------------+-----------------------------------+
-| This controls whether cover is enabled for this specific library in this mode.                   |
-| This should generally be the value of ctx.coverage_instrumented()                                |
 +--------------------------------+-----------------------------+-----------------------------------+
 
 new_library
 ~~~~~~~~~~~
 
-This creates a new GoLibrary.
+This creates a new DotnetLibrary_.
+You can add extra fields to the go library by providing extra named parameters to this function,
+they will be visible to the resolver when it is invoked.
+
++--------------------------------+--------------------------------+-----------------------------------+
+| **Name**                       | **Type**                       | **Default value**                 |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`name`                  | :type:`string`                 | |mandatory|                       |
++--------------------------------+--------------------------------+-----------------------------------+
+| A unique name for this library.                                                                     |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`dotnet`                | :type:`DotnetContext`          | |mandatory|                       |
++--------------------------------+--------------------------------+-----------------------------------+
+| This must be the same DotnetContext object you got this function from.                              |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`deps`                  | :type:`list of DotnetLibrary`  |                                   |
++--------------------------------+--------------------------------+-----------------------------------+
+| The direct dependencies of this library.                                                            |
++--------------------------------+--------------------------------+-----------------------------------+
+| :param:`transitive`            | :type:`depset of DotnetLibrary`|                                   |
++--------------------------------+--------------------------------+-----------------------------------+
+| The full set of transitive dependencies. This includes ``deps`` for this                            |
+| library and all ``deps`` members transitively reachable through ``deps``.                           |
++--------------------------------+--------------------------------+-----------------------------------+
+
+new_resource
+~~~~~~~~~~~~
+
+This creates a new DotnetResource_.
 You can add extra fields to the go library by providing extra named parameters to this function,
 they will be visible to the resolver when it is invoked.
 
 +--------------------------------+-----------------------------+-----------------------------------+
 | **Name**                       | **Type**                    | **Default value**                 |
 +--------------------------------+-----------------------------+-----------------------------------+
-| :param:`go`                    | :type:`GoContext`           | |mandatory|                       |
+| :param:`name`                  | :type:`string`              | |mandatory|                       |
 +--------------------------------+-----------------------------+-----------------------------------+
-| This must be the same GoContext object you got this function from.                               |
+| A unique name for this library.                                                                  |
 +--------------------------------+-----------------------------+-----------------------------------+
-| :param:`resolver`              | :type:`function`            | :value:`None`                     |
+| :param:`dotnet`                | :type:`DotnetContext`       | |mandatory|                       |
 +--------------------------------+-----------------------------+-----------------------------------+
-| This is the function that gets invoked when converting from a GoLibrary to a GoSource.           |
-| The function's signature must be                                                                 |
-|                                                                                                  |
-| .. code:: bzl                                                                                    |
-|                                                                                                  |
-|     def _testmain_library_to_source(go, attr, source, merge)                                     |
-|                                                                                                  |
-| attr is the attributes of the rule being processed                                               |
-| source is the dictionary of GoSource fields being generated                                      |
-| merge is a helper you can call to merge                                                          |
+| This must be the same DotnetContext object you got this function from.                           |
 +--------------------------------+-----------------------------+-----------------------------------+
-| :param:`importable`            | :type:`bool`                | |mandatory|                       |
+| :param:`result`                | :type:`File`                | |mandatory|                       |
 +--------------------------------+-----------------------------+-----------------------------------+
-| This controls whether the GoLibrary_ is supposed to be importable. This is generally only false  |
-| for the "main" libraries that are built just before linking.                                     |
+| The .resources file.                                                                             |
++--------------------------------+-----------------------------+-----------------------------------+
+| :param:`identifier`            | :type:`string`              | :value:`None`                     |
++--------------------------------+-----------------------------+-----------------------------------+
+| Identifier passed to -resource flag of mcs compiler. If empty the basename of the result         |
+| is used.                                                                                         |
 +--------------------------------+-----------------------------+-----------------------------------+

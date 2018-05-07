@@ -46,7 +46,7 @@ dotnet_import_library = rule(
     _dotnet_imort_library_impl,
     attrs = {
         "deps": attr.label_list(providers=[DotnetLibrary]),
-        "src": attr.label(allow_files = FileType([".dll"])),        
+        "src": attr.label(allow_files = FileType([".dll"]), mandatory=True),        
         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
