@@ -1,4 +1,0 @@
-[submodule "dotnet/externals/nunit2/nunitv2"]
-	path = dotnet/externals/nunit2/nunitv2
-	url = https://github.com/tomek1909/nunitv2.git
-	branch = 2.6.4-bazel

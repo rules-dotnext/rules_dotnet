@@ -220,7 +220,7 @@ Test example
         ],
         deps = [
             "//examples/example_lib:MyClass",
-            "//dotnet/externals/nunit2:nunit.framework",
+            "@nunit2//:nunit.framework",
         ],
     )
 
@@ -267,7 +267,7 @@ Example
 
     dotnet_resx(
         name = "Transform",
-        src = "//dotnet/externals/nunit2/nunitv2:src/ClientUtilities/util/Transform.resx",
+        src = ":src/ClientUtilities/util/Transform.resx",
     )
 
 

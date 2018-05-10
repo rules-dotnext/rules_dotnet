@@ -7,6 +7,6 @@ dotnet_nunit_test(
     ],
     deps = [
         "//examples/example_lib:MyClass",
-        "//dotnet/externals/nunit2:nunit.framework",
+        "@nunit2//:nunit.framework",
     ],
 )
