@@ -9,4 +9,5 @@ dotnet_nunit_test(
         "//examples/example_lib:MyClass",
         "@nunit2//:nunit.framework",
     ],
+    size = "small",
 )
