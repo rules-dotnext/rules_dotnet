@@ -101,6 +101,7 @@ def emit_assembly(dotnet,
     result = dotnet.declare_file(dotnet, path=name+extension)
   else:
     result = dotnet.declare_file(dotnet, path=out)  
+    extension = ""
     
   runner_args = _make_runner_arglist(dotnet, deps, resources, result, executable, defines)
 

@@ -20,7 +20,7 @@ load(
 )
  
 
-def dotnet_nunit_test(name, deps, srcs, defines = None, out = None, **kwargs):
+def dotnet_nunit_test(name, deps, srcs, data = [], defines = None, out = None, **kwargs):
     dotnet_library(name = "%s_exe" % name, deps = deps, srcs = srcs, out = out, defines = defines)
     exe = ":%s_exe" % name
     dotnet_launcher_gen(name = "%s_launcher" % name, exe = exe, nunit="@nunit2//:nunit-console-runner-exe_exe")
@@ -29,6 +29,6 @@ def dotnet_nunit_test(name, deps, srcs, defines = None, out = None, **kwargs):
         name=name, 
         srcs = [":%s_launcher" % name],
         deps = ["@io_bazel_rules_dotnet//dotnet/tools/runner:lib"],
-        data = [exe, "@nunit2//:nunit-console-runner-exe_exe"],
+        data = [exe, "@nunit2//:nunit-console-runner-exe_exe"] + data,
         **kwargs
     )

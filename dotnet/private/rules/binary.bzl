@@ -52,7 +52,7 @@ _dotnet_binary = rule(
     executable = True,
 )
 
-def dotnet_binary(name, deps, srcs, defines = None, out = None):
+def dotnet_binary(name, srcs, deps = [], defines = None, out = None):
     _dotnet_binary(name = "%s_exe" % name, deps = deps, srcs = srcs, out = out, defines = defines)
     exe = ":%s_exe" % name
     dotnet_launcher_gen(name = "%s_launcher" % name, exe = exe)

@@ -22,7 +22,7 @@ def _dotnet_launcher_gen_impl(ctx):
   if ctx.attr.nunit:
     nunit = ctx.attr.nunit.files.to_list()[0].path
   
-  generated_file = dotnet.declare_file(dotnet, "generated.c")
+  generated_file = dotnet.declare_file(dotnet, "{}_generated.c".format(name))
   content = _TEMPLATE.format(exe.path, nunit)
   dotnet.actions.write(output = generated_file, content = content, is_executable=False)
 
@@ -41,5 +41,4 @@ dotnet_launcher_gen = rule(
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
     executable = False,
-    outputs = {"generated": "generated.c"}
 )
