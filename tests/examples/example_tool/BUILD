@@ -6,7 +6,7 @@ dotnet_binary(
         "MyTool.cs",
     ],
     deps = [
-        "//examples/example_lib:MyClass",
+        "//tests/examples/example_lib:MyClass",
     ],
 )
 

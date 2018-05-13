@@ -6,7 +6,7 @@ dotnet_nunit_test(
         "MyTest.cs",
     ],
     deps = [
-        "//examples/example_lib:MyClass",
+        "//tests/examples/example_lib:MyClass",
         "@nunit2//:nunit.framework",
     ],
     size = "small",

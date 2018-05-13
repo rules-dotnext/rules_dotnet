@@ -9,6 +9,6 @@ dotnet_library(
     #resources = [ "hello.txt" ],
     visibility = ["//visibility:public"],
     deps = [
-        "//examples/example_transitive_lib:TransitiveClass",
+        "//tests/examples/example_transitive_lib:TransitiveClass",
     ],
 )

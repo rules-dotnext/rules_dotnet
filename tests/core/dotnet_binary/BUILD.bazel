@@ -1,7 +1,5 @@
 load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_binary", "dotnet_nunit_test")
 
-#test_suite(name = "dotnet_binary")
-
 dotnet_binary(
     name = "custom_bin",
     srcs = [

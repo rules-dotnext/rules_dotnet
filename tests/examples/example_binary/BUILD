@@ -8,7 +8,7 @@ dotnet_binary(
         "Properties/AssemblyInfo.cs",
     ],
     deps = [
-        "//examples/example_lib:MyClass",
+        "//tests/examples/example_lib:MyClass",
         "@npgsql//:npgsqllib",
     ],
 )

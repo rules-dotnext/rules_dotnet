@@ -69,7 +69,7 @@ script:
       run \
       -s \
       --local_resources=400,1,1.0 \
-      //examples/example_binary:hello
+      //tests/examples/example_binary:hello
   - |
     bazel \
       --batch \
