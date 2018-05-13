@@ -5,7 +5,7 @@ Basic dotnet_binary functionality
 
 Tests to ensure the basic features of dotnet_binary are working as expected.
 
-out_test
---------
+custom_bin
+----------
 
 Test that a dotnet_binary_ rule can write its executable file with a custom name.
