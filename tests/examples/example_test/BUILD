@@ -1,7 +1,7 @@
 load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_nunit_test")
 
 dotnet_nunit_test(
-    name = "MyTest",
+    name = "example_test",
     srcs = [
         "MyTest.cs",
     ],

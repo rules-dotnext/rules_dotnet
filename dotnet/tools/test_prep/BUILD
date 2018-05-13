@@ -1,7 +1,7 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-  name = "runner",
+  name = "test_prep",
   srcs = glob([
     "*.c",
   ]),

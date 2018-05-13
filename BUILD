@@ -4,3 +4,5 @@ dotnet_context_data(
     name = "dotnet_context_data",
     visibility = ["//visibility:public"],
 )
+
+exports_files(["AUTHORS"])

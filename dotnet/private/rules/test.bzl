@@ -28,7 +28,7 @@ def dotnet_nunit_test(name, deps, srcs, data = [], defines = None, out = None, *
     native.cc_test(
         name=name, 
         srcs = [":%s_launcher" % name],
-        deps = ["@io_bazel_rules_dotnet//dotnet/tools/runner:lib"],
+        deps = ["@io_bazel_rules_dotnet//dotnet/tools/runner", "@io_bazel_rules_dotnet//dotnet/tools/common"],
         data = [exe, "@nunit2//:nunit-console-runner-exe_exe"] + data,
         **kwargs
     )

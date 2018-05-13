@@ -60,8 +60,11 @@ def _get_dotnet_stdlib(context_data):
     return f
   fail("Could not find mscorlib in dotnet_sdk (lib, %s)" % context_data._libVersion)
 
-def _declare_file(dotnet, path):
-  return dotnet.actions.declare_file(path)
+def _declare_file(dotnet, path = None, ext = None):
+  result = path if path else dotnet._ctx.label.name
+  if ext:
+    result += ext
+  return dotnet.actions.declare_file(result)
 
 
 def _new_library(dotnet, name=None, deps=None, transitive=None, **kwargs):
@@ -143,7 +146,7 @@ dotnet_context_data = rule(
             default="@dotnet_sdk//:lib",
         ),
         "_libVersion": attr.string(
-            default="4.7-api",
+            default="4.5",
         ),
     },
 )

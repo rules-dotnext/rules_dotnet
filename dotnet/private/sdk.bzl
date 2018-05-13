@@ -41,7 +41,11 @@ def _dotnet_host_sdk_impl_osx(ctx):
   ctx.symlink(mono, "mono_bin/mono")
   monoroot = ctx.path("/usr/local/Cellar/mono/5.4.1.6/lib/mono")
   if not monoroot.exists:
-    fail("Can't find mono in /usr/local/Cellar/mono/5.4.1.6/lib/mono")
+    current = ctx.path(mono).dirname
+    monodir = paths.join("{}".format(current), "..", "lib", "mono")
+    monoroot = ctx.path(monodir)
+    if not monoroot.exists:
+      fail("Can't find mono in /usr/local/Cellar/mono/5.4.1.6/lib/mono")
   ctx.symlink(monoroot, "lib")
   bin = paths.join("{}".format(monoroot), "4.5")
   ctx.symlink(bin, "mcs_bin")
@@ -74,6 +78,10 @@ def _dotnet_download_sdk_impl(ctx):
   filename, sha256 = ctx.attr.sdks[host]
   _sdk_build_file(ctx)
   _remote_sdk(ctx, [filename], ctx.attr.strip_prefix, sha256)
+  ctx.symlink("mono/lib/mono/4.5", "mcs_bin")
+  ctx.symlink("mono/bin", "mono_bin")
+  ctx.symlink("mono/lib/mono", "lib")
+
 
 dotnet_download_sdk = repository_rule(
     _dotnet_download_sdk_impl,
@@ -106,6 +114,7 @@ def _remote_sdk(ctx, urls, strip_prefix, sha256):
       stripPrefix = strip_prefix,
       sha256 = sha256,
   )
+  
 def _sdk_build_file(ctx):
   ctx.file("ROOT")
   ctx.template("BUILD.bazel",

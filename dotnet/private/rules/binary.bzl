@@ -60,6 +60,6 @@ def dotnet_binary(name, srcs, deps = [], defines = None, out = None):
     native.cc_binary(
         name=name, 
         srcs = [":%s_launcher" % name],
-        deps = ["@io_bazel_rules_dotnet//dotnet/tools/runner:lib"],
+        deps = ["@io_bazel_rules_dotnet//dotnet/tools/runner", "@io_bazel_rules_dotnet//dotnet/tools/common"],
         data = [exe],
     )

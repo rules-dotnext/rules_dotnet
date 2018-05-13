@@ -1,9 +1,13 @@
 package(default_visibility = ["//visibility:public"])
 
 cc_library(
-  name = "runner",
+  name = "common",
   srcs = glob([
     "*.c",
   ]),
-  deps = ["//dotnet/tools/common:common"],
+  hdrs = glob([
+    "*.h",
+  ]),
 )
+
+exports_files(["manifest.h"])
