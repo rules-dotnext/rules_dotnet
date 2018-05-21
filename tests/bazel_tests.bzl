@@ -40,6 +40,7 @@ _bazel_test_script_template = """
 set -u
 
 echo pwd is `pwd`
+echo command is {command}
 echo running in {work_dir}
 unset TEST_TMPDIR
 RULES_DOTNET_OUTPUT={output}
@@ -51,7 +52,7 @@ cp -f {workspace} {work_dir}/WORKSPACE
 cp -f {build} {work_dir}/BUILD.bazel
 cd {work_dir}
 
-{bazel} --bazelrc {bazelrc} --nomaster_blazerc {command}  --experimental_repository_cache={cache_dir} --config {config} {args} {target} >& bazel-output.txt
+{bazel} --bazelrc {bazelrc} --nomaster_blazerc {command} --config {config} {args} {target} >& bazel-output.txt
 result=$?
 
 function at_exit {{

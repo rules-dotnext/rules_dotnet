@@ -78,7 +78,7 @@ static void CreateLinkIfNeeded(const char* target, const char *toCreate)
 
     flag = SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
     retry:
-    result = CreateSymbolicLink(toCreate, target, flag);
+    result = CreateSymbolicLinkA(toCreate, target, flag);
     if (!result) {
         error = GetLastError();
         if (error == 87 && flag!=0) {
@@ -142,9 +142,9 @@ static void do_mkdir(const char *path)
     }
 
     /* Directory does not exist. EEXIST for race condition */
-    if (_mkdir(path) != 0 && errno != EEXIST) {
-        printf("Error %d creating directoryxx for %s\n", errno, path);
-        //exit(-1);        
+    if (CreateDirectoryA(path, NULL) == 0) {
+        printf("Error %d creating directory for %s\n", GetLastError(), path);
+        exit(-1);        
     }
 }
 
@@ -169,7 +169,7 @@ static void do_mkdir(const char *path)
     }
 
     if (status != 0) {
-        printf("Error %d creating directoryxx for %s\n", errno, path);
+        printf("Error %d creating directory for %s\n", errno, path);
         //exit(-1);        
     }
 }
