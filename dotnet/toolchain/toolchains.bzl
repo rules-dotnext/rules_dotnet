@@ -35,9 +35,9 @@ CORE_SDK_REPOSITORIES = {
         "core_windows_amd64":      ("https://download.microsoft.com/download/3/7/1/37189942-C91D-46E9-907B-CF2B2DE584C7/dotnet-sdk-2.1.200-win-x64.zip", 
                                 "f3c92c52d88364ac4359716e11e13b67f0e4ea256676b56334a4eb88c728e7fd"),
         "core_linux_amd64":      ("https://download.microsoft.com/download/3/7/1/37189942-C91D-46E9-907B-CF2B2DE584C7/dotnet-sdk-2.1.200-linux-x64.tar.gz", 
-                                "a9afb92d4a81f17664a040c8f36147e57a46bb3c33314b73ec737ad73608e08b"),
+                                "58977b4b232f5fe97f9825340ce473cf1ec1bad76eb512fe6b5e2210c76c09de"),
         "core_darwin_amd64":      ("https://download.microsoft.com/download/3/7/1/37189942-C91D-46E9-907B-CF2B2DE584C7/dotnet-sdk-2.1.200-osx-x64.tar.gz", 
-                                "a9afb92d4a81f17664a040c8f36147e57a46bb3c33314b73ec737ad73608e09b"),
+                                "ac695c3319caf043e6b40861906cd4d396ba8922fd206332d2a778635667a2ba"),
     },
 }
 
