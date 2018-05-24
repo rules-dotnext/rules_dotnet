@@ -9,6 +9,10 @@ load(
     "dotnet_local_sdk",
 )
 load(
+    "//dotnet/private:sdk_core.bzl",
+    "core_download_sdk",
+)
+load(
     "//dotnet/platform:list.bzl",
     "DOTNETARCH",
     "DOTNETOS",
@@ -17,6 +21,7 @@ load(
 )
 
 DEFAULT_VERSION = "4.2.3"
+CORE_DEFAULT_VERSION = "2.1.200"
 
 SDK_REPOSITORIES = {
     "4.2.3": {
@@ -24,6 +29,18 @@ SDK_REPOSITORIES = {
                                 "a7afb92d4a81f17664a040c8f36147e57a46bb3c33314b73ec737ad73608e08b"),
     },
 }
+
+CORE_SDK_REPOSITORIES = {
+    "2.1.200": {
+        "core_windows_amd64":      ("https://download.microsoft.com/download/3/7/1/37189942-C91D-46E9-907B-CF2B2DE584C7/dotnet-sdk-2.1.200-win-x64.zip", 
+                                "f3c92c52d88364ac4359716e11e13b67f0e4ea256676b56334a4eb88c728e7fd"),
+        "core_linux_amd64":      ("https://download.microsoft.com/download/3/7/1/37189942-C91D-46E9-907B-CF2B2DE584C7/dotnet-sdk-2.1.200-linux-x64.tar.gz", 
+                                "a9afb92d4a81f17664a040c8f36147e57a46bb3c33314b73ec737ad73608e08b"),
+        "core_darwin_amd64":      ("https://download.microsoft.com/download/3/7/1/37189942-C91D-46E9-907B-CF2B2DE584C7/dotnet-sdk-2.1.200-osx-x64.tar.gz", 
+                                "a9afb92d4a81f17664a040c8f36147e57a46bb3c33314b73ec737ad73608e09b"),
+    },
+}
+
 
 def _generate_toolchains():
   # Use all the above information to generate all the possible toolchains we might support
@@ -44,7 +61,7 @@ _toolchains = _generate_toolchains()
 
 _label_prefix = "@io_bazel_rules_dotnet//dotnet/toolchain:"
 
-def dotnet_register_toolchains(dotnet_version=DEFAULT_VERSION):
+def dotnet_register_toolchains(dotnet_version=DEFAULT_VERSION, core_version=CORE_DEFAULT_VERSION):
   """See /dotnet/toolchains.rst#dostnet-register-toolchains for full documentation."""
   if "dotnet_download_sdk" not in native.existing_rules() and "dotnet_host_sdk" not in native.existing_rules() and "dotnet_local_sdk" not in native.existing_rules():
     if dotnet_version in SDK_REPOSITORIES:
@@ -58,6 +75,16 @@ def dotnet_register_toolchains(dotnet_version=DEFAULT_VERSION):
       )
     else:
       fail("Unknown dotnet version {}".format(dotnet_version))
+
+  if "core_download_sdk" not in native.existing_rules():
+    if core_version in CORE_SDK_REPOSITORIES:
+      core_download_sdk(
+          name = "core_sdk",
+          version = core_version,
+          sdks = CORE_SDK_REPOSITORIES[core_version],
+      )
+    elif core_version != None:
+      fail("Unknown core version {}".format(core_version))
 
   # Use the final dictionaries to register all the toolchains
   for toolchain in _toolchains:

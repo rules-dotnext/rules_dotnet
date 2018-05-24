@@ -130,7 +130,7 @@ def _dotnet_context_data(ctx):
       _libVersion = ctx.attr._libVersion,
   )
 
-dotnet_context_data = rule(
+core_context_data = rule(
     _dotnet_context_data,
     attrs = {
         "_mcs_bin": attr.label(
@@ -151,3 +151,23 @@ dotnet_context_data = rule(
     },
 )
   
+dotnet_context_data = rule(
+    _dotnet_context_data,
+    attrs = {
+        "_mcs_bin": attr.label(
+            allow_files = True,
+            default="@core_sdk//:mcs_bin",
+        ),
+        "_mono_bin": attr.label(
+            allow_files = True,
+            default="@core_sdk//:mono_bin",
+        ),
+        "_lib": attr.label(
+            allow_files = True,
+            default="@core_sdk//:lib",
+        ),
+        "_libVersion": attr.string(
+            default="",
+        ),
+    },
+)
