@@ -2,6 +2,11 @@ load(
     "//dotnet/private:dotnet_toolchain.bzl",
     "dotnet_toolchain",
 )
+
+load(
+    "//dotnet/private:core_toolchain.bzl",
+    "core_toolchain",
+)
 load(
     "//dotnet/private:sdk.bzl",
     "dotnet_download_sdk",
@@ -51,6 +56,7 @@ def _generate_toolchains():
     csc_flags = []
     toolchains.append(dict(
         name = toolchain_name,
+        impl = impl,
         host = host,
         csc_flags = csc_flags,
     ))
@@ -135,8 +141,16 @@ def declare_constraints():
 def declare_toolchains():
   # Use the final dictionaries to create all the toolchains
   for toolchain in _toolchains:
-    dotnet_toolchain(
-        # Required fields
-        name = toolchain["name"],
-        host = toolchain["host"],
-    )
+    if toolchain["impl"] == "mono":
+        dotnet_toolchain(
+            # Required fields
+            name = toolchain["name"],
+            host = toolchain["host"],
+        )
+    else:
+        core_toolchain(
+            # Required fields
+            name = toolchain["name"],
+            host = toolchain["host"],
+        )
+    

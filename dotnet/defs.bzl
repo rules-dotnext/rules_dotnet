@@ -32,6 +32,11 @@ load(
 )
 
 load(
+    "@io_bazel_rules_dotnet//dotnet/private:rules/library_core.bzl", 
+    core_library = "core_library"
+)
+
+load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/resx.bzl", 
     dotnet_resx = "dotnet_resx"
 )

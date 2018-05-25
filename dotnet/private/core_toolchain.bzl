@@ -20,60 +20,46 @@ load(
     "paths",
 )
 
+
 load("@io_bazel_rules_dotnet//dotnet/private:actions/binary.bzl", "emit_binary")
-load("@io_bazel_rules_dotnet//dotnet/private:actions/library.bzl", "emit_library")
+load("@io_bazel_rules_dotnet//dotnet/private:actions/library_core.bzl", "emit_library")
 load("@io_bazel_rules_dotnet//dotnet/private:actions/resx.bzl", "emit_resx")
 
 def _get_dotnet_runner(context_data, ext):
   for f in context_data._mono_bin.files:
     basename = paths.basename(f.path)
-    if basename != "mono" + ext:
+    if basename != "dotnet" + ext:
       continue
     return f
-  fail("Could not find mono executable in dotnet_sdk (mono_bin)")
+  fail("Could not find dotnet core executable in core_sdk (mono_bin)")
 
 
 def _get_dotnet_mcs(context_data):
   for f in context_data._mcs_bin.files:
     basename = paths.basename(f.path)
-    if basename != "mcs.exe":
+    if basename != "csc.dll":
       continue
     return f
 
   for f in context_data._lib.files:
     basename = paths.basename(f.path)
-    if basename != "mcs.exe":
+    if basename != "csc.dll":
       continue
     return f
-  fail("Could not find mcs.exe in dotnet_sdk (mcs_bin, lib)")
+  fail("Could not find csc.dll in core_sdk (mcs_bin, lib)")
 
 def _get_dotnet_resgen(context_data):
-  for f in context_data._mcs_bin.files:
-    basename = paths.basename(f.path)
-    if basename != "resgen.exe":
-      continue
-    return f
-
-  for f in context_data._lib.files:
-    basename = paths.basename(f.path)
-    if basename != "resgen.exe":
-      continue
-    return f
-
-  fail("Could not find resgen.exe in dotnet_sdk (mcs_bin, lib)")
+  return None
 
 def _get_dotnet_stdlib(context_data):
-  for f in context_data._lib.files:
+  for f in context_data._shared.files:
     basename = paths.basename(f.path)
     if basename != "mscorlib.dll":
       continue
-    dirname = paths.dirname(f.path)
-    if dirname.find(context_data._libVersion)==-1:
-      continue
     return f
-  fail("Could not find mscorlib in dotnet_sdk (lib, %s)" % context_data._libVersion)
+  fail("Could not find mscorlib in core_sdk (lib, %s)" % context_data._libVersion)
 
-def _dotnet_toolchain_impl(ctx):
+def _core_toolchain_impl(ctx):
   return [platform_common.ToolchainInfo(
       name = ctx.label.name,
       default_dotnetimpl = ctx.attr.dotnetimpl,
@@ -93,8 +79,8 @@ def _dotnet_toolchain_impl(ctx):
       ),
   )]
 
-_dotnet_toolchain = rule(
-    _dotnet_toolchain_impl,
+_core_toolchain = rule(
+    _core_toolchain_impl,
     attrs = {
         # Minimum requirements to specify a toolchain
         "dotnetimpl": attr.string(mandatory = True),
@@ -103,8 +89,8 @@ _dotnet_toolchain = rule(
     },
 )
 
-def dotnet_toolchain(name, host, constraints=[], **kwargs):
-  """See dotnet/toolchains.rst#dotnet-toolchain for full documentation."""
+def core_toolchain(name, host, constraints=[], **kwargs):
+  """See dotnet/toolchains.rst#core-toolchain for full documentation."""
 
   elems = host.split("_")
   impl, os, arch = elems[0], elems[1], elems[2]
@@ -114,7 +100,7 @@ def dotnet_toolchain(name, host, constraints=[], **kwargs):
   ]
 
   impl_name = name + "-impl"
-  _dotnet_toolchain(
+  _core_toolchain(
       name = impl_name,
       dotnetimpl = impl,
       dotnetos = os,
@@ -125,7 +111,7 @@ def dotnet_toolchain(name, host, constraints=[], **kwargs):
   )
   native.toolchain(
       name = name,
-      toolchain_type = "@io_bazel_rules_dotnet//dotnet:toolchain",
+      toolchain_type = "@io_bazel_rules_dotnet//dotnet:toolchain_core",
       exec_compatible_with = host_constraints,
       toolchain = ":"+impl_name,
   )

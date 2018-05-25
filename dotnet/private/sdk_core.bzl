@@ -18,6 +18,7 @@ def _core_download_sdk_impl(ctx):
   ctx.symlink("core/sdk/" + ctx.attr.version + "/Roslyn/bincore", "mcs_bin")
   ctx.symlink("core/.", "mono_bin")
   ctx.symlink("core/sdk/" + ctx.attr.version, "lib")
+  ctx.symlink("core/shared/", "shared")
 
 
 core_download_sdk = repository_rule(

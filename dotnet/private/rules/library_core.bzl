@@ -10,8 +10,8 @@ load(
 )
 
 
-def _dotnet_library_impl(ctx):
-  """dotnet_library_impl emits actions for compiling dotnet executable assembly."""
+def _core_library_impl(ctx):
+  """core_library_impl emits actions for compiling dotnet executable assembly."""
   dotnet = dotnet_context(ctx)
   name = ctx.label.name
  
@@ -35,16 +35,16 @@ def _dotnet_library_impl(ctx):
       ),
   ]
   
-dotnet_library = rule(
-    _dotnet_library_impl,
+core_library = rule(
+    _core_library_impl,
     attrs = {
         "deps": attr.label_list(providers=[DotnetLibrary]),
         "resources": attr.label_list(providers=[DotnetResource]),
         "srcs": attr.label_list(allow_files = FileType([".cs"])),        
         "out": attr.string(),
         "defines": attr.string_list(),
-        "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))
+        "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:core_context_data"))
     },
-    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
+    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_core"],
     executable = False,
 )
