@@ -91,7 +91,7 @@ def dotnet_context(ctx, attr=None):
   if not attr:
     attr = ctx.attr
 
-  context_data = attr._dotnet_context_data 
+  context_data = attr.dotnet_context_data 
   ext = ""
   if toolchain.default_dotnetos == "windows":
     ext = ".exe"
@@ -130,7 +130,7 @@ def _dotnet_context_data(ctx):
       _libVersion = ctx.attr._libVersion,
   )
 
-core_context_data = rule(
+dotnet_context_data = rule(
     _dotnet_context_data,
     attrs = {
         "_mcs_bin": attr.label(
@@ -151,7 +151,7 @@ core_context_data = rule(
     },
 )
   
-dotnet_context_data = rule(
+core_context_data = rule(
     _dotnet_context_data,
     attrs = {
         "_mcs_bin": attr.label(

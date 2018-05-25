@@ -43,7 +43,7 @@ dotnet_library = rule(
         "srcs": attr.label_list(allow_files = FileType([".cs"])),        
         "out": attr.string(),
         "defines": attr.string_list(),
-        "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))
+        "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
     executable = False,

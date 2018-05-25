@@ -45,7 +45,7 @@ def _dotnet_stdlib_impl(ctx):
 dotnet_stdlib = rule(
     _dotnet_stdlib_impl,
     attrs = {
-        "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))
+        "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
     executable = False,

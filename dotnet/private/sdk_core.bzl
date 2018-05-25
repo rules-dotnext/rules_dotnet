@@ -15,9 +15,9 @@ def _core_download_sdk_impl(ctx):
   filename, sha256 = ctx.attr.sdks[host]
   _sdk_build_file(ctx)
   _remote_sdk(ctx, [filename], ctx.attr.strip_prefix, sha256)
-  ctx.symlink("sdk/" + ctx.attr.version + "/Roslyn/bincore", "mcs_bin")
-  ctx.symlink(".", "mono_bin")
-  ctx.symlink("sdk/" + ctx.attr.version, "lib")
+  ctx.symlink("core/sdk/" + ctx.attr.version + "/Roslyn/bincore", "mcs_bin")
+  ctx.symlink("core/.", "mono_bin")
+  ctx.symlink("core/sdk/" + ctx.attr.version, "lib")
 
 
 core_download_sdk = repository_rule(
@@ -37,6 +37,7 @@ def _remote_sdk(ctx, urls, strip_prefix, sha256):
       url = urls,
       stripPrefix = strip_prefix,
       sha256 = sha256,
+      output="core",
   )
   
 def _sdk_build_file(ctx):
