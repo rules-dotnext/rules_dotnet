@@ -72,6 +72,7 @@ def dotnet_context(ctx, attr=None):
       workspace_name = ctx.workspace_name,
       libVersion = context_data._libVersion,
       lib = context_data._lib,
+      shared = context_data._shared,
       _ctx = ctx
   )
 
