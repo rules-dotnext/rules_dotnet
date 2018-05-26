@@ -17,5 +17,6 @@ core_library(
     visibility = ["//visibility:public"],
     deps = [
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.CoreLib.dll",
     ]
 )
