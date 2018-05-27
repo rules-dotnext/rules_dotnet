@@ -282,8 +282,7 @@ const char *GetManifestDir() {
 
 void LinkHostFxr(const char *manifestDir)
 {
-	char buffer[64*1024], *q, *z;
-    char buffer2[64*1024];
+	char buffer[64*1024], *q;
     const struct Entry *p = g_Entries;
 
 	while(p != NULL) {

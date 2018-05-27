@@ -100,6 +100,8 @@ Setup
 
     load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_library", "dotnet_binary")
 
+* If you intend to use CoreCLR make sure to install libunwind-devel if it is not present on your system
+  (applies to Linux).
 
 Examples
 ~~~~~~~~

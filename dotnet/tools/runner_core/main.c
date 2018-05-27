@@ -104,6 +104,9 @@ int main(int argc, char *argv[], char *envp[])
 	sprintf(buffer, "MONO_PATH=%s", manifestDir);
 	putenv(buffer);
 	ReadManifest(manifestDir);
+	#ifndef _MSC_VER
+	PrepareExe(manifestDir);
+	#endif
 	LinkFiles(manifestDir);
 	LinkHostFxr(manifestDir);
 	RunExe(manifestDir, argc, argv);

@@ -12,3 +12,6 @@ void LinkFilesTree(const char *manifestDir);
 const char *GetManifestDir();
 void LinkHostFxr(const char *manifestDir);
 
+#ifndef _MSC_VER
+void PrepareExe(const char *manifestDir);
+#endif
