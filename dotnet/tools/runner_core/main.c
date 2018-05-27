@@ -26,9 +26,7 @@ static void RunExe(const char *manifestDir, int argc, char **argv) {
 	char **args;
 	int i, c;
     int test = strlen(Nunit) > 0;
-#ifndef _MSC_VER
-	char monofullpath[64*1024];
-#endif
+	char runnerfullpath[64*1024];
 
 	getcwd(fullpath, sizeof(fullpath));
 	printf("cwd %s\n", fullpath);
@@ -41,10 +39,12 @@ static void RunExe(const char *manifestDir, int argc, char **argv) {
 		++found;
 	}
 #ifdef _MSC_VER
-	c = argc+1;
+	c = argc+2;
 	if (test) c = c + 2;
 	args = malloc( (c) * sizeof(char*));
 	c = 0;
+	sprintf(runnerfullpath, "%s/dotnet", manifestDir);
+	args[c++] = strdup(runnerfullpath);
 	if (test) {
 		sprintf(fullpath, "%s/nunit-console-runner-exe_exe.exe", manifestDir);
 		args[c++] = strdup(fullpath);
@@ -68,8 +68,8 @@ static void RunExe(const char *manifestDir, int argc, char **argv) {
 	if (test) c = c+2;
 	args = malloc( (c) * sizeof(char*));
 	c = 0;
-	sprintf(monofullpath, "%s/mono", manifestDir);
-	args[c++] = strdup(monofullpath);
+	sprintf(runnerfullpath, "%s/dotnet", manifestDir);
+	args[c++] = strdup(runnerfullpath);
 	if (test) {
 		sprintf(fullpath, "%s/nunit-console-runner-exe_exe.exe", manifestDir);
 		args[c++] = strdup(fullpath);
@@ -105,6 +105,7 @@ int main(int argc, char *argv[], char *envp[])
 	putenv(buffer);
 	ReadManifest(manifestDir);
 	LinkFiles(manifestDir);
+	LinkHostFxr(manifestDir);
 	RunExe(manifestDir, argc, argv);
 
 	return 0;

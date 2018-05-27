@@ -75,6 +75,15 @@ script:
       --batch \
       --host_jvm_args=-Xmx500m \
       --host_jvm_args=-Xms500m \
+      run \
+      -s \
+      --local_resources=400,1,1.0 \
+      //tests/examples/example_binary:hello-core
+  - |
+    bazel \
+      --batch \
+      --host_jvm_args=-Xmx500m \
+      --host_jvm_args=-Xms500m \
       test \
       -s \
       --local_resources=400,1,1.0 \

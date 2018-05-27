@@ -21,7 +21,7 @@ load(
 )
 
 
-load("@io_bazel_rules_dotnet//dotnet/private:actions/binary.bzl", "emit_binary")
+load("@io_bazel_rules_dotnet//dotnet/private:actions/binary_core.bzl", "emit_binary")
 load("@io_bazel_rules_dotnet//dotnet/private:actions/library_core.bzl", "emit_library")
 load("@io_bazel_rules_dotnet//dotnet/private:actions/resx.bzl", "emit_resx")
 

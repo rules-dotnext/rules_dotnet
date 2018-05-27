@@ -2,158 +2,1467 @@ package(default_visibility = [ "//visibility:public" ])
 
 load("@io_bazel_rules_dotnet//dotnet/private:rules/stdlib_core.bzl", "core_stdlib")
 
+core_stdlib(name = "System.Private.CoreLib.dll")
 
-core_stdlib(name="Microsoft.CSharp.dll")
-core_stdlib(name="Microsoft.VisualBasic.dll")
-core_stdlib(name="Microsoft.Win32.Primitives.dll")
-core_stdlib(name="Microsoft.Win32.Registry.dll")
-core_stdlib(name="SOS.NETCore.dll")
-core_stdlib(name="System.AppContext.dll")
-core_stdlib(name="System.Buffers.dll")
-core_stdlib(name="System.Collections.Concurrent.dll")
-core_stdlib(name="System.Collections.Immutable.dll")
-core_stdlib(name="System.Collections.NonGeneric.dll")
-core_stdlib(name="System.Collections.Specialized.dll")
-core_stdlib(name="System.Collections.dll")
-core_stdlib(name="System.ComponentModel.Annotations.dll")
-core_stdlib(name="System.ComponentModel.Composition.dll")
-core_stdlib(name="System.ComponentModel.DataAnnotations.dll")
-core_stdlib(name="System.ComponentModel.EventBasedAsync.dll")
-core_stdlib(name="System.ComponentModel.Primitives.dll")
-core_stdlib(name="System.ComponentModel.TypeConverter.dll")
-core_stdlib(name="System.ComponentModel.dll")
-core_stdlib(name="System.Configuration.dll")
-core_stdlib(name="System.Console.dll")
-core_stdlib(name="System.Core.dll")
-core_stdlib(name="System.Data.Common.dll")
-core_stdlib(name="System.Data.dll")
-core_stdlib(name="System.Diagnostics.Contracts.dll")
-core_stdlib(name="System.Diagnostics.Debug.dll")
-core_stdlib(name="System.Diagnostics.DiagnosticSource.dll")
-core_stdlib(name="System.Diagnostics.FileVersionInfo.dll")
-core_stdlib(name="System.Diagnostics.Process.dll")
-core_stdlib(name="System.Diagnostics.StackTrace.dll")
-core_stdlib(name="System.Diagnostics.TextWriterTraceListener.dll")
-core_stdlib(name="System.Diagnostics.Tools.dll")
-core_stdlib(name="System.Diagnostics.TraceSource.dll")
-core_stdlib(name="System.Diagnostics.Tracing.dll")
-core_stdlib(name="System.Drawing.Primitives.dll")
-core_stdlib(name="System.Drawing.dll")
-core_stdlib(name="System.Dynamic.Runtime.dll")
-core_stdlib(name="System.Globalization.Calendars.dll")
-core_stdlib(name="System.Globalization.Extensions.dll")
-core_stdlib(name="System.Globalization.dll")
-core_stdlib(name="System.IO.Compression.FileSystem.dll")
-core_stdlib(name="System.IO.Compression.ZipFile.dll")
-core_stdlib(name="System.IO.Compression.dll")
-core_stdlib(name="System.IO.FileSystem.AccessControl.dll")
-core_stdlib(name="System.IO.FileSystem.DriveInfo.dll")
-core_stdlib(name="System.IO.FileSystem.Primitives.dll")
-core_stdlib(name="System.IO.FileSystem.Watcher.dll")
-core_stdlib(name="System.IO.FileSystem.dll")
-core_stdlib(name="System.IO.IsolatedStorage.dll")
-core_stdlib(name="System.IO.MemoryMappedFiles.dll")
-core_stdlib(name="System.IO.Pipes.dll")
-core_stdlib(name="System.IO.UnmanagedMemoryStream.dll")
-core_stdlib(name="System.IO.dll")
-core_stdlib(name="System.Linq.Expressions.dll")
-core_stdlib(name="System.Linq.Parallel.dll")
-core_stdlib(name="System.Linq.Queryable.dll")
-core_stdlib(name="System.Linq.dll")
-core_stdlib(name="System.Net.Http.dll")
-core_stdlib(name="System.Net.HttpListener.dll")
-core_stdlib(name="System.Net.Mail.dll")
-core_stdlib(name="System.Net.NameResolution.dll")
-core_stdlib(name="System.Net.NetworkInformation.dll")
-core_stdlib(name="System.Net.Ping.dll")
-core_stdlib(name="System.Net.Primitives.dll")
-core_stdlib(name="System.Net.Requests.dll")
-core_stdlib(name="System.Net.Security.dll")
-core_stdlib(name="System.Net.ServicePoint.dll")
-core_stdlib(name="System.Net.Sockets.dll")
-core_stdlib(name="System.Net.WebClient.dll")
-core_stdlib(name="System.Net.WebHeaderCollection.dll")
-core_stdlib(name="System.Net.WebProxy.dll")
-core_stdlib(name="System.Net.WebSockets.Client.dll")
-core_stdlib(name="System.Net.WebSockets.dll")
-core_stdlib(name="System.Net.dll")
-core_stdlib(name="System.Numerics.Vectors.dll")
-core_stdlib(name="System.Numerics.dll")
-core_stdlib(name="System.ObjectModel.dll")
-core_stdlib(name="System.Private.CoreLib.dll")
-core_stdlib(name="System.Private.DataContractSerialization.dll")
-core_stdlib(name="System.Private.Uri.dll")
-core_stdlib(name="System.Private.Xml.Linq.dll")
-core_stdlib(name="System.Private.Xml.dll")
-core_stdlib(name="System.Reflection.DispatchProxy.dll")
-core_stdlib(name="System.Reflection.Emit.ILGeneration.dll")
-core_stdlib(name="System.Reflection.Emit.Lightweight.dll")
-core_stdlib(name="System.Reflection.Emit.dll")
-core_stdlib(name="System.Reflection.Extensions.dll")
-core_stdlib(name="System.Reflection.Metadata.dll")
-core_stdlib(name="System.Reflection.Primitives.dll")
-core_stdlib(name="System.Reflection.TypeExtensions.dll")
-core_stdlib(name="System.Reflection.dll")
-core_stdlib(name="System.Resources.Reader.dll")
-core_stdlib(name="System.Resources.ResourceManager.dll")
-core_stdlib(name="System.Resources.Writer.dll")
-core_stdlib(name="System.Runtime.CompilerServices.VisualC.dll")
-core_stdlib(name="System.Runtime.Extensions.dll")
-core_stdlib(name="System.Runtime.Handles.dll")
-core_stdlib(name="System.Runtime.InteropServices.RuntimeInformation.dll")
-core_stdlib(name="System.Runtime.InteropServices.WindowsRuntime.dll")
-core_stdlib(name="System.Runtime.InteropServices.dll")
-core_stdlib(name="System.Runtime.Loader.dll")
-core_stdlib(name="System.Runtime.Numerics.dll")
-core_stdlib(name="System.Runtime.Serialization.Formatters.dll")
-core_stdlib(name="System.Runtime.Serialization.Json.dll")
-core_stdlib(name="System.Runtime.Serialization.Primitives.dll")
-core_stdlib(name="System.Runtime.Serialization.Xml.dll")
-core_stdlib(name="System.Runtime.Serialization.dll")
-core_stdlib(name="System.Runtime.dll")
-core_stdlib(name="System.Security.AccessControl.dll")
-core_stdlib(name="System.Security.Claims.dll")
-core_stdlib(name="System.Security.Cryptography.Algorithms.dll")
-core_stdlib(name="System.Security.Cryptography.Cng.dll")
-core_stdlib(name="System.Security.Cryptography.Csp.dll")
-core_stdlib(name="System.Security.Cryptography.Encoding.dll")
-core_stdlib(name="System.Security.Cryptography.OpenSsl.dll")
-core_stdlib(name="System.Security.Cryptography.Primitives.dll")
-core_stdlib(name="System.Security.Cryptography.X509Certificates.dll")
-core_stdlib(name="System.Security.Principal.Windows.dll")
-core_stdlib(name="System.Security.Principal.dll")
-core_stdlib(name="System.Security.SecureString.dll")
-core_stdlib(name="System.Security.dll")
-core_stdlib(name="System.ServiceModel.Web.dll")
-core_stdlib(name="System.ServiceProcess.dll")
-core_stdlib(name="System.Text.Encoding.Extensions.dll")
-core_stdlib(name="System.Text.Encoding.dll")
-core_stdlib(name="System.Text.RegularExpressions.dll")
-core_stdlib(name="System.Threading.Overlapped.dll")
-core_stdlib(name="System.Threading.Tasks.Dataflow.dll")
-core_stdlib(name="System.Threading.Tasks.Extensions.dll")
-core_stdlib(name="System.Threading.Tasks.Parallel.dll")
-core_stdlib(name="System.Threading.Tasks.dll")
-core_stdlib(name="System.Threading.Thread.dll")
-core_stdlib(name="System.Threading.ThreadPool.dll")
-core_stdlib(name="System.Threading.Timer.dll")
-core_stdlib(name="System.Threading.dll")
-core_stdlib(name="System.Transactions.Local.dll")
-core_stdlib(name="System.Transactions.dll")
-core_stdlib(name="System.ValueTuple.dll")
-core_stdlib(name="System.Web.HttpUtility.dll")
-core_stdlib(name="System.Web.dll")
-core_stdlib(name="System.Windows.dll")
-core_stdlib(name="System.Xml.Linq.dll")
-core_stdlib(name="System.Xml.ReaderWriter.dll")
-core_stdlib(name="System.Xml.Serialization.dll")
-core_stdlib(name="System.Xml.XDocument.dll")
-core_stdlib(name="System.Xml.XPath.XDocument.dll")
-core_stdlib(name="System.Xml.XPath.dll")
-core_stdlib(name="System.Xml.XmlDocument.dll")
-core_stdlib(name="System.Xml.XmlSerializer.dll")
-core_stdlib(name="System.Xml.dll")
-core_stdlib(name="System.dll")
-core_stdlib(name="WindowsBase.dll")
-core_stdlib(name="mscorlib.dll")
-core_stdlib(name="netstandard.dll")
+core_stdlib(name = "Microsoft.CSharp.dll", deps = [
+      ":netstandard.dll",
+    ]
+)
+core_stdlib(name = "Microsoft.VisualBasic.dll", deps = [
+      ":netstandard.dll",
+    ]
+)
+core_stdlib(name = "Microsoft.Win32.Primitives.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Runtime.InteropServices.dll",
+    ]
+)
+core_stdlib(name = "Microsoft.Win32.Registry.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Security.AccessControl.dll",
+      ":System.Security.Principal.Windows.dll",
+      ":System.Collections.dll",
+      ":System.Buffers.dll",
+    ]
+)
+core_stdlib(name = "mscorlib.dll", deps = [
+      ":System.Private.CoreLib.dll",
+      ":Microsoft.Win32.Registry.dll",
+      ":System.Security.Principal.Windows.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Collections.Concurrent.dll",
+      ":System.ObjectModel.dll",
+      ":System.Console.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Diagnostics.StackTrace.dll",
+      ":System.IO.FileSystem.dll",
+      ":System.IO.FileSystem.DriveInfo.dll",
+      ":System.Runtime.dll",
+      ":System.IO.IsolatedStorage.dll",
+      ":System.ComponentModel.dll",
+      ":System.Threading.Thread.dll",
+      ":System.Resources.Writer.dll",
+      ":System.Runtime.CompilerServices.VisualC.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Serialization.Formatters.dll",
+      ":System.Security.AccessControl.dll",
+      ":System.IO.FileSystem.AccessControl.dll",
+      ":System.Security.Claims.dll",
+      ":System.Security.Cryptography.Algorithms.dll",
+      ":System.Security.Cryptography.Primitives.dll",
+      ":System.Security.Cryptography.Csp.dll",
+      ":System.Security.Cryptography.Encoding.dll",
+      ":System.Security.Cryptography.X509Certificates.dll",
+      ":System.Security.Principal.dll",
+      ":System.Threading.dll",
+      ":System.Threading.Tasks.Parallel.dll",
+    ]
+)
+core_stdlib(name = "netstandard.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.IO.MemoryMappedFiles.dll",
+      ":System.IO.Pipes.dll",
+      ":System.Diagnostics.Process.dll",
+      ":System.Security.Cryptography.X509Certificates.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Diagnostics.Tools.dll",
+      ":System.Collections.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Collections.Concurrent.dll",
+      ":System.ObjectModel.dll",
+      ":System.Collections.Specialized.dll",
+      ":System.ComponentModel.TypeConverter.dll",
+      ":System.ComponentModel.EventBasedAsync.dll",
+      ":System.ComponentModel.Primitives.dll",
+      ":System.ComponentModel.dll",
+      ":Microsoft.Win32.Primitives.dll",
+      ":System.Console.dll",
+      ":System.Data.Common.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Diagnostics.TraceSource.dll",
+      ":System.Diagnostics.Contracts.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Diagnostics.TextWriterTraceListener.dll",
+      ":System.Diagnostics.FileVersionInfo.dll",
+      ":System.Diagnostics.StackTrace.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.Drawing.Primitives.dll",
+      ":System.Linq.Expressions.dll",
+      ":System.IO.Compression.dll",
+      ":System.IO.Compression.ZipFile.dll",
+      ":System.IO.FileSystem.dll",
+      ":System.IO.FileSystem.DriveInfo.dll",
+      ":System.IO.FileSystem.Watcher.dll",
+      ":System.IO.IsolatedStorage.dll",
+      ":System.Linq.dll",
+      ":System.Linq.Queryable.dll",
+      ":System.Linq.Parallel.dll",
+      ":System.Threading.Thread.dll",
+      ":System.Net.Requests.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Net.HttpListener.dll",
+      ":System.Net.ServicePoint.dll",
+      ":System.Net.NameResolution.dll",
+      ":System.Net.WebClient.dll",
+      ":System.Net.Http.dll",
+      ":System.Net.WebHeaderCollection.dll",
+      ":System.Net.WebProxy.dll",
+      ":System.Net.Mail.dll",
+      ":System.Net.NetworkInformation.dll",
+      ":System.Net.Ping.dll",
+      ":System.Net.Security.dll",
+      ":System.Net.Sockets.dll",
+      ":System.Net.WebSockets.Client.dll",
+      ":System.Net.WebSockets.dll",
+      ":System.Runtime.Numerics.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Reflection.Primitives.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Resources.Writer.dll",
+      ":System.Runtime.CompilerServices.VisualC.dll",
+      ":System.Runtime.InteropServices.RuntimeInformation.dll",
+      ":System.Runtime.Serialization.Primitives.dll",
+      ":System.Runtime.Serialization.Xml.dll",
+      ":System.Runtime.Serialization.Json.dll",
+      ":System.Runtime.Serialization.Formatters.dll",
+      ":System.Security.Claims.dll",
+      ":System.Security.Cryptography.Algorithms.dll",
+      ":System.Security.Cryptography.Csp.dll",
+      ":System.Security.Cryptography.Encoding.dll",
+      ":System.Security.Cryptography.Primitives.dll",
+      ":System.Security.Principal.dll",
+      ":System.Text.Encoding.Extensions.dll",
+      ":System.Text.RegularExpressions.dll",
+      ":System.Threading.dll",
+      ":System.Threading.Overlapped.dll",
+      ":System.Threading.ThreadPool.dll",
+      ":System.Threading.Tasks.Parallel.dll",
+      ":System.Threading.Timer.dll",
+      ":System.Transactions.Local.dll",
+      ":System.Web.HttpUtility.dll",
+      ":System.Xml.ReaderWriter.dll",
+      ":System.Xml.XDocument.dll",
+      ":System.Xml.XmlSerializer.dll",
+      ":System.Xml.XPath.XDocument.dll",
+      ":System.Xml.XPath.dll",
+    ]
+)
+core_stdlib(name = "SOS.NETCore.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Reflection.Metadata.dll",
+      ":System.Collections.dll",
+      ":System.IO.dll",
+      ":System.Collections.Immutable.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.IO.FileSystem.dll",
+    ]
+)
+core_stdlib(name = "System.AppContext.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Buffers.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Collections.Concurrent.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Threading.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Collections.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.Runtime.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.Collections.dll", deps = [
+      ":System.Private.CoreLib.dll",
+      ":System.Runtime.dll",
+    ]
+)
+core_stdlib(name = "System.Collections.Immutable.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Collections.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Diagnostics.Tools.dll",
+      ":System.Linq.dll",
+      ":System.Threading.dll",
+      ":System.Runtime.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.Collections.NonGeneric.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Threading.dll",
+    ]
+)
+core_stdlib(name = "System.Collections.Specialized.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Threading.dll",
+    ]
+)
+core_stdlib(name = "System.ComponentModel.Annotations.dll", deps = [
+      ":netstandard.dll",
+    ]
+)
+core_stdlib(name = "System.ComponentModel.Composition.dll", deps = [
+      ":System.Runtime.dll",
+    ]
+)
+core_stdlib(name = "System.ComponentModel.DataAnnotations.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.ComponentModel.Annotations.dll",
+    ]
+)
+core_stdlib(name = "System.ComponentModel.dll", deps = [
+      ":System.Runtime.dll",
+    ]
+)
+core_stdlib(name = "System.ComponentModel.EventBasedAsync.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Threading.dll",
+      ":System.ComponentModel.Primitives.dll",
+      ":System.ComponentModel.dll",
+    ]
+)
+core_stdlib(name = "System.ComponentModel.Primitives.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.ComponentModel.dll",
+      ":System.Threading.dll",
+      ":System.Runtime.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.ComponentModel.TypeConverter.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Net.Security.dll",
+      ":System.Collections.dll",
+      ":System.Drawing.Primitives.dll",
+      ":System.ComponentModel.Primitives.dll",
+      ":System.Threading.Timer.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.ComponentModel.dll",
+      ":System.ObjectModel.dll",
+      ":System.Collections.Specialized.dll",
+      ":System.Diagnostics.TraceSource.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Runtime.Serialization.Formatters.dll",
+      ":System.Linq.dll",
+      ":System.Resources.Writer.dll",
+      ":System.Threading.dll",
+      ":System.IO.FileSystem.dll",
+      ":System.Text.RegularExpressions.dll",
+    ]
+)
+core_stdlib(name = "System.Configuration.dll", deps = [
+      ":System.Runtime.dll",
+    ]
+)
+core_stdlib(name = "System.Console.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Threading.dll",
+      ":System.Text.Encoding.Extensions.dll",
+      ":System.Threading.Tasks.dll",
+    ]
+)
+core_stdlib(name = "System.Core.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.IO.MemoryMappedFiles.dll",
+      ":System.Security.Cryptography.Cng.dll",
+      ":System.IO.Pipes.dll",
+      ":System.Collections.dll",
+      ":System.Linq.Expressions.dll",
+      ":System.Linq.dll",
+      ":System.Linq.Queryable.dll",
+      ":System.Linq.Parallel.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Security.Cryptography.Algorithms.dll",
+      ":System.Security.Cryptography.Csp.dll",
+      ":System.Security.Cryptography.X509Certificates.dll",
+      ":System.Threading.dll",
+      ":System.Threading.Tasks.dll",
+    ]
+)
+core_stdlib(name = "System.Data.Common.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Xml.ReaderWriter.dll",
+      ":System.ObjectModel.dll",
+      ":System.ComponentModel.TypeConverter.dll",
+      ":System.Collections.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.ComponentModel.Primitives.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Runtime.Numerics.dll",
+      ":System.ComponentModel.dll",
+      ":System.Xml.XmlSerializer.dll",
+      ":System.Runtime.Serialization.Formatters.dll",
+      ":System.Threading.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.Text.Encoding.Extensions.dll",
+      ":System.Collections.Concurrent.dll",
+      ":System.Text.RegularExpressions.dll",
+      ":System.Transactions.Local.dll",
+      ":System.Threading.Thread.dll",
+      ":System.Linq.Expressions.dll",
+    ]
+)
+core_stdlib(name = "System.Data.dll", deps = [
+      ":System.Private.CoreLib.dll",
+      ":System.Data.Common.dll",
+    ]
+)
+core_stdlib(name = "System.Diagnostics.Contracts.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Diagnostics.Debug.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Diagnostics.DiagnosticSource.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.Collections.dll",
+      ":System.Threading.dll",
+      ":System.Diagnostics.Debug.dll",
+    ]
+)
+core_stdlib(name = "System.Diagnostics.FileVersionInfo.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.IO.FileSystem.dll",
+    ]
+)
+core_stdlib(name = "System.Diagnostics.Process.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Collections.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Threading.ThreadPool.dll",
+      ":System.ComponentModel.Primitives.dll",
+      ":System.Threading.Thread.dll",
+      ":System.Diagnostics.FileVersionInfo.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Collections.Specialized.dll",
+      ":Microsoft.Win32.Registry.dll",
+      ":System.Text.Encoding.Extensions.dll",
+      ":System.Threading.dll",
+      ":System.ComponentModel.TypeConverter.dll",
+      ":Microsoft.Win32.Primitives.dll",
+      ":System.IO.FileSystem.dll",
+    ]
+)
+core_stdlib(name = "System.Diagnostics.StackTrace.dll", deps = [
+      ":System.Private.CoreLib.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Reflection.Metadata.dll",
+      ":System.IO.FileSystem.dll",
+    ]
+)
+core_stdlib(name = "System.Diagnostics.TextWriterTraceListener.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Diagnostics.TraceSource.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Threading.dll",
+    ]
+)
+core_stdlib(name = "System.Diagnostics.Tools.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Diagnostics.TraceSource.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Threading.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Collections.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Collections.Specialized.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.IO.FileSystem.dll",
+    ]
+)
+core_stdlib(name = "System.Diagnostics.Tracing.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.dll", deps = [
+      ":System.Private.CoreLib.dll",
+      ":System.Collections.dll",
+      ":System.IO.Compression.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Diagnostics.Process.dll",
+      ":System.Security.Cryptography.X509Certificates.dll",
+      ":System.Diagnostics.Tools.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.Concurrent.dll",
+      ":System.Runtime.dll",
+      ":System.ObjectModel.dll",
+      ":System.Collections.Specialized.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.ComponentModel.TypeConverter.dll",
+      ":System.ComponentModel.EventBasedAsync.dll",
+      ":System.ComponentModel.Primitives.dll",
+      ":System.ComponentModel.dll",
+      ":Microsoft.Win32.Primitives.dll",
+      ":System.Diagnostics.TraceSource.dll",
+      ":System.Diagnostics.TextWriterTraceListener.dll",
+      ":System.Diagnostics.FileVersionInfo.dll",
+      ":System.Private.Uri.dll",
+      ":System.IO.FileSystem.Watcher.dll",
+      ":System.Net.Requests.dll",
+      ":System.Net.HttpListener.dll",
+      ":System.Net.ServicePoint.dll",
+      ":System.Net.NameResolution.dll",
+      ":System.Net.WebClient.dll",
+      ":System.Net.WebHeaderCollection.dll",
+      ":System.Net.WebProxy.dll",
+      ":System.Net.Mail.dll",
+      ":System.Net.NetworkInformation.dll",
+      ":System.Net.Ping.dll",
+      ":System.Net.Security.dll",
+      ":System.Net.Sockets.dll",
+      ":System.Net.WebSockets.Client.dll",
+      ":System.Net.WebSockets.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Security.Cryptography.Encoding.dll",
+      ":System.Text.RegularExpressions.dll",
+      ":System.Threading.dll",
+      ":System.Threading.Thread.dll",
+    ]
+)
+core_stdlib(name = "System.Drawing.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Drawing.Primitives.dll",
+      ":System.ComponentModel.TypeConverter.dll",
+    ]
+)
+core_stdlib(name = "System.Drawing.Primitives.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.ComponentModel.Primitives.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Collections.dll",
+      ":System.Runtime.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.Dynamic.Runtime.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Linq.Expressions.dll",
+    ]
+)
+core_stdlib(name = "System.Globalization.Calendars.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Globalization.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Globalization.Extensions.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.IO.Compression.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Threading.dll",
+      ":System.Buffers.dll",
+    ]
+)
+core_stdlib(name = "System.IO.Compression.FileSystem.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.IO.Compression.ZipFile.dll",
+    ]
+)
+core_stdlib(name = "System.IO.Compression.ZipFile.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.IO.Compression.dll",
+      ":System.IO.FileSystem.dll",
+      ":System.Buffers.dll",
+    ]
+)
+core_stdlib(name = "System.IO.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Runtime.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.IO.FileSystem.AccessControl.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.IO.FileSystem.dll",
+      ":System.Security.AccessControl.dll",
+      ":System.Security.Principal.Windows.dll",
+      ":System.Collections.NonGeneric.dll",
+    ]
+)
+core_stdlib(name = "System.IO.FileSystem.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Threading.Overlapped.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Collections.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Text.Encoding.Extensions.dll",
+      ":System.Buffers.dll",
+    ]
+)
+core_stdlib(name = "System.IO.FileSystem.DriveInfo.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.IO.FileSystem.dll",
+      ":System.Threading.Tasks.dll",
+    ]
+)
+core_stdlib(name = "System.IO.FileSystem.Primitives.dll", deps = [
+      ":System.Runtime.dll",
+    ]
+)
+core_stdlib(name = "System.IO.FileSystem.Watcher.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Threading.Overlapped.dll",
+      ":System.ComponentModel.Primitives.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.IO.FileSystem.dll",
+      ":System.Threading.dll",
+      ":Microsoft.Win32.Primitives.dll",
+    ]
+)
+core_stdlib(name = "System.IO.IsolatedStorage.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Security.Cryptography.Algorithms.dll",
+      ":System.Threading.dll",
+      ":System.IO.FileSystem.dll",
+      ":System.IO.FileSystem.AccessControl.dll",
+      ":System.Security.Cryptography.Primitives.dll",
+      ":System.Linq.dll",
+      ":System.Security.AccessControl.dll",
+      ":System.Security.Principal.Windows.dll",
+    ]
+)
+core_stdlib(name = "System.IO.MemoryMappedFiles.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Threading.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.IO.FileSystem.dll",
+    ]
+)
+core_stdlib(name = "System.IO.Pipes.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Threading.Overlapped.dll",
+      ":System.Security.Principal.dll",
+      ":System.Threading.dll",
+      ":System.Threading.Tasks.dll",
+    ]
+)
+core_stdlib(name = "System.IO.UnmanagedMemoryStream.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Linq.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Collections.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Diagnostics.Tools.dll",
+      ":System.Runtime.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.Linq.Expressions.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Collections.dll",
+      ":System.Reflection.Emit.ILGeneration.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Diagnostics.Tools.dll",
+      ":System.Reflection.Emit.dll",
+      ":System.ObjectModel.dll",
+      ":System.Reflection.Primitives.dll",
+      ":System.Reflection.Emit.Lightweight.dll",
+      ":System.Threading.dll",
+      ":System.Linq.dll",
+    ]
+)
+core_stdlib(name = "System.Linq.Parallel.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.dll",
+      ":System.Linq.dll",
+      ":System.Diagnostics.Tools.dll",
+      ":System.Collections.Concurrent.dll",
+      ":System.Threading.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Diagnostics.Tracing.dll",
+    ]
+)
+core_stdlib(name = "System.Linq.Queryable.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Linq.Expressions.dll",
+      ":System.Collections.dll",
+      ":System.Linq.dll",
+    ]
+)
+core_stdlib(name = "System.Net.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Net.WebClient.dll",
+      ":System.Net.WebHeaderCollection.dll",
+      ":System.Net.Requests.dll",
+      ":System.Net.NetworkInformation.dll",
+      ":System.Net.Sockets.dll",
+    ]
+)
+core_stdlib(name = "System.Net.Http.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Security.Cryptography.X509Certificates.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Collections.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Diagnostics.DiagnosticSource.dll",
+      ":Microsoft.Win32.Primitives.dll",
+      ":System.Security.Cryptography.Encoding.dll",
+      ":System.Threading.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Buffers.dll",
+      ":System.IO.Compression.dll",
+    ]
+)
+core_stdlib(name = "System.Net.HttpListener.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Threading.Overlapped.dll",
+      ":System.Net.WebHeaderCollection.dll",
+      ":System.Collections.dll",
+      ":System.Security.Cryptography.X509Certificates.dll",
+      ":System.Net.Security.dll",
+      ":System.Collections.Specialized.dll",
+      ":System.Security.Principal.dll",
+      ":System.Security.Principal.Windows.dll",
+      ":Microsoft.Win32.Primitives.dll",
+      ":System.Threading.dll",
+      ":System.Security.Claims.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.Net.WebSockets.dll",
+      ":System.Security.Cryptography.Algorithms.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Threading.Timer.dll",
+      ":System.Net.Requests.dll",
+      ":System.Net.NameResolution.dll",
+      ":System.Text.Encoding.Extensions.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Security.Cryptography.Primitives.dll",
+    ]
+)
+core_stdlib(name = "System.Net.Mail.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Security.Cryptography.X509Certificates.dll",
+      ":System.Collections.dll",
+      ":System.Collections.Specialized.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.Net.Sockets.dll",
+      ":System.Net.Security.dll",
+      ":System.Threading.dll",
+      ":System.Security.Principal.Windows.dll",
+      ":System.Net.Primitives.dll",
+      ":Microsoft.Win32.Primitives.dll",
+      ":System.Net.Requests.dll",
+      ":System.ComponentModel.EventBasedAsync.dll",
+      ":System.Threading.Timer.dll",
+      ":System.Net.ServicePoint.dll",
+      ":System.Net.NetworkInformation.dll",
+      ":System.IO.FileSystem.dll",
+    ]
+)
+core_stdlib(name = "System.Net.NameResolution.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.Collections.dll",
+      ":System.Threading.dll",
+      ":System.Security.Principal.Windows.dll",
+    ]
+)
+core_stdlib(name = "System.Net.NetworkInformation.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Net.Sockets.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.Collections.dll",
+      ":System.Threading.dll",
+      ":System.Security.Principal.Windows.dll",
+      ":System.Threading.Overlapped.dll",
+      ":Microsoft.Win32.Primitives.dll",
+      ":System.Threading.ThreadPool.dll",
+    ]
+)
+core_stdlib(name = "System.Net.Ping.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.ComponentModel.Primitives.dll",
+      ":System.Threading.dll",
+      ":System.Threading.ThreadPool.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.ComponentModel.EventBasedAsync.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Net.NameResolution.dll",
+      ":Microsoft.Win32.Primitives.dll",
+    ]
+)
+core_stdlib(name = "System.Net.Primitives.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":Microsoft.Win32.Primitives.dll",
+      ":System.Threading.dll",
+    ]
+)
+core_stdlib(name = "System.Net.Requests.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.Specialized.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Net.WebHeaderCollection.dll",
+      ":System.Threading.dll",
+      ":System.Net.Http.dll",
+      ":System.Net.ServicePoint.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Security.Cryptography.X509Certificates.dll",
+      ":System.Net.Security.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Collections.dll",
+      ":System.Security.Principal.dll",
+      ":System.Net.Sockets.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.Security.Principal.Windows.dll",
+      ":System.Threading.Thread.dll",
+    ]
+)
+core_stdlib(name = "System.Net.Security.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Security.Cryptography.X509Certificates.dll",
+      ":System.Collections.Concurrent.dll",
+      ":System.Collections.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Threading.dll",
+      ":System.Security.Cryptography.Encoding.dll",
+      ":Microsoft.Win32.Primitives.dll",
+      ":System.Security.Principal.dll",
+      ":System.Security.Principal.Windows.dll",
+      ":System.Threading.ThreadPool.dll",
+      ":System.Security.Claims.dll",
+    ]
+)
+core_stdlib(name = "System.Net.ServicePoint.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Security.Cryptography.X509Certificates.dll",
+      ":System.Collections.Concurrent.dll",
+      ":System.Net.Security.dll",
+    ]
+)
+core_stdlib(name = "System.Net.Sockets.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Threading.Overlapped.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.Collections.dll",
+      ":System.Threading.dll",
+      ":System.Security.Principal.Windows.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Buffers.dll",
+      ":System.Net.NameResolution.dll",
+      ":System.IO.FileSystem.dll",
+    ]
+)
+core_stdlib(name = "System.Net.WebClient.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.ComponentModel.Primitives.dll",
+      ":System.ComponentModel.EventBasedAsync.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Net.WebHeaderCollection.dll",
+      ":System.Collections.Specialized.dll",
+      ":System.Net.Requests.dll",
+      ":System.Threading.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.IO.FileSystem.dll",
+    ]
+)
+core_stdlib(name = "System.Net.WebHeaderCollection.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.Specialized.dll",
+      ":System.Diagnostics.Tracing.dll",
+    ]
+)
+core_stdlib(name = "System.Net.WebProxy.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Text.RegularExpressions.dll",
+      ":System.Net.NameResolution.dll",
+      ":System.Net.NetworkInformation.dll",
+    ]
+)
+core_stdlib(name = "System.Net.WebSockets.Client.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":Microsoft.Win32.Primitives.dll",
+      ":System.Net.WebSockets.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Collections.dll",
+      ":System.Net.WebHeaderCollection.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Security.Cryptography.X509Certificates.dll",
+      ":System.Threading.dll",
+    ]
+)
+core_stdlib(name = "System.Net.WebSockets.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Collections.Specialized.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Security.Principal.dll",
+      ":Microsoft.Win32.Primitives.dll",
+      ":System.Runtime.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.Numerics.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Runtime.Numerics.dll",
+      ":System.Numerics.Vectors.dll",
+    ]
+)
+core_stdlib(name = "System.Numerics.Vectors.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.ObjectModel.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Collections.dll",
+      ":System.Threading.dll",
+    ]
+)
+core_stdlib(name = "System.Private.DataContractSerialization.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Xml.ReaderWriter.dll",
+      ":System.Text.Encoding.Extensions.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Collections.dll",
+      ":System.Reflection.Emit.Lightweight.dll",
+      ":System.Reflection.Emit.ILGeneration.dll",
+      ":System.Reflection.Primitives.dll",
+      ":System.Runtime.Serialization.Primitives.dll",
+      ":System.Xml.XmlSerializer.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Runtime.Serialization.Formatters.dll",
+      ":System.Threading.dll",
+      ":System.Linq.dll",
+      ":System.Text.RegularExpressions.dll",
+      ":System.Xml.XDocument.dll",
+      ":System.Collections.Specialized.dll",
+    ]
+)
+core_stdlib(name = "System.Private.Uri.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Private.Xml.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Diagnostics.TraceSource.dll",
+      ":System.Text.RegularExpressions.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Net.Requests.dll",
+      ":System.Text.Encoding.Extensions.dll",
+      ":System.Threading.Tasks.Extensions.dll",
+      ":System.Reflection.Emit.dll",
+      ":System.Reflection.Emit.ILGeneration.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Reflection.Primitives.dll",
+      ":System.Collections.Specialized.dll",
+      ":System.Threading.dll",
+      ":System.Diagnostics.Tools.dll",
+      ":System.Reflection.Emit.Lightweight.dll",
+      ":System.ObjectModel.dll",
+      ":System.Linq.dll",
+      ":System.IO.FileSystem.dll",
+      ":System.Console.dll",
+    ]
+)
+core_stdlib(name = "System.Private.Xml.Linq.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Private.Xml.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Collections.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Diagnostics.Tools.dll",
+      ":System.Threading.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Linq.dll",
+    ]
+)
+core_stdlib(name = "System.Reflection.DispatchProxy.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Collections.dll",
+      ":System.Reflection.Emit.dll",
+      ":System.Reflection.Emit.ILGeneration.dll",
+      ":System.Reflection.Primitives.dll",
+      ":System.Threading.dll",
+      ":System.Linq.dll",
+    ]
+)
+core_stdlib(name = "System.Reflection.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Reflection.Emit.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Reflection.Emit.ILGeneration.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Reflection.Emit.Lightweight.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Reflection.Extensions.dll", deps = [
+      ":System.Runtime.dll",
+    ]
+)
+core_stdlib(name = "System.Reflection.Metadata.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.Immutable.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Collections.dll",
+      ":System.IO.Compression.dll",
+      ":System.IO.MemoryMappedFiles.dll",
+      ":System.Threading.dll",
+      ":System.Text.Encoding.Extensions.dll",
+      ":System.Buffers.dll",
+    ]
+)
+core_stdlib(name = "System.Reflection.Primitives.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Reflection.TypeExtensions.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Resources.Reader.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+    ]
+)
+core_stdlib(name = "System.Resources.ResourceManager.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Resources.Writer.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.CompilerServices.VisualC.dll", deps = [
+      ":System.Runtime.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.dll", deps = [
+      ":System.Private.CoreLib.dll",
+      ":System.Private.Uri.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.Extensions.dll", deps = [
+      ":System.Private.CoreLib.dll",
+      ":System.Security.Principal.dll",
+      ":System.Private.Uri.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.Handles.dll", deps = [
+      ":System.Runtime.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.InteropServices.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.InteropServices.RuntimeInformation.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Threading.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.InteropServices.WindowsRuntime.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.Loader.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.Numerics.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.Serialization.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Runtime.Serialization.Primitives.dll",
+      ":System.Runtime.Serialization.Xml.dll",
+      ":System.Runtime.Serialization.Json.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.Serialization.Formatters.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Collections.Concurrent.dll",
+      ":System.Collections.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Threading.dll",
+      ":System.Text.Encoding.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.Serialization.Json.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Private.DataContractSerialization.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.Serialization.Primitives.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+    ]
+)
+core_stdlib(name = "System.Runtime.Serialization.Xml.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Private.DataContractSerialization.dll",
+      ":System.Runtime.Serialization.Primitives.dll",
+    ]
+)
+core_stdlib(name = "System.Security.AccessControl.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Security.Principal.Windows.dll",
+      ":System.Collections.dll",
+      ":System.Threading.dll",
+      ":System.Threading.Thread.dll",
+      ":System.Collections.NonGeneric.dll",
+    ]
+)
+core_stdlib(name = "System.Security.Claims.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Security.Principal.dll",
+      ":System.Collections.dll",
+      ":System.Runtime.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.Security.Cryptography.Algorithms.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Security.Cryptography.Encoding.dll",
+      ":System.Security.Cryptography.Primitives.dll",
+      ":System.Collections.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Threading.dll",
+    ]
+)
+core_stdlib(name = "System.Security.Cryptography.Cng.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Security.Cryptography.Encoding.dll",
+      ":System.Security.Cryptography.Primitives.dll",
+      ":System.Security.Cryptography.Algorithms.dll",
+    ]
+)
+core_stdlib(name = "System.Security.Cryptography.Csp.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Security.Cryptography.Encoding.dll",
+      ":System.Security.Cryptography.Primitives.dll",
+      ":System.Security.Cryptography.Algorithms.dll",
+      ":System.Threading.dll",
+      ":System.Text.Encoding.Extensions.dll",
+      ":System.Threading.Thread.dll",
+    ]
+)
+core_stdlib(name = "System.Security.Cryptography.Encoding.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.dll",
+      ":System.Security.Cryptography.Primitives.dll",
+      ":System.Collections.Concurrent.dll",
+      ":System.Linq.dll",
+    ]
+)
+core_stdlib(name = "System.Security.Cryptography.OpenSsl.dll", deps = [
+      ":netstandard.dll",
+    ]
+)
+core_stdlib(name = "System.Security.Cryptography.Primitives.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Threading.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Diagnostics.Debug.dll",
+    ]
+)
+core_stdlib(name = "System.Security.Cryptography.X509Certificates.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Security.Cryptography.Cng.dll",
+      ":System.Security.Cryptography.Encoding.dll",
+      ":System.Runtime.Numerics.dll",
+      ":System.Collections.dll",
+      ":System.Security.Cryptography.Primitives.dll",
+      ":System.Security.Cryptography.Algorithms.dll",
+      ":System.Net.Primitives.dll",
+      ":System.Collections.NonGeneric.dll",
+      ":System.Security.Cryptography.Csp.dll",
+      ":System.Threading.dll",
+      ":System.IO.FileSystem.dll",
+    ]
+)
+core_stdlib(name = "System.Security.dll", deps = [
+      ":System.Runtime.dll",
+    ]
+)
+core_stdlib(name = "System.Security.Principal.dll", deps = [
+      ":System.Runtime.dll",
+    ]
+)
+core_stdlib(name = "System.Security.Principal.Windows.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.dll",
+      ":System.Security.Claims.dll",
+      ":System.Security.Principal.dll",
+      ":System.Threading.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":Microsoft.Win32.Primitives.dll",
+    ]
+)
+core_stdlib(name = "System.Security.SecureString.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Runtime.InteropServices.dll",
+    ]
+)
+core_stdlib(name = "System.ServiceModel.Web.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Runtime.Serialization.Json.dll",
+    ]
+)
+core_stdlib(name = "System.ServiceProcess.dll", deps = [
+      ":System.Runtime.dll",
+    ]
+)
+core_stdlib(name = "System.Text.Encoding.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Text.Encoding.Extensions.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Text.RegularExpressions.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Threading.dll",
+    ]
+)
+core_stdlib(name = "System.Threading.dll", deps = [
+      ":System.Private.CoreLib.dll",
+      ":System.Runtime.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.Threading.Overlapped.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Threading.Tasks.Dataflow.dll", deps = [
+      ":netstandard.dll",
+    ]
+)
+core_stdlib(name = "System.Threading.Tasks.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Threading.Tasks.Extensions.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Collections.dll",
+    ]
+)
+core_stdlib(name = "System.Threading.Tasks.Parallel.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.Concurrent.dll",
+      ":System.Threading.Tasks.dll",
+      ":System.Diagnostics.Tracing.dll",
+      ":System.Diagnostics.Debug.dll",
+      ":System.Threading.dll",
+    ]
+)
+core_stdlib(name = "System.Threading.Thread.dll", deps = [
+      ":System.Private.CoreLib.dll",
+      ":System.Security.Principal.dll",
+      ":System.Runtime.Extensions.dll",
+    ]
+)
+core_stdlib(name = "System.Threading.ThreadPool.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Threading.Timer.dll", deps = [
+      ":System.Private.CoreLib.dll",
+    ]
+)
+core_stdlib(name = "System.Transactions.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Transactions.Local.dll",
+    ]
+)
+core_stdlib(name = "System.Transactions.Local.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+      ":System.Runtime.InteropServices.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Threading.dll",
+      ":System.Runtime.Serialization.Formatters.dll",
+      ":System.Threading.Timer.dll",
+      ":System.Threading.Thread.dll",
+      ":System.Threading.ThreadPool.dll",
+      ":System.Diagnostics.Tracing.dll",
+    ]
+)
+core_stdlib(name = "System.ValueTuple.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Resources.ResourceManager.dll",
+    ]
+)
+core_stdlib(name = "System.Web.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Web.HttpUtility.dll",
+    ]
+)
+core_stdlib(name = "System.Web.HttpUtility.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Collections.Specialized.dll",
+    ]
+)
+core_stdlib(name = "System.Windows.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.ObjectModel.dll",
+    ]
+)
+core_stdlib(name = "System.Xml.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Xml.ReaderWriter.dll",
+      ":System.Xml.XmlSerializer.dll",
+      ":System.Xml.XPath.dll",
+    ]
+)
+core_stdlib(name = "System.Xml.Linq.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Xml.XDocument.dll",
+      ":System.Xml.XPath.XDocument.dll",
+    ]
+)
+core_stdlib(name = "System.Xml.ReaderWriter.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Private.Xml.dll",
+    ]
+)
+core_stdlib(name = "System.Xml.Serialization.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Xml.ReaderWriter.dll",
+      ":System.Xml.XmlSerializer.dll",
+    ]
+)
+core_stdlib(name = "System.Xml.XDocument.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Private.Xml.Linq.dll",
+    ]
+)
+core_stdlib(name = "System.Xml.XmlDocument.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Private.Xml.dll",
+    ]
+)
+core_stdlib(name = "System.Xml.XmlSerializer.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Private.Xml.dll",
+    ]
+)
+core_stdlib(name = "System.Xml.XPath.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Private.Xml.dll",
+    ]
+)
+core_stdlib(name = "System.Xml.XPath.XDocument.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.Runtime.Extensions.dll",
+      ":System.Private.Xml.dll",
+      ":System.Private.Xml.Linq.dll",
+    ]
+)
+core_stdlib(name = "WindowsBase.dll", deps = [
+      ":System.Runtime.dll",
+      ":System.ObjectModel.dll",
+    ]
+)

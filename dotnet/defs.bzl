@@ -27,6 +27,11 @@ load(
 )
 
 load(
+    "@io_bazel_rules_dotnet//dotnet/private:rules/binary_core.bzl", 
+    core_binary = "core_binary"
+)
+
+load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/library.bzl", 
     dotnet_library = "dotnet_library"
 )

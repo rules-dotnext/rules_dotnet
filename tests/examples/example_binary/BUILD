@@ -1,4 +1,4 @@
-load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_binary")
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_binary", "core_binary")
 
 
 dotnet_binary(
@@ -11,4 +11,17 @@ dotnet_binary(
         "//tests/examples/example_lib:MyClass",
         "@npgsql//:npgsqllib",
     ],
+)
+
+core_binary(
+    name = "hello-core",
+    srcs = [
+        "Program.cs",
+    ],
+    deps = [
+        "//tests/examples/example_lib:MyClass",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.CoreLib.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Console.dll",
+    ]
 )
