@@ -26,6 +26,8 @@ before_install:
       sudo apt install apt-transport-https
       echo "deb https://download.mono-project.com/repo/ubuntu stable-trusty main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
       sudo apt update
+      sudo apt search unwind
+      sudo apt search libunwind      
       sudo apt install mono-devel libunwind-dev
       export RULES_DOTNET_USE_LOCAL_MONO=true
       OS=linux
