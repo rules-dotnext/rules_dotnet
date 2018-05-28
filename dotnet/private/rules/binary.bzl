@@ -26,6 +26,7 @@ def _dotnet_binary_impl(ctx):
       resources = ctx.attr.resources,
       out = ctx.attr.out,
       defines = ctx.attr.defines,
+      unsafe = ctx.attr.unsafe,
   )
 
   transitive_files = [d.result for d in executable.transitive.to_list()]
@@ -46,6 +47,7 @@ _dotnet_binary = rule(
         "srcs": attr.label_list(allow_files = FileType([".cs"])),        
         "out": attr.string(),
         "defines": attr.string_list(),
+        "unsafe": attr.bool(default = False),
         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data")),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],

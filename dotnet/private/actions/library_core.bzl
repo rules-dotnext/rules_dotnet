@@ -9,7 +9,8 @@ def emit_library(dotnet,
     deps = None,
     resources = None,
     out = None,
-    defines = None):
+    defines = None,
+    unsafe = False):
 
   return emit_assembly(
     dotnet = dotnet,
@@ -20,4 +21,5 @@ def emit_library(dotnet,
     out = out,
     executable = False,
     defines = defines,
+    unsafe = unsafe,
   )
