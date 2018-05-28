@@ -1,0 +1,6 @@
+[submodule "dotnet/externals/xunit"]
+	path = dotnet/externals/xunit
+	url = https://github.com/xunit/xunit.git
+[submodule "dotnet/externals/abstractions.xunit"]
+	path = dotnet/externals/abstractions.xunit
+	url = https://github.com/xunit/abstractions.xunit.git
