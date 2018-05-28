@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "core_library", "core_resource")
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "core_library", "core_resource", "core_binary")
 
 core_library(
     name = "xunit.abstractions.dll",
@@ -121,5 +121,63 @@ core_library(
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.Uri.dll",
         ":xunit.abstractions.dll",
         ":xunit.runner.utility.dll",
+    ]
+)
+
+filegroup(
+  name = "common_console_files",
+  srcs = [
+    ":xunit/src/common/AssemblyExtensions.cs",
+    ":xunit/src/common/ConsoleHelper.cs",
+    ":xunit/src/common/DictionaryExtensions.cs",
+    ":xunit/src/common/Guard.cs",
+    ":xunit/src/common/Json.cs",
+  ]
+)
+
+core_resource(
+    name = "HTML_xslt",
+    src = ":xunit/src/xunit.console/HTML.xslt",
+)
+
+core_resource(
+    name = "NUnitXml_xslt",
+    src = ":xunit/src/xunit.console/NUnitXml.xslt",
+)
+
+core_resource(
+    name = "xUnit1_xslt",
+    src = ":xunit/src/xunit.console/xUnit1.xslt",
+)
+
+core_binary(
+    name = "xunit.console.dll",
+    srcs = [":common_console_files"] + glob(["xunit/src/xunit.console/**/*.cs"]),
+    defines = ["NETCOREAPP1_0"],
+    resources = [":HTML_xslt", ":NUnitXml_xslt", ":xUnit1_xslt"],
+    deps = [
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.Extensions.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.CoreLib.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Linq.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Collections.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Collections.Concurrent.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Net.Http.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Net.Primitives.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Threading.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Threading.Tasks.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Threading.Thread.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.Uri.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Xml.XDocument.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Xml.Linq.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.Xml.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.Xml.Linq.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Console.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.IO.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.IO.FileSystem.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.InteropServices.RuntimeInformation.dll",
+        ":xunit.runner.reporters.dll",
+        ":xunit.runner.utility.dll",
+        ":xunit.abstractions.dll",
     ]
 )

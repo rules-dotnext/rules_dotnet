@@ -56,8 +56,8 @@ _core_binary = rule(
     executable = True,
 )
 
-def core_binary(name, srcs, deps = [], defines = None, out = None):
-    _core_binary(name = "%s_exe" % name, deps = deps, srcs = srcs, out = out, defines = defines)
+def core_binary(name, srcs, deps = [], defines = None, out = None, resources = None):
+    _core_binary(name = "%s_exe" % name, deps = deps, srcs = srcs, out = out, defines = defines, resources = resources)
     exe = ":%s_exe" % name
     dotnet_launcher_gen(name = "%s_launcher" % name, exe = exe)
 
