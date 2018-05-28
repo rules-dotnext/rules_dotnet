@@ -47,6 +47,11 @@ load(
 )
 
 load(
+    "@io_bazel_rules_dotnet//dotnet/private:rules/resource_core.bzl", 
+    core_resource = "core_resource"
+)
+
+load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/test.bzl", 
     dotnet_nunit_test = "dotnet_nunit_test"
 )
