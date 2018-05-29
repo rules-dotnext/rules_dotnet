@@ -81,7 +81,7 @@ def _make_runner_arglist(dotnet, deps, resources, output, executable, defines, u
 
   return args
 
-def emit_assembly(dotnet,
+def emit_assembly_core(dotnet,
     name = "",
     srcs = None,
     deps = None,

@@ -1,9 +1,9 @@
 load(
     "@io_bazel_rules_dotnet//dotnet/private:actions/assembly_core.bzl",
-    "emit_assembly",
+    "emit_assembly_core",
 )
 
-def emit_library(dotnet,
+def emit_library_core(dotnet,
     name = "",
     srcs = None,
     deps = None,
@@ -12,7 +12,7 @@ def emit_library(dotnet,
     defines = None,
     unsafe = False):
 
-  return emit_assembly(
+  return emit_assembly_core(
     dotnet = dotnet,
     name = name,
     srcs = srcs,

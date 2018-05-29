@@ -21,8 +21,8 @@ load(
 )
 
 
-load("@io_bazel_rules_dotnet//dotnet/private:actions/binary_core.bzl", "emit_binary")
-load("@io_bazel_rules_dotnet//dotnet/private:actions/library_core.bzl", "emit_library")
+load("@io_bazel_rules_dotnet//dotnet/private:actions/binary_core.bzl", "emit_binary_core")
+load("@io_bazel_rules_dotnet//dotnet/private:actions/library_core.bzl", "emit_library_core")
 load("@io_bazel_rules_dotnet//dotnet/private:actions/resx.bzl", "emit_resx")
 
 def _get_dotnet_runner(context_data, ext):
@@ -70,8 +70,8 @@ def _core_toolchain_impl(ctx):
       get_dotnet_resgen = _get_dotnet_resgen,
       get_dotnet_stdlib = _get_dotnet_stdlib,
       actions = struct(
-          binary = emit_binary,
-          library = emit_library,
+          binary = emit_binary_core,
+          library = emit_library_core,
           resx = emit_resx,
       ),
       flags = struct(

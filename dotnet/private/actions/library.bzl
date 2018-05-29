@@ -1,5 +1,5 @@
 load(
-    "@io_bazel_rules_dotnet//dotnet/private:actions/assembly_core.bzl",
+    "@io_bazel_rules_dotnet//dotnet/private:actions/assembly.bzl",
     "emit_assembly",
 )
 
