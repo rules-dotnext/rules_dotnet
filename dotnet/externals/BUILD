@@ -76,7 +76,7 @@ filegroup(
     ":xunit/src/common/ExceptionUtility.cs",
     ":xunit/src/common/Guard.cs",
     ":xunit/src/common/Json.cs",
-    #":xunit/src/common/LongLivedMarshalByRefObject.cs",
+    ":xunit/src/common/LongLivedMarshalByRefObject.cs",
     ":xunit/src/common/NewReflectionExtensions.cs",
     ":xunit/src/common/NullMessageSink.cs",
     ":xunit/src/common/SerializationHelper.cs",
@@ -122,7 +122,7 @@ core_library(
 core_library(
     name = "xunit.runner.reporters.dll",
     srcs = [":xunit/src/common/XunitWorkerThread.cs"] + glob(["xunit/src/xunit.runner.reporters/**/*.cs"]),
-    defines = ["XUNIT_FRAMEWORK", "NETCOREAPP1_0"],
+    defines = ["NETCOREAPP1_0"],
     visibility = ["//visibility:public"],
     deps = [
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
@@ -252,5 +252,81 @@ core_library(
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.InteropServices.RuntimeInformation.dll",
         ":xunit.core.dll",
         ":xunit.abstractions.dll",
+    ]
+)
+
+core_library(
+    name = "xunit.assert.dll",
+    srcs = glob(["assert.xunit/**/*.cs"]),
+    defines = ["NETSTANDARD1_1"],
+    visibility = ["//visibility:public"],
+    unsafe = True,
+    deps = [
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.Extensions.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.CoreLib.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Linq.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Linq.Expressions.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Collections.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Collections.Concurrent.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Net.Http.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Threading.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Threading.Tasks.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Threading.Thread.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Xml.XDocument.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Xml.Linq.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.Xml.Linq.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.IO.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.IO.FileSystem.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Console.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Text.RegularExpressions.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.InteropServices.RuntimeInformation.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.ObjectModel.dll",
+    ]
+)
+
+filegroup(
+  name = "common_test_utility_files",
+  srcs = [
+    ":xunit/src/common/AssemblyExtensions.cs",
+    ":xunit/src/common/DictionaryExtensions.cs",
+    ":xunit/src/common/ExceptionExtensions.cs",
+    ":xunit/src/common/ExecutionHelper.cs",
+    ":xunit/src/common/TestOptionsNames.cs",
+  ],
+)
+
+core_library(
+    name = "xunit.test.utility.dll",
+    srcs = [":common_test_utility_files"] + glob(["xunit/test/test.utility/**/*.cs"]),
+    defines = ["NETSTANDARD1_1"],
+    visibility = ["//visibility:public"],
+    unsafe = True,
+    deps = [
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.Extensions.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.CoreLib.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Linq.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Linq.Expressions.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Collections.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Collections.Concurrent.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Net.Http.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Threading.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Threading.Tasks.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Threading.Thread.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Xml.XDocument.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Xml.Linq.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.Xml.Linq.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.IO.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.IO.FileSystem.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Console.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Text.RegularExpressions.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.InteropServices.RuntimeInformation.dll",
+        ":xunit.core.dll",
+        ":xunit.execution.dll",
+        ":xunit.abstractions.dll",
+        ":xunit.runner.utility.dll",
+        ":nsubstitute.dll",
+        ":xunit.assert.dll",
     ]
 )
