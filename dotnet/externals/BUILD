@@ -2,6 +2,24 @@ package(default_visibility = ["//visibility:public"])
 
 load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "core_library", "core_resource", "core_binary")
 
+
+core_library(
+    name = "nsubstitute.dll",
+    srcs = glob(["NSubstitute/Source/NSubstitute/**/*.cs"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.Extensions.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.CoreLib.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Collections.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Collections.Concurrent.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Linq.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Linq.Expressions.dll",
+        "@castle_core//:castle.core.dll",
+    ]
+)
+
+
 core_library(
     name = "xunit.abstractions.dll",
     srcs = glob(["abstractions.xunit/src/xunit.abstractions/**/*.cs"]),

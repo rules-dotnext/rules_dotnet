@@ -21,6 +21,22 @@ dotnet_import_library(
     """
 )
 
+dotnet_nuget_new(
+    name = "castle_core", 
+    package="Castle.Core", 
+    version="4.0.0", 
+    sha256="5f15e3a575e3a009ab606d5e6fe74133c3947e4cabd6640fcb4d5e3d5e0ebc79",
+    build_file_content = """
+package(default_visibility = [ "//visibility:public" ])
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_import_library")
+
+dotnet_import_library(
+    name = "castle.core.dll",
+    src = "lib/net45/Castle.Core.dll"
+)    
+    """
+)
+
 
 load("@io_bazel_rules_dotnet//tests:bazel_tests.bzl", "test_environment")
 

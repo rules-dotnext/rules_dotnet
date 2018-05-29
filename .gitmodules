@@ -7,3 +7,6 @@
 [submodule "dotnet/externals/assert.xunit"]
 	path = dotnet/externals/assert.xunit
 	url = https://github.com/xunit/assert.xunit.git
+[submodule "dotnet/externals/NSubstitute"]
+	path = dotnet/externals/NSubstitute
+	url = https://github.com/nsubstitute/NSubstitute.git
