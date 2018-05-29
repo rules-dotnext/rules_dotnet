@@ -46,13 +46,16 @@ static void RunExe(const char *manifestDir, int argc, char **argv) {
 	sprintf(runnerfullpath, "%s/dotnet", manifestDir);
 	args[c++] = strdup(runnerfullpath);
 	if (test) {
-		sprintf(fullpath, "%s/nunit-console-runner-exe_exe.exe", manifestDir);
-		args[c++] = strdup(fullpath);
-		sprintf(fullpath, "-result=%s", getenv("XML_OUTPUT_FILE"));
+		sprintf(fullpath, "%s/xunit.console.dll_exe.exe", manifestDir);
 		args[c++] = strdup(fullpath);
 	}
 	sprintf(fullpath, "%s/%s", manifestDir, found);
 	args[c++] = strdup(fullpath);
+	if (test) {
+		args[c++] = "-xml";
+		sprintf(fullpath, "%s", getenv("XML_OUTPUT_FILE"));
+		args[c++] = strdup(fullpath);
+	}
 	for(i = 1; i < argc; ++i) {
 		args[c++] = argv[i];
 	}
@@ -71,17 +74,22 @@ static void RunExe(const char *manifestDir, int argc, char **argv) {
 	sprintf(runnerfullpath, "%s/dotnet", manifestDir);
 	args[c++] = strdup(runnerfullpath);
 	if (test) {
-		sprintf(fullpath, "%s/nunit-console-runner-exe_exe.exe", manifestDir);
-		args[c++] = strdup(fullpath);
-		sprintf(fullpath, "-result=%s", getenv("XML_OUTPUT_FILE"));
+		sprintf(fullpath, "%s/xunit.console.dll_exe.exe", manifestDir);
 		args[c++] = strdup(fullpath);
 	}
 	sprintf(fullpath, "%s/%s", manifestDir, found);
 	args[c++] = strdup(fullpath);
+	if (test) {
+		args[c++] = "-xml";
+		sprintf(fullpath, "%s", getenv("XML_OUTPUT_FILE"));
+		args[c++] = strdup(fullpath);
+	}
 	for(i = 1; i < argc; ++i) {
 		args[c++] = argv[i];
 	}
 	args[c] = NULL;
+	for(i = 0; args[i]!=NULL; ++i)
+		printf("Arg %d = %s\n", i, args[i]);
 	if (execvp(args[0], args) == -1) {
 		printf("Couldn't execute %s, (%d)\n", found, errno);
 		exit(-1);				
@@ -94,6 +102,7 @@ int main(int argc, char *argv[], char *envp[])
 {
 	const char *manifestDir;
 	char buffer[64*1024];
+    int test = strlen(Nunit) > 0;
 
 	printf("Launcher running %s (%s)\n", Exe, Nunit);
 	if (strlen(Exe) > 32*1024) {
@@ -106,6 +115,8 @@ int main(int argc, char *argv[], char *envp[])
 	ReadManifest(manifestDir);
 	#ifndef _MSC_VER
 	PrepareExe(manifestDir);
+	if (test)
+		PrepareTestExe(manifestDir);
 	#endif
 	LinkFiles(manifestDir);
 	LinkHostFxr(manifestDir);

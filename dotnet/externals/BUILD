@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "core_library", "core_resource", "core_binary")
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "core_library", "core_resource", "core_binary", "core_xunit_test")
 
 
 core_library(
@@ -331,12 +331,10 @@ core_library(
     ]
 )
 
-core_library(
-    name = "xunit.test.assert.dll",
+core_xunit_test(
+    name = "xunit.test.assert",
     srcs = [":assert.xunit/Sdk/ArgumentFormatter.cs"]+glob(["xunit/test/test.xunit.assert/**/*.cs"]),
     defines = ["NETSTANDARD1_1"],
-    visibility = ["//visibility:public"],
-    unsafe = True,
     deps = [
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.Extensions.dll",
@@ -365,3 +363,4 @@ core_library(
         ":nsubstitute.dll",
     ]
 )
+

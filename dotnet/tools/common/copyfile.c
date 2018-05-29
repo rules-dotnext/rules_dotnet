@@ -133,4 +133,33 @@ void PrepareExe(const char *manifestDir)
     sprintf(target, "%s%s", manifestDir, q);
     CopyIfNeeded(target, p->Path);
 }
+void PrepareTestExe(const char *manifestDir)
+{
+	const struct Entry *p = g_Entries;
+    char target[64*1024];
+    const char *q = "/xunit.console.dll_exe.exe";
+    const char *z;
+
+   
+	while(p != NULL) {
+        z = strrchr(p->Key, '/');
+        if (z==NULL)
+            continue;
+        
+        if (strcmp(q, z) == 0)
+            break;
+
+		p = p->Next;
+	}
+
+    if (p == NULL)
+    {
+        printf("Exe (%s) - not found in MANIFEST\n", q);
+        exit(-1);
+    }
+
+    sprintf(target, "%s%s", manifestDir, q);
+    CopyIfNeeded(target, p->Path);
+}
+
 #endif

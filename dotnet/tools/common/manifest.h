@@ -14,4 +14,5 @@ void LinkHostFxr(const char *manifestDir);
 
 #ifndef _MSC_VER
 void PrepareExe(const char *manifestDir);
+void PrepareTestExe(const char *manifestDir);
 #endif

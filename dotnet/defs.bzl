@@ -66,3 +66,8 @@ load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/import.bzl", 
     dotnet_import_library = "dotnet_import_library"
 )
+
+load(
+    "@io_bazel_rules_dotnet//dotnet/private:rules/test_core.bzl", 
+    core_xunit_test = "core_xunit_test"
+)
