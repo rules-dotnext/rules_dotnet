@@ -27,11 +27,25 @@ def _core_library_impl(ctx):
 
   transitive_files = [d.result for d in library.transitive.to_list()]
 
+  if library.pdb:
+    pdbs = [library.pdb]
+  else:
+    pdbs = []
+
+  runfiles = ctx.runfiles(files = [dotnet.stdlib, library.result] + pdbs, transitive_files=depset(direct=transitive_files))
+  if library.runfiles:
+    runfiles.merge(library.runfiles)
+
+  print("name %s" % name)
+  for f in runfiles.files:
+    if f.extension == "pdb":
+        print("f %s" % f)
+
   return [
       library,
       DefaultInfo(
           files = depset([library.result]),
-          runfiles = ctx.runfiles(files = [dotnet.stdlib, library.result], transitive_files=depset(direct=transitive_files)),
+          runfiles = runfiles,
       ),
   ]
   

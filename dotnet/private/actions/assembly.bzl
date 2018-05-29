@@ -139,10 +139,20 @@ def emit_assembly(dotnet,
   deps_libraries = [d[DotnetLibrary] for d in deps]
   transitive = sets.union(deps_libraries, *[a[DotnetLibrary].transitive for a in deps])
 
+  runfiles = None
+  for d in deps_libraries:
+    if d.runfiles:
+      if not runfiles:
+        runfiles = d.runfiles
+      else:
+        runfiles.merge(d.runfiles)
+
   return dotnet.new_library(
     dotnet = dotnet, 
     name = name, 
     deps = deps, 
     transitive = transitive,
-    result = result)
+    result = result,
+    pdb = None,
+    runfiles=runfiles)
 

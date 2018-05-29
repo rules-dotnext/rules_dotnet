@@ -17,7 +17,7 @@ def _map_dep(deps):
 def _map_resource(resources):
   return [d[DotnetResource].result.path + "," + d[DotnetResource].identifier for d in resources]
 
-def _make_runner_arglist(dotnet, deps, resources, output, executable, defines, unsafe):
+def _make_runner_arglist(dotnet, deps, resources, output, pdb, executable, defines, unsafe):
   args = dotnet.actions.args()
 
   # /out:<file>
@@ -35,6 +35,10 @@ def _make_runner_arglist(dotnet, deps, resources, output, executable, defines, u
   args.add("/nostdlib")
   args.add("/langversion:latest")
   args.add("/nologo")
+
+  if pdb:
+    args.add("-debug:full")
+    args.add("-pdb:" + pdb.path)
 
   # /warn
   #args.add(format="/warn:%s", value=str(ctx.attr.warn))
@@ -105,7 +109,12 @@ def emit_assembly_core(dotnet,
     result = dotnet.declare_file(dotnet, path=out)  
     extension = ""
     
-  runner_args = _make_runner_arglist(dotnet, deps, resources, result, executable, defines, unsafe)
+  if dotnet.debug:
+    pdb = dotnet.declare_file(dotnet, path=name+".pdb")
+  else:
+    pdb = None
+
+  runner_args = _make_runner_arglist(dotnet, deps, resources, result, pdb, executable, defines, unsafe)
 
   attr_srcs = [f for t in srcs for f in as_iterable(t.files)]
   runner_args.add(attr_srcs)
@@ -128,7 +137,7 @@ def emit_assembly_core(dotnet,
   deps_files = _map_dep(deps)
   dotnet.actions.run(
       inputs = attr_srcs + [paramfile] + deps_files + [dotnet.stdlib] + [r[DotnetResource].result for r in resources],
-      outputs = [result],
+      outputs = [result] + ([pdb] if pdb else []),
       executable = dotnet.runner,
       arguments = [dotnet.mcs.path, "@"+paramfile.path],
       progress_message = (
@@ -137,10 +146,21 @@ def emit_assembly_core(dotnet,
   deps_libraries = [d[DotnetLibrary] for d in deps]
   transitive = sets.union(deps_libraries, *[a[DotnetLibrary].transitive for a in deps])
 
+  runfiles = dotnet._ctx.runfiles(files = [pdb]) if pdb else None
+  for d in deps_libraries:
+    if d.runfiles:
+      if not runfiles:
+        runfiles = d.runfiles
+      else:
+        runfiles.merge(d.runfiles)
+
+
   return dotnet.new_library(
     dotnet = dotnet, 
     name = name, 
     deps = deps, 
     transitive = transitive,
-    result = result)
+    result = result,
+    pdb = pdb,
+    runfiles=runfiles)
 

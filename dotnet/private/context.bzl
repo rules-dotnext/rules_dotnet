@@ -20,12 +20,15 @@ def _declare_file(dotnet, path = None, ext = None):
   return dotnet.actions.declare_file(result)
 
 
-def _new_library(dotnet, name=None, deps=None, transitive=None, **kwargs):
+def _new_library(dotnet, name=None, deps=None, transitive=None, result=None, pdb=None, runfiles=None,**kwargs):
   return DotnetLibrary(
       name = dotnet.label.name if not name else name,
       label = dotnet.label,
       deps = deps,
       transitive = transitive,
+      result=result,
+      pdb=pdb,
+      runfiles=runfiles,
       **kwargs
   )
 
@@ -73,6 +76,7 @@ def dotnet_context(ctx, attr=None):
       libVersion = context_data._libVersion,
       lib = context_data._lib,
       shared = context_data._shared,
+      debug = ctx.var["COMPILATION_MODE"] == "dbg",
       _ctx = ctx
   )
 

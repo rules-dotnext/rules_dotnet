@@ -32,10 +32,34 @@ def _core_binary_impl(ctx):
   transitive_files = [d.result for d in executable.transitive.to_list()]
   native_deps = ctx.attr._native_deps.files.to_list()
 
+  if executable.pdb:
+    pdbs = [executable.pdb]
+  else:
+    pdbs = []
+
+  print("name %s" % name)
+
+  print("r %s" % executable.runfiles)
+
+  runfiles = ctx.runfiles(files = [dotnet.stdlib, dotnet.runner] + native_deps + pdbs, transitive_files=depset(direct=transitive_files))
+
+  if executable.runfiles:
+    for f in executable.runfiles.files:
+        if f.extension == "pdb":
+            print("e %s" % f)
+
+  if executable.runfiles:
+    print("merging")
+    runfiles.merge(executable.runfiles)
+
+  for f in runfiles.files:
+    if f.extension == "pdb":
+        print("f %s" % f)
+
   return [
       DefaultInfo(
           files = depset([executable.result]),
-          runfiles = ctx.runfiles(files = [dotnet.stdlib, dotnet.runner] + native_deps, transitive_files=depset(direct=transitive_files)),
+          runfiles = runfiles,
           executable = executable.result,
       ),
   ]
