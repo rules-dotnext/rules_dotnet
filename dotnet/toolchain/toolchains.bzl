@@ -18,6 +18,11 @@ load(
     "core_download_sdk",
 )
 load(
+    "//dotnet/private:sdk_net.bzl",
+    "net_download_sdk",
+)
+
+load(
     "//dotnet/platform:list.bzl",
     "DOTNETARCH",
     "DOTNETOS",
@@ -27,6 +32,8 @@ load(
 
 DEFAULT_VERSION = "4.2.3"
 CORE_DEFAULT_VERSION = "2.1.200"
+NET_ROSLYN_DEFAULT_VERSION = "2.8.2"
+NET_DEFAULT_VERSION="4.7.2"
 
 SDK_REPOSITORIES = {
     "4.2.3": {
@@ -43,6 +50,13 @@ CORE_SDK_REPOSITORIES = {
                                 "58977b4b232f5fe97f9825340ce473cf1ec1bad76eb512fe6b5e2210c76c09de"),
         "core_darwin_amd64":      ("https://download.microsoft.com/download/3/7/1/37189942-C91D-46E9-907B-CF2B2DE584C7/dotnet-sdk-2.1.200-osx-x64.tar.gz", 
                                 "ac695c3319caf043e6b40861906cd4d396ba8922fd206332d2a778635667a2ba"),
+    },
+}
+
+NET_ROSLYN_REPOSITORIES = {
+    "2.8.2": {
+        "core_windows_amd64":      ("https://www.nuget.org/api/v2/package/Microsoft.Net.Compilers/2.8.2/microsoft.net.compilers.2.8.2.nupkg", 
+                                "f3c92c52d88364ac4359716e11e13b67f0e4ea256676b56334a4eb88c728e7f1"),
     },
 }
 
@@ -67,7 +81,7 @@ _toolchains = _generate_toolchains()
 
 _label_prefix = "@io_bazel_rules_dotnet//dotnet/toolchain:"
 
-def dotnet_register_toolchains(dotnet_version=DEFAULT_VERSION, core_version=CORE_DEFAULT_VERSION):
+def dotnet_register_toolchains(dotnet_version=DEFAULT_VERSION, core_version=CORE_DEFAULT_VERSION, net_version=NET_DEFAULT_VERSION, net_roslyn_version=NET_ROSLYN_DEFAULT_VERSION):
   """See /dotnet/toolchains.rst#dostnet-register-toolchains for full documentation."""
   if "dotnet_download_sdk" not in native.existing_rules() and "dotnet_host_sdk" not in native.existing_rules() and "dotnet_local_sdk" not in native.existing_rules():
     if dotnet_version in SDK_REPOSITORIES:
@@ -91,6 +105,16 @@ def dotnet_register_toolchains(dotnet_version=DEFAULT_VERSION, core_version=CORE
       )
     elif core_version != None:
       fail("Unknown core version {}".format(core_version))
+
+  if "net_download_sdk" not in native.existing_rules():
+    if net_roslyn_version in NET_ROSLYN_REPOSITORIES:
+      net_download_sdk(
+          name = "net_sdk",
+          version = net_version,
+          sdks = NET_ROSLYN_REPOSITORIES[net_roslyn_version],
+      )
+    elif net_roslyn_version != None:
+      fail("Unknown .net Roslyn version {}".format(net_roslyn_version))
 
   # Use the final dictionaries to register all the toolchains
   for toolchain in _toolchains:

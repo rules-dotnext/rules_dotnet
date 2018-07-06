@@ -19,7 +19,7 @@ def _make_runner_arglist(dotnet, source, output):
   args = dotnet.actions.args()
 
   args.add(dotnet.resgen.path)
-  args.add(format = "%s", value = source.files)
+  args.add(source.files, format = "%s")
 
   return args
 

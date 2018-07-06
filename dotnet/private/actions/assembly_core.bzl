@@ -21,7 +21,7 @@ def _make_runner_arglist(dotnet, deps, resources, output, pdb, executable, defin
   args = dotnet.actions.args()
 
   # /out:<file>
-  args.add(format="/out:%s", value=output.path)
+  args.add(output.path, format="/out:%s")
 
   if executable:
     target = "exe"
@@ -29,7 +29,7 @@ def _make_runner_arglist(dotnet, deps, resources, output, pdb, executable, defin
     target = "library"
 
   # /target (exe for binary, library for lib, module for module)
-  args.add(format="/target:%s", value=target)
+  args.add(target, format="/target:%s")
 
   args.add("/fullpaths")
   args.add("/nostdlib")
@@ -52,12 +52,12 @@ def _make_runner_arglist(dotnet, deps, resources, output, pdb, executable, defin
   #  args.add(format="/lib:%s", value=libdirs)
 
   if deps and len(deps)>0:
-    args.add(format="/reference:%s", value=deps, map_fn=_map_dep)
+    args.add(deps, format="/reference:%s", map_fn=_map_dep)
 
-  args.add(format="/reference:%s", value=dotnet.stdlib)
+  args.add(dotnet.stdlib, format="/reference:%s")
 
   if defines and len(defines)>0:
-    args.add(format="/define:%s", value=defines)
+    args.add(defines, format="/define:%s")
 
   if unsafe:
     args.add("/unsafe")
@@ -71,7 +71,7 @@ def _make_runner_arglist(dotnet, deps, resources, output, pdb, executable, defin
   # TODO(jeremy): /define:name[;name2]
 
   if resources and len(resources)>0:
-    args.add(format="/resource:%s", value=resources, map_fn=_map_resource)
+    args.add(resources, format="/resource:%s", map_fn=_map_resource)
 
   # TODO(jeremy): /resource:filename[,identifier[,accesibility-modifier]]
 

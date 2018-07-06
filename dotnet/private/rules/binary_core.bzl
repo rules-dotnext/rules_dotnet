@@ -37,19 +37,9 @@ def _core_binary_impl(ctx):
   else:
     pdbs = []
 
-  print("name %s" % name)
-
-  print("r %s" % executable.runfiles)
-
   runfiles = ctx.runfiles(files = [dotnet.stdlib, dotnet.runner] + native_deps + pdbs, transitive_files=depset(direct=transitive_files))
 
   if executable.runfiles:
-    for f in executable.runfiles.files:
-        if f.extension == "pdb":
-            print("e %s" % f)
-
-  if executable.runfiles:
-    print("merging")
     runfiles.merge(executable.runfiles)
 
   for f in runfiles.files:

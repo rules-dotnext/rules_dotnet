@@ -36,11 +36,6 @@ def _core_library_impl(ctx):
   if library.runfiles:
     runfiles.merge(library.runfiles)
 
-  print("name %s" % name)
-  for f in runfiles.files:
-    if f.extension == "pdb":
-        print("f %s" % f)
-
   return [
       library,
       DefaultInfo(

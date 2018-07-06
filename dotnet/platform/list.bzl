@@ -1,6 +1,7 @@
 DOTNETIMPL = {
     "mono": None,
     "core": None,
+    "net": None,
 }
 
 DOTNETOS = {
@@ -20,6 +21,7 @@ DOTNETIMPL_OS_ARCH = (
     ("core", "darwin", "amd64"),
     ("core", "linux", "amd64"),
     ("core", "windows", "amd64"),
+    ("net", "windows", "amd64"),
 )
 
 def declare_config_settings():
