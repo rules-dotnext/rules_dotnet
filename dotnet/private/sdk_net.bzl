@@ -2,21 +2,14 @@ load("@io_bazel_rules_dotnet//dotnet/private:common.bzl", "executable_extension"
 
 
 def _detect_net_framework(ctx, version):
-  system = ctx.which("System.dll")
-  if not system:
-    defpath = ctx.path("C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v" + version)
-    if defpath.exists:
-      return defpath
-    else:
-      fail("Failed to find .net " + version + " in default location " + defpath)
-  
-
-  return ""
-
+  defpath = ctx.path("C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v" + version)
+  if defpath.exists:
+    return defpath
+  fail("Failed to find .net " + version + " in default location " + defpath)
 
 
 def _net_download_sdk_impl(ctx):
-  if ctx.os.name != 'windows':
+  if not ctx.os.name.startswith('windows'):
     fail("Unsupported operating system: " + ctx.os.name)
 
   host = "net_windows_amd64"
@@ -53,12 +46,13 @@ def _remote_sdk(ctx, urls, strip_prefix, sha256):
       stripPrefix = strip_prefix,
       sha256 = sha256,
       output="net",
+      type="zip",
   )
   
 def _sdk_build_file(ctx):
   ctx.file("ROOT")
   ctx.template("BUILD.bazel",
-      Label("@io_bazel_rules_dotnet//dotnet/private:BUILD.sdk.bazel"),
+      Label("@io_bazel_rules_dotnet//dotnet/private:BUILD.net.bazel"),
       executable = False,
   )
 

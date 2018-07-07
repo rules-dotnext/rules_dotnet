@@ -1,4 +1,4 @@
-load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_library", "core_library")
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_library", "core_library", "net_library")
 
 dotnet_library(
     name = "MyClass",
@@ -25,3 +25,4 @@ core_library(
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.CoreLib.dll",
     ]
 )
+

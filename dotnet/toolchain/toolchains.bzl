@@ -8,6 +8,10 @@ load(
     "core_toolchain",
 )
 load(
+    "//dotnet/private:net_toolchain.bzl",
+    "net_toolchain",
+)
+load(
     "//dotnet/private:sdk.bzl",
     "dotnet_download_sdk",
     "dotnet_host_sdk",
@@ -55,8 +59,8 @@ CORE_SDK_REPOSITORIES = {
 
 NET_ROSLYN_REPOSITORIES = {
     "2.8.2": {
-        "core_windows_amd64":      ("https://www.nuget.org/api/v2/package/Microsoft.Net.Compilers/2.8.2/microsoft.net.compilers.2.8.2.nupkg", 
-                                "f3c92c52d88364ac4359716e11e13b67f0e4ea256676b56334a4eb88c728e7f1"),
+        "net_windows_amd64":      ("https://www.nuget.org/api/v2/package/Microsoft.Net.Compilers/2.8.2/", 
+                                "118bbad08ceff7ce174254d4a2fdf29bc21a96389b2f0a8c1d140db58f1bd395"),
     },
 }
 
@@ -171,8 +175,14 @@ def declare_toolchains():
             name = toolchain["name"],
             host = toolchain["host"],
         )
-    else:
+    elif toolchain["impl"] == "core":
         core_toolchain(
+            # Required fields
+            name = toolchain["name"],
+            host = toolchain["host"],
+        )
+    elif toolchain["impl"] == "net":
+        net_toolchain(
             # Required fields
             name = toolchain["name"],
             host = toolchain["host"],

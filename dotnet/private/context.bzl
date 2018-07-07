@@ -154,3 +154,35 @@ core_context_data = rule(
         ),
     },
 )
+
+net_context_data = rule(
+    _dotnet_context_data,
+    attrs = {
+        "_mcs_bin": attr.label(
+            allow_files = True,
+            default="@net_sdk//:mcs_bin",
+        ),
+        "_mono_bin": attr.label(
+            allow_files = True,
+            default="@net_sdk//:mono_bin",
+        ),
+        "_lib": attr.label(
+            allow_files = True,
+            default="@net_sdk//:lib",
+        ),
+        "_shared": attr.label(
+            allow_files = True,
+            default="@net_sdk//:lib",
+        ),
+        "_host": attr.label(
+            allow_files = True,
+            default="@net_sdk//:mcs_bin",
+        ),
+        "_libVersion": attr.string(
+            default="",
+        ),
+        "_toolchain_type": attr.string(
+            default="@io_bazel_rules_dotnet//dotnet:toolchain_net",
+        ),
+    },
+)
