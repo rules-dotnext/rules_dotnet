@@ -26,3 +26,14 @@ core_library(
     ]
 )
 
+net_library(
+    name = "MyClass-net",
+    srcs = [
+        "MyClass.cs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//tests/examples/example_transitive_lib:TransitiveClass-net",
+    ]
+)
+

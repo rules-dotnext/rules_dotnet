@@ -30,14 +30,13 @@ def _net_binary_impl(ctx):
   )
 
   transitive_files = [d.result for d in executable.transitive.to_list()]
-  native_deps = ctx.attr._native_deps.files.to_list()
 
   if executable.pdb:
     pdbs = [executable.pdb]
   else:
     pdbs = []
 
-  runfiles = ctx.runfiles(files = [dotnet.stdlib, dotnet.runner] + native_deps + pdbs, transitive_files=depset(direct=transitive_files))
+  runfiles = ctx.runfiles(files = [dotnet.stdlib]  + pdbs, transitive_files=depset(direct=transitive_files))
 
   if executable.runfiles:
     runfiles.merge(executable.runfiles)
@@ -64,7 +63,6 @@ _net_binary = rule(
         "defines": attr.string_list(),
         "unsafe": attr.bool(default = False),
         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:net_context_data")),
-        "_native_deps": attr.label(default = Label("@net_sdk//:native_deps"))
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_net"],
     executable = True,

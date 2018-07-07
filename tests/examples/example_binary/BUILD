@@ -1,4 +1,4 @@
-load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_binary", "core_binary")
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_binary", "core_binary", "net_binary")
 
 
 dotnet_binary(
@@ -23,5 +23,15 @@ core_binary(
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.CoreLib.dll",
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Console.dll",
+    ]
+)
+
+net_binary(
+    name = "hello-net",
+    srcs = [
+        "Program.cs",
+    ],
+    deps = [
+        "//tests/examples/example_lib:MyClass",
     ]
 )
