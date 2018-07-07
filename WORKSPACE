@@ -37,6 +37,23 @@ dotnet_import_library(
     """
 )
 
+dotnet_nuget_new(
+    name = "Microsoft.Build.Framework", 
+    package="Microsoft.Build.Framework", 
+    version="15.7.179", 
+    sha256="872275efced822c36e25b9ad88aa93272a9b85b3e6498855309a6fbb45f07b34",
+    build_file_content = """
+package(default_visibility = [ "//visibility:public" ])
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "net_import_library")
+
+net_import_library(
+    name = "lib",
+    src = "lib/net46/Microsoft.Build.Framework.dll"
+)    
+    """
+)
+
+
 
 load("@io_bazel_rules_dotnet//tests:bazel_tests.bzl", "test_environment")
 

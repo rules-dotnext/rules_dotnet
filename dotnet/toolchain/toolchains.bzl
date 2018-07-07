@@ -97,7 +97,7 @@ def dotnet_register_toolchains(dotnet_version=DEFAULT_VERSION, core_version=CORE
       dotnet_host_sdk(
           name = "dotnet_sdk"
       )
-    else:
+    elif dotnet_version != None:
       fail("Unknown dotnet version {}".format(dotnet_version))
 
   if "core_download_sdk" not in native.existing_rules():
