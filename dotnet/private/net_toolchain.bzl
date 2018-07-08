@@ -23,7 +23,7 @@ load(
 
 load("@io_bazel_rules_dotnet//dotnet/private:actions/binary_net.bzl", "emit_binary_net")
 load("@io_bazel_rules_dotnet//dotnet/private:actions/library_net.bzl", "emit_library_net")
-load("@io_bazel_rules_dotnet//dotnet/private:actions/resx.bzl", "emit_resx")
+load("@io_bazel_rules_dotnet//dotnet/private:actions/resx_net.bzl", "emit_resx_net")
 
 def _get_dotnet_runner(context_data, ext):
   return None
@@ -34,11 +34,15 @@ def _get_dotnet_mcs(context_data):
     if basename != "csc.exe":
       continue
     return f
-
   fail("Could not find csc.exe in net_sdk (mcs_bin)")
 
 def _get_dotnet_resgen(context_data):
-  return None
+  for f in context_data._tools.files:
+    basename = paths.basename(f.path)
+    if basename.lower() != "resgen.exe":
+      continue
+    return f
+  fail("Could not find resgen.exe in net_sdk (tools)")
 
 def _get_dotnet_stdlib(context_data):
   for f in context_data._lib.files:
@@ -61,7 +65,7 @@ def _net_toolchain_impl(ctx):
       actions = struct(
           binary = emit_binary_net,
           library = emit_library_net,
-          resx = emit_resx,
+          resx = emit_resx_net,
       ),
       flags = struct(
           compile = (),

@@ -7,6 +7,12 @@ def _detect_net_framework(ctx, version):
     return defpath
   fail("Failed to find .net " + version + " in default location " + defpath)
 
+def _detect_net_tools(ctx, version):
+  defpath = ctx.path("C:/Program Files (x86)/Microsoft SDKs/Windows/v10.0A/bin/NETFX " + version + " Tools")
+  if defpath.exists:
+    return defpath
+  fail("Failed to find .net tools " + version + " in default location " + defpath)
+
 
 def _net_download_sdk_impl(ctx):
   if not ctx.os.name.startswith('windows'):
@@ -24,8 +30,10 @@ def _net_download_sdk_impl(ctx):
   ctx.symlink("net/tools", "mono_bin")
 
   lib = _detect_net_framework(ctx, ctx.attr.version)
-
   ctx.symlink(lib, "lib")
+
+  tools = _detect_net_tools(ctx, ctx.attr.version)
+  ctx.symlink(tools, "tools")
 
 
 net_download_sdk = repository_rule(

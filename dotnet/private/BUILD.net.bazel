@@ -28,3 +28,9 @@ filegroup(
   ]),
 )
 
+filegroup(
+  name = "tools",
+  srcs = glob([
+    "tools/**/*",
+  ]),
+)

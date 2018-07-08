@@ -1,33 +1,33 @@
 load(
-    "//dotnet/private:dotnet_toolchain.bzl",
+    "@io_bazel_rules_dotnet//dotnet/private:dotnet_toolchain.bzl",
     "dotnet_toolchain",
 )
 
 load(
-    "//dotnet/private:core_toolchain.bzl",
+    "@io_bazel_rules_dotnet//dotnet/private:core_toolchain.bzl",
     "core_toolchain",
 )
 load(
-    "//dotnet/private:net_toolchain.bzl",
+    "@io_bazel_rules_dotnet//dotnet/private:net_toolchain.bzl",
     "net_toolchain",
 )
 load(
-    "//dotnet/private:sdk.bzl",
+    "@io_bazel_rules_dotnet//dotnet/private:sdk.bzl",
     "dotnet_download_sdk",
     "dotnet_host_sdk",
     "dotnet_local_sdk",
 )
 load(
-    "//dotnet/private:sdk_core.bzl",
+    "@io_bazel_rules_dotnet//dotnet/private:sdk_core.bzl",
     "core_download_sdk",
 )
 load(
-    "//dotnet/private:sdk_net.bzl",
+    "@io_bazel_rules_dotnet//dotnet/private:sdk_net.bzl",
     "net_download_sdk",
 )
 
 load(
-    "//dotnet/platform:list.bzl",
+    "@io_bazel_rules_dotnet//dotnet/platform:list.bzl",
     "DOTNETARCH",
     "DOTNETOS",
     "DOTNETIMPL",

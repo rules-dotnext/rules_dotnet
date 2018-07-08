@@ -57,6 +57,11 @@ load(
 )
 
 load(
+    "@io_bazel_rules_dotnet//dotnet/private:rules/resx_net.bzl", 
+    net_resx = "net_resx"
+)
+
+load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/resource_core.bzl", 
     core_resource = "core_resource"
 )

@@ -85,6 +85,7 @@ def _dotnet_context_data(ctx):
       _mcs_bin = ctx.attr._mcs_bin,
       _mono_bin = ctx.attr._mono_bin,
       _lib = ctx.attr._lib,
+      _tools = ctx.attr._tools,
       _shared = ctx.attr._shared,
       _host = ctx.attr._host,
       _libVersion = ctx.attr._libVersion,
@@ -105,6 +106,10 @@ dotnet_context_data = rule(
         "_lib": attr.label(
             allow_files = True,
             default="@dotnet_sdk//:lib",
+        ),
+        "_tools": attr.label(
+            allow_files = True,
+            default="@net_sdk//:lib",
         ),
         "_shared": attr.label(
             allow_files = True,
@@ -138,6 +143,10 @@ core_context_data = rule(
             allow_files = True,
             default="@core_sdk//:lib",
         ),
+        "_tools": attr.label(
+            allow_files = True,
+            default="@net_sdk//:lib",
+        ),
         "_shared": attr.label(
             allow_files = True,
             default="@core_sdk//:shared",
@@ -169,6 +178,10 @@ net_context_data = rule(
         "_lib": attr.label(
             allow_files = True,
             default="@net_sdk//:lib",
+        ),
+        "_tools": attr.label(
+            allow_files = True,
+            default="@net_sdk//:tools",
         ),
         "_shared": attr.label(
             allow_files = True,
