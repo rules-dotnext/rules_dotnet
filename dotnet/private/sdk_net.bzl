@@ -5,12 +5,14 @@ def _detect_net_framework(ctx, version):
   defpath = ctx.path("C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v" + version)
   if defpath.exists:
     return defpath
-  fail("Failed to find .net " + version + " in default location " + defpath)
+  fail("Failed to find .net " + version + " in default location " + str(defpath))
 
 def _detect_net_tools(ctx, version):
-  defpath = ctx.path("C:/Program Files (x86)/Microsoft SDKs/Windows/v10.0A/bin/NETFX " + version + " Tools")
-  if defpath.exists:
-    return defpath
+  ms_sdk_versions = ["v7.0A", "v7.1A", "v8.0", "v8.0A", "v8.1", "v8.1A", "v10.0A"]
+  for ms_sdk_version in ms_sdk_versions:
+    defpath = ctx.path("C:/Program Files (x86)/Microsoft SDKs/Windows/" + ms_sdk_version + "/bin/NETFX " + version + " Tools")
+    if defpath.exists:
+      return defpath
   fail("Failed to find .net tools " + version + " in default location " + defpath)
 
 
