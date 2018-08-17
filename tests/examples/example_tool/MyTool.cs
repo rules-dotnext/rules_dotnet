@@ -7,7 +7,6 @@ namespace example_tool
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("Invoked");
             if (args.Length == 0) {
                 Console.Error.WriteLine("No output files specified!");
                 Environment.Exit(1);

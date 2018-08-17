@@ -72,6 +72,11 @@ load(
 )
 
 load(
+    "@io_bazel_rules_dotnet//dotnet/private:rules/test_net.bzl", 
+    net_nunit_test = "net_nunit_test"
+)
+
+load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/nuget.bzl", 
     dotnet_nuget = "dotnet_nuget",
     dotnet_nuget_new = "dotnet_nuget_new"

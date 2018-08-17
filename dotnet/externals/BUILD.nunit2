@@ -1,6 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_library", "dotnet_binary", "dotnet_resx")
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_library", "dotnet_binary", "dotnet_resx", "net_library", "net_resx", "net_binary")
 
 dotnet_library(
     name = "nunit.core.interfaces",
@@ -8,6 +8,13 @@ dotnet_library(
     defines = ["CLR_4_0"],
     visibility = ["//visibility:public"],
     deps = ["@io_bazel_rules_dotnet//dotnet/stdlib:System.dll"]
+)
+
+net_library(
+    name = "net.nunit.core.interfaces",
+    srcs = [":NUnitCore_Interfaces_files"],
+    defines = ["CLR_4_0"],
+    visibility = ["//visibility:public"],
 )
 
 dotnet_library(
@@ -22,6 +29,13 @@ dotnet_library(
     ]
 )
 
+net_library(
+    name = "net.nunit.framework",
+    srcs = [":NUnitFramework_framework_files"],
+    defines = ["CLR_4_0"],
+    visibility = ["//visibility:public"],
+)
+
 dotnet_library(
     name = "nunit.core",
     srcs = [":NUnitCore_core_files"],
@@ -31,6 +45,16 @@ dotnet_library(
         "@io_bazel_rules_dotnet//dotnet/stdlib:System.dll",
         "@io_bazel_rules_dotnet//dotnet/stdlib:System.Configuration.dll",
         ":nunit.core.interfaces",
+    ]
+)
+
+net_library(
+    name = "net.nunit.core",
+    srcs = [":NUnitCore_core_files"],
+    defines = ["CLR_4_0"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":net.nunit.core.interfaces",
     ]
 )
 
@@ -51,8 +75,25 @@ dotnet_library(
     ]
 )
 
+net_library(
+    name = "net.nunit.util",
+    srcs = [":ClientUtilities_util_files"],
+    resources = [":net.Transform"],
+    defines = ["CLR_4_0"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":net.nunit.core.interfaces",
+        ":net.nunit.core",
+    ]
+)
+
 dotnet_resx(
     name = "Transform",
+    src = ":src/ClientUtilities/util/Transform.resx",
+)
+
+net_resx(
+    name = "net.Transform",
     src = ":src/ClientUtilities/util/Transform.resx",
 )
 
@@ -70,6 +111,17 @@ dotnet_library(
     ]
 )
 
+net_library(
+    name = "net.nunit-console-runner",
+    srcs = [":ConsoleRunner_nunit_console_files"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":net.nunit.core.interfaces",
+        ":net.nunit.core",
+        ":net.nunit.util",
+    ]
+)
+
 dotnet_binary(
     name = "nunit-console-runner-exe",
     srcs = [":ConsoleRunner_nunit_console_exe_files"],
@@ -78,6 +130,16 @@ dotnet_binary(
         ":nunit-console-runner",
         ":nunit.core",
         ":nunit.util",
+    ]
+)
+
+net_binary(
+    name = "net.nunit-console-runner-exe",
+    srcs = [":ConsoleRunner_nunit_console_exe_files"],
+    deps = [
+        ":net.nunit-console-runner",
+        ":net.nunit.core",
+        ":net.nunit.util",
     ]
 )
 
