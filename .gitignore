@@ -6,8 +6,8 @@
 /bazel-rules_dotnet
 /bazel-testlogs
 .vscode
-_build
-_static
-_templates
-obj
 bin
+obj
+_templates
+_static
+_build
