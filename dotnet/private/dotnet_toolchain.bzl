@@ -15,9 +15,63 @@
 Toolchain rules used by dotnet.
 """
 
+load(
+    "@io_bazel_rules_dotnet//dotnet/private:common.bzl",
+    "paths",
+)
+
 load("@io_bazel_rules_dotnet//dotnet/private:actions/binary.bzl", "emit_binary")
 load("@io_bazel_rules_dotnet//dotnet/private:actions/library.bzl", "emit_library")
 load("@io_bazel_rules_dotnet//dotnet/private:actions/resx.bzl", "emit_resx")
+
+def _get_dotnet_runner(context_data, ext):
+  for f in context_data._mono_bin.files:
+    basename = paths.basename(f.path)
+    if basename != "mono" + ext:
+      continue
+    return f
+  fail("Could not find mono executable in dotnet_sdk (mono_bin)")
+
+
+def _get_dotnet_mcs(context_data):
+  for f in context_data._mcs_bin.files:
+    basename = paths.basename(f.path)
+    if basename != "mcs.exe":
+      continue
+    return f
+
+  for f in context_data._lib.files:
+    basename = paths.basename(f.path)
+    if basename != "mcs.exe":
+      continue
+    return f
+  fail("Could not find mcs.exe in dotnet_sdk (mcs_bin, lib)")
+
+def _get_dotnet_resgen(context_data):
+  for f in context_data._mcs_bin.files:
+    basename = paths.basename(f.path)
+    if basename != "resgen.exe":
+      continue
+    return f
+
+  for f in context_data._lib.files:
+    basename = paths.basename(f.path)
+    if basename != "resgen.exe":
+      continue
+    return f
+
+  fail("Could not find resgen.exe in dotnet_sdk (mcs_bin, lib)")
+
+def _get_dotnet_stdlib(context_data):
+  for f in context_data._lib.files:
+    basename = paths.basename(f.path)
+    if basename != "mscorlib.dll":
+      continue
+    dirname = paths.dirname(f.path)
+    if dirname.find(context_data._libVersion)==-1:
+      continue
+    return f
+  fail("Could not find mscorlib in dotnet_sdk (lib, %s)" % context_data._libVersion)
 
 def _dotnet_toolchain_impl(ctx):
   return [platform_common.ToolchainInfo(
@@ -25,6 +79,10 @@ def _dotnet_toolchain_impl(ctx):
       default_dotnetimpl = ctx.attr.dotnetimpl,
       default_dotnetos = ctx.attr.dotnetos,
       default_dotnetarch = ctx.attr.dotnetarch,
+      get_dotnet_runner = _get_dotnet_runner,
+      get_dotnet_mcs = _get_dotnet_mcs,
+      get_dotnet_resgen = _get_dotnet_resgen,
+      get_dotnet_stdlib = _get_dotnet_stdlib,
       actions = struct(
           binary = emit_binary,
           library = emit_library,
@@ -51,7 +109,6 @@ def dotnet_toolchain(name, host, constraints=[], **kwargs):
   elems = host.split("_")
   impl, os, arch = elems[0], elems[1], elems[2]
   host_constraints = constraints + [
-    #"@io_bazel_rules_dotnet//dotnet/toolchain:" + impl,
     "@io_bazel_rules_dotnet//dotnet/toolchain:" + os,
     "@io_bazel_rules_dotnet//dotnet/toolchain:" + arch,
   ]
@@ -70,6 +127,5 @@ def dotnet_toolchain(name, host, constraints=[], **kwargs):
       name = name,
       toolchain_type = "@io_bazel_rules_dotnet//dotnet:toolchain",
       exec_compatible_with = host_constraints,
-      #target_compatible_with = host_constraints,
       toolchain = ":"+impl_name,
   )

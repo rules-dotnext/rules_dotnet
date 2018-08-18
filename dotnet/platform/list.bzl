@@ -1,5 +1,7 @@
 DOTNETIMPL = {
     "mono": None,
+    "core": None,
+    "net": None,
 }
 
 DOTNETOS = {
@@ -16,6 +18,10 @@ DOTNETIMPL_OS_ARCH = (
     ("mono", "darwin", "amd64"),
     ("mono", "linux", "amd64"),
     ("mono", "windows", "amd64"),
+    ("core", "darwin", "amd64"),
+    ("core", "linux", "amd64"),
+    ("core", "windows", "amd64"),
+    ("net", "windows", "amd64"),
 )
 
 def declare_config_settings():
@@ -37,9 +43,9 @@ def declare_config_settings():
         name = arch,
         constraint_values = ["//dotnet/toolchain:" + arch],
     )
-  for arch, os, arch in DOTNETIMPL_OS_ARCH:
+  for impl, os, arch in DOTNETIMPL_OS_ARCH:
     native.config_setting(
-        name = arch + "_" + os + "_" + arch,
+        name = impl + "_" + os + "_" + arch,
         constraint_values = [
             "//dotnet/toolchain:" + os,
             "//dotnet/toolchain:" + arch,

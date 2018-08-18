@@ -22,7 +22,7 @@ extern const char * Nunit;
 
 
 static void RunExe(const char *manifestDir, int argc, char **argv) {
-	char fullpath[64*1024];
+	char fullpath[64*1024], *p;
 	char **args;
 	int i, c;
     int test = strlen(Nunit) > 0;
@@ -46,7 +46,8 @@ static void RunExe(const char *manifestDir, int argc, char **argv) {
 	args = malloc( (c) * sizeof(char*));
 	c = 0;
 	if (test) {
-		sprintf(fullpath, "%s/nunit-console-runner-exe_exe.exe", manifestDir);
+		p = strrchr(Nunit, '/');
+		sprintf(fullpath, "%s%s", manifestDir, p);
 		args[c++] = strdup(fullpath);
 		sprintf(fullpath, "-result=%s", getenv("XML_OUTPUT_FILE"));
 		args[c++] = strdup(fullpath);
@@ -57,9 +58,6 @@ static void RunExe(const char *manifestDir, int argc, char **argv) {
 		args[c++] = argv[i];
 	}
 	args[c] = NULL;
-	for(i = 0; args[i]!=NULL; ++i) {
-		printf("Arg %d = %s\n", i, args[i]);
-	}
 	i = _spawnvp(_P_WAIT, args[0], args);
 	if (i != 0) {
 		printf("Couldn't execute %s or returned status code != 0\n", fullpath);
@@ -74,7 +72,8 @@ static void RunExe(const char *manifestDir, int argc, char **argv) {
 	sprintf(monofullpath, "%s/mono", manifestDir);
 	args[c++] = strdup(monofullpath);
 	if (test) {
-		sprintf(fullpath, "%s/nunit-console-runner-exe_exe.exe", manifestDir);
+		p = strrchr(Nunit, '/');
+		sprintf(fullpath, "%s%s", manifestDir, p);
 		args[c++] = strdup(fullpath);
 		sprintf(fullpath, "-result=%s", getenv("XML_OUTPUT_FILE"));
 		args[c++] = strdup(fullpath);
@@ -85,12 +84,6 @@ static void RunExe(const char *manifestDir, int argc, char **argv) {
 		args[c++] = argv[i];
 	}
 	args[c] = NULL;
-	for(i = 0; args[i]!=NULL; ++i) {
-		printf("Arg %d = %s\n", i, args[i]);
-	}
-	for(i = 0; args[i]!=NULL; ++i) {
-		printf("Arg %d = %s\n", i, args[i]);
-	}
 	if (execvp(args[0], args) == -1) {
 		printf("Couldn't execute %s, (%d)\n", found, errno);
 		exit(-1);				

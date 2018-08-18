@@ -279,3 +279,27 @@ const char *GetManifestDir() {
 	printf("Couldn't find MANIFEST file\n");
 	exit(-1);
 }
+
+void LinkHostFxr(const char *manifestDir)
+{
+	char buffer[64*1024], *q;
+    const struct Entry *p = g_Entries;
+
+	while(p != NULL) {
+        q = strstr(p->Key, "host/fxr/");
+        if (q!=NULL)
+            break;
+
+		p = p->Next;
+	}
+
+    if (q == NULL) {
+        printf("Couldn't find host/fxr/ entry in the MANIFEST\n");
+        exit(-1);
+    }
+
+
+    sprintf(buffer, "%s/%s", manifestDir, q);
+    CreateDirTreeForFile(buffer);
+    CreateLinkIfNeeded(p->Path, buffer);
+}

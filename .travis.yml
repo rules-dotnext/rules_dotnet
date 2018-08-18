@@ -26,7 +26,7 @@ before_install:
       sudo apt install apt-transport-https
       echo "deb https://download.mono-project.com/repo/ubuntu stable-trusty main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
       sudo apt update
-      sudo apt install mono-devel
+      sudo apt install mono-devel libunwind8-dev
       export RULES_DOTNET_USE_LOCAL_MONO=true
       OS=linux
     fi
@@ -70,6 +70,15 @@ script:
       -s \
       --local_resources=400,1,1.0 \
       //tests/examples/example_binary:hello
+  - |
+    bazel \
+      --batch \
+      --host_jvm_args=-Xmx500m \
+      --host_jvm_args=-Xms500m \
+      run \
+      -s \
+      --local_resources=400,1,1.0 \
+      //tests/examples/example_binary:hello-core
   - |
     bazel \
       --batch \

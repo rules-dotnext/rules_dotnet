@@ -12,53 +12,6 @@ load(
 
 DotnetContext = provider()
 
-def _get_dotnet_runner(context_data, ext):
-  for f in context_data._mono_bin.files:
-    basename = paths.basename(f.path)
-    if basename != "mono" + ext:
-      continue
-    return f
-  fail("Could not find mono executable in dotnet_sdk (mono_bin)")
-
-def _get_dotnet_mcs(context_data):
-  for f in context_data._mcs_bin.files:
-    basename = paths.basename(f.path)
-    if basename != "mcs.exe":
-      continue
-    return f
-
-  for f in context_data._lib.files:
-    basename = paths.basename(f.path)
-    if basename != "mcs.exe":
-      continue
-    return f
-  fail("Could not find mcs.exe in dotnet_sdk (mcs_bin, lib)")
-
-def _get_dotnet_resgen(context_data):
-  for f in context_data._mcs_bin.files:
-    basename = paths.basename(f.path)
-    if basename != "resgen.exe":
-      continue
-    return f
-
-  for f in context_data._lib.files:
-    basename = paths.basename(f.path)
-    if basename != "resgen.exe":
-      continue
-    return f
-
-  fail("Could not find resgen.exe in dotnet_sdk (mcs_bin, lib)")
-
-def _get_dotnet_stdlib(context_data):
-  for f in context_data._lib.files:
-    basename = paths.basename(f.path)
-    if basename != "mscorlib.dll":
-      continue
-    dirname = paths.dirname(f.path)
-    if dirname.find(context_data._libVersion)==-1:
-      continue
-    return f
-  fail("Could not find mscorlib in dotnet_sdk (lib, %s)" % context_data._libVersion)
 
 def _declare_file(dotnet, path = None, ext = None):
   result = path if path else dotnet._ctx.label.name
@@ -67,12 +20,15 @@ def _declare_file(dotnet, path = None, ext = None):
   return dotnet.actions.declare_file(result)
 
 
-def _new_library(dotnet, name=None, deps=None, transitive=None, **kwargs):
+def _new_library(dotnet, name=None, deps=None, transitive=None, result=None, pdb=None, runfiles=None,**kwargs):
   return DotnetLibrary(
       name = dotnet.label.name if not name else name,
       label = dotnet.label,
       deps = deps,
       transitive = transitive,
+      result=result,
+      pdb=pdb,
+      runfiles=runfiles,
       **kwargs
   )
 
@@ -86,19 +42,19 @@ def _new_resource(dotnet, name, result, identifier=None, **kwargs):
   )
 
 def dotnet_context(ctx, attr=None):
-  toolchain = ctx.toolchains["@io_bazel_rules_dotnet//dotnet:toolchain"]
-
   if not attr:
     attr = ctx.attr
 
   context_data = attr._dotnet_context_data 
+  toolchain = ctx.toolchains[context_data._toolchain_type]
+
   ext = ""
   if toolchain.default_dotnetos == "windows":
     ext = ".exe"
-  runner = _get_dotnet_runner(context_data, ext)
-  mcs = _get_dotnet_mcs(context_data)
-  stdlib = _get_dotnet_stdlib(context_data)
-  resgen = _get_dotnet_resgen(context_data)
+  runner = toolchain.get_dotnet_runner(context_data, ext)
+  mcs = toolchain.get_dotnet_mcs(context_data)
+  stdlib = toolchain.get_dotnet_stdlib(context_data)
+  resgen = toolchain.get_dotnet_resgen(context_data)
 
   return DotnetContext(
       # Fields
@@ -119,6 +75,8 @@ def dotnet_context(ctx, attr=None):
       workspace_name = ctx.workspace_name,
       libVersion = context_data._libVersion,
       lib = context_data._lib,
+      shared = context_data._shared,
+      debug = ctx.var["COMPILATION_MODE"] == "dbg",
       _ctx = ctx
   )
 
@@ -127,7 +85,11 @@ def _dotnet_context_data(ctx):
       _mcs_bin = ctx.attr._mcs_bin,
       _mono_bin = ctx.attr._mono_bin,
       _lib = ctx.attr._lib,
+      _tools = ctx.attr._tools,
+      _shared = ctx.attr._shared,
+      _host = ctx.attr._host,
       _libVersion = ctx.attr._libVersion,
+      _toolchain_type = ctx.attr._toolchain_type,
   )
 
 dotnet_context_data = rule(
@@ -145,9 +107,95 @@ dotnet_context_data = rule(
             allow_files = True,
             default="@dotnet_sdk//:lib",
         ),
+        "_tools": attr.label(
+            allow_files = True,
+            default="@net_sdk//:lib",
+        ),
+        "_shared": attr.label(
+            allow_files = True,
+            default="@dotnet_sdk//:lib",
+        ),
+        "_host": attr.label(
+            allow_files = True,
+            default="@dotnet_sdk//:lib",
+        ),
         "_libVersion": attr.string(
             default="4.5",
+        ),
+        "_toolchain_type": attr.string(
+            default="@io_bazel_rules_dotnet//dotnet:toolchain",
         ),
     },
 )
   
+core_context_data = rule(
+    _dotnet_context_data,
+    attrs = {
+        "_mcs_bin": attr.label(
+            allow_files = True,
+            default="@core_sdk//:mcs_bin",
+        ),
+        "_mono_bin": attr.label(
+            allow_files = True,
+            default="@core_sdk//:mono_bin",
+        ),
+        "_lib": attr.label(
+            allow_files = True,
+            default="@core_sdk//:lib",
+        ),
+        "_tools": attr.label(
+            allow_files = True,
+            default="@net_sdk//:lib",
+        ),
+        "_shared": attr.label(
+            allow_files = True,
+            default="@core_sdk//:shared",
+        ),
+        "_host": attr.label(
+            allow_files = True,
+            default="@core_sdk//:host",
+        ),
+        "_libVersion": attr.string(
+            default="",
+        ),
+        "_toolchain_type": attr.string(
+            default="@io_bazel_rules_dotnet//dotnet:toolchain_core",
+        ),
+    },
+)
+
+net_context_data = rule(
+    _dotnet_context_data,
+    attrs = {
+        "_mcs_bin": attr.label(
+            allow_files = True,
+            default="@net_sdk//:mcs_bin",
+        ),
+        "_mono_bin": attr.label(
+            allow_files = True,
+            default="@net_sdk//:mono_bin",
+        ),
+        "_lib": attr.label(
+            allow_files = True,
+            default="@net_sdk//:lib",
+        ),
+        "_tools": attr.label(
+            allow_files = True,
+            default="@net_sdk//:tools",
+        ),
+        "_shared": attr.label(
+            allow_files = True,
+            default="@net_sdk//:lib",
+        ),
+        "_host": attr.label(
+            allow_files = True,
+            default="@net_sdk//:mcs_bin",
+        ),
+        "_libVersion": attr.string(
+            default="",
+        ),
+        "_toolchain_type": attr.string(
+            default="@io_bazel_rules_dotnet//dotnet:toolchain_net",
+        ),
+    },
+)

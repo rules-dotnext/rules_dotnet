@@ -20,3 +20,24 @@ filegroup(
     "lib/**/*",
   ]),
 )
+
+filegroup(
+  name = "shared",
+  srcs = glob([
+    "shared/**/*",
+  ]),
+)
+
+filegroup(
+  name = "host",
+  srcs = glob([
+    "host/**/*",
+  ]),
+)
+
+filegroup(
+  name = "native_deps",
+  srcs = glob(["host/**/*"]) + 
+        glob(["shared/**/hostpolicy*"]) + glob(["shared/**/api-ms-*"]) + glob(["shared/**/*.so"]) + 
+        glob(["shared/**/coreclr.dll"]) + glob(["shared/**/clrjit.dll"])+ glob(["shared/**/*.dylib"]),
+)

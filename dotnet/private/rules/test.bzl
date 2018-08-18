@@ -1,15 +1,4 @@
 load(
-    "@io_bazel_rules_dotnet//dotnet/private:context.bzl",
-    "dotnet_context",
-)
-
-load(
-    "@io_bazel_rules_dotnet//dotnet/private:providers.bzl",
-    "DotnetLibrary",
-    "DotnetResource",
-)
-
-load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/launcher_gen.bzl",
     "dotnet_launcher_gen",
 )

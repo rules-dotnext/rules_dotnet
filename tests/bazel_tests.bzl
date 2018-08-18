@@ -52,7 +52,7 @@ cp -f {workspace} {work_dir}/WORKSPACE
 cp -f {build} {work_dir}/BUILD.bazel
 cd {work_dir}
 
-{bazel} --bazelrc {bazelrc} --nomaster_blazerc {command} --config {config} {args} {target} >& bazel-output.txt
+{bazel} --bazelrc {bazelrc} {command} --config {config} {args} {target} >& bazel-output.txt
 result=$?
 
 function at_exit {{

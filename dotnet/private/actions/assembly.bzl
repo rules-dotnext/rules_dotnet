@@ -17,11 +17,11 @@ def _map_dep(deps):
 def _map_resource(resources):
   return [d[DotnetResource].result.path + "," + d[DotnetResource].identifier for d in resources]
 
-def _make_runner_arglist(dotnet, deps, resources, output, executable, defines):
+def _make_runner_arglist(dotnet, deps, resources, output, executable, defines, unsafe):
   args = dotnet.actions.args()
 
   # /out:<file>
-  args.add(format="/out:%s", value=output.path)
+  args.add(output.path, format="/out:%s",)
 
   if executable:
     target = "exe"
@@ -29,7 +29,7 @@ def _make_runner_arglist(dotnet, deps, resources, output, executable, defines):
     target = "library"
 
   # /target (exe for binary, library for lib, module for module)
-  args.add(format="/target:%s", value=target)
+  args.add(target, format="/target:%s")
 
   args.add("/fullpaths")
   args.add("/noconfig")
@@ -50,12 +50,15 @@ def _make_runner_arglist(dotnet, deps, resources, output, executable, defines):
   #  args.add(format="/lib:%s", value=libdirs)
 
   if deps and len(deps)>0:
-    args.add(format="/reference:%s", value=deps, map_fn=_map_dep)
+    args.add(deps, format="/reference:%s", map_fn=_map_dep)
 
-  args.add(format="/reference:%s", value=dotnet.stdlib)
+  args.add(dotnet.stdlib, format="/reference:%s")
 
   if defines and len(defines)>0:
-    args.add(format="/define:%s", value=defines)
+    args.add(defines, format="/define:%s")
+
+  if unsafe:
+    args.add("/unsafe")
 
   # /debug
   #debug = ctx.var.get("BINMODE", "") == "-dbg"
@@ -66,7 +69,7 @@ def _make_runner_arglist(dotnet, deps, resources, output, executable, defines):
   # TODO(jeremy): /define:name[;name2]
 
   if resources and len(resources)>0:
-    args.add(format="/resource:%s", value=resources, map_fn=_map_resource)
+    args.add(resources, format="/resource:%s", map_fn=_map_resource)
 
   # TODO(jeremy): /resource:filename[,identifier[,accesibility-modifier]]
 
@@ -87,7 +90,8 @@ def emit_assembly(dotnet,
     out = None,
     resources = None,
     executable = True,
-    defines = None):
+    defines = None,
+    unsafe = False):
   """See dotnet/toolchains.rst#binary for full documentation."""
 
   if name == "" and out == None:
@@ -103,7 +107,7 @@ def emit_assembly(dotnet,
     result = dotnet.declare_file(dotnet, path=out)  
     extension = ""
     
-  runner_args = _make_runner_arglist(dotnet, deps, resources, result, executable, defines)
+  runner_args = _make_runner_arglist(dotnet, deps, resources, result, executable, defines, unsafe)
 
   attr_srcs = [f for t in srcs for f in as_iterable(t.files)]
   runner_args.add(attr_srcs)
@@ -135,10 +139,20 @@ def emit_assembly(dotnet,
   deps_libraries = [d[DotnetLibrary] for d in deps]
   transitive = sets.union(deps_libraries, *[a[DotnetLibrary].transitive for a in deps])
 
+  runfiles = None
+  for d in deps_libraries:
+    if d.runfiles:
+      if not runfiles:
+        runfiles = d.runfiles
+      else:
+        runfiles.merge(d.runfiles)
+
   return dotnet.new_library(
     dotnet = dotnet, 
     name = name, 
     deps = deps, 
     transitive = transitive,
-    result = result)
+    result = result,
+    pdb = None,
+    runfiles=runfiles)
 
