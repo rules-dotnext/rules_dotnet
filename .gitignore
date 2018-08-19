@@ -1,10 +1,6 @@
 *.swp
 *~
-/bazel-bin
-/bazel-genfiles
-/bazel-out
-/bazel-rules_dotnet
-/bazel-testlogs
+/bazel-*
 .vscode
 bin
 obj
