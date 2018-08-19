@@ -10,18 +10,28 @@ load(
 
 load(
     "@io_bazel_rules_dotnet//dotnet/private:common.bzl",
+    "paths",
     "sets"
 )
 
+def _get_net_stdlib_byname(shared, libVersion, name):
+  lname = name.lower()
+  for f in shared.files:
+    basename = paths.basename(f.path)
+    if basename.lower() != lname:
+      continue
+    return f
+  fail("Could not find %s in net_sdk (shared)" % name)
 
-def _net_imort_library_impl(ctx):
-  """net_import_library_impl emits actions for importing an external dll (for example provided by nuget)."""
+
+# TODO(tomek) we don't need special treatment for mscorlib.dll
+def _net_stdlib_impl(ctx):
+  """_net_stdlib_impl emits the assembly from @bnet_sdk//:shared."""
   dotnet = dotnet_context(ctx)
   name = ctx.label.name
- 
-  deps = ctx.attr.deps
-  src = ctx.attr.src
+  result = _get_net_stdlib_byname(dotnet.shared, dotnet.libVersion, name)
 
+  deps = ctx.attr.deps
   deps_libraries = [d[DotnetLibrary] for d in deps]
   transitive = sets.union(deps_libraries, *[a[DotnetLibrary].transitive for a in deps])
 
@@ -30,23 +40,19 @@ def _net_imort_library_impl(ctx):
     name = name, 
     deps = deps, 
     transitive = transitive,
-    result = src.files.to_list()[0])
-
-  transitive_files = [d.result for d in library.transitive.to_list()]
-
+    result = result)
+ 
   return [
       library,
       DefaultInfo(
           files = depset([library.result]),
-          runfiles = ctx.runfiles(files = [dotnet.stdlib, library.result], transitive_files=depset(direct=transitive_files)),
       ),
   ]
   
-net_import_library = rule(
-    _net_imort_library_impl,
+net_stdlib = rule(
+    _net_stdlib_impl,
     attrs = {
-        "deps": attr.label_list(providers=[DotnetLibrary]),
-        "src": attr.label(allow_files = FileType([".dll", ".exe"]), mandatory=True),        
+        "deps": attr.label_list(providers=[DotnetLibrary]),        
         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:net_context_data"))
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_net"],

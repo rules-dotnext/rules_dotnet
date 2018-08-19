@@ -41,10 +41,6 @@ def _net_binary_impl(ctx):
   if executable.runfiles:
     runfiles.merge(executable.runfiles)
 
-  for f in runfiles.files:
-    if f.extension == "pdb":
-        print("f %s" % f)
-
   return [
       DefaultInfo(
           files = depset([executable.result]),

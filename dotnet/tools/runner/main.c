@@ -22,7 +22,7 @@ extern const char * Nunit;
 
 
 static void RunExe(const char *manifestDir, int argc, char **argv) {
-	char fullpath[64*1024];
+	char fullpath[64*1024], *p;
 	char **args;
 	int i, c;
     int test = strlen(Nunit) > 0;
@@ -46,7 +46,8 @@ static void RunExe(const char *manifestDir, int argc, char **argv) {
 	args = malloc( (c) * sizeof(char*));
 	c = 0;
 	if (test) {
-		sprintf(fullpath, "%s/nunit-console-runner-exe_exe.exe", manifestDir);
+		p = strrchr(Nunit, '/');
+		sprintf(fullpath, "%s%s", manifestDir, p);
 		args[c++] = strdup(fullpath);
 		sprintf(fullpath, "-result=%s", getenv("XML_OUTPUT_FILE"));
 		args[c++] = strdup(fullpath);
@@ -71,7 +72,8 @@ static void RunExe(const char *manifestDir, int argc, char **argv) {
 	sprintf(monofullpath, "%s/mono", manifestDir);
 	args[c++] = strdup(monofullpath);
 	if (test) {
-		sprintf(fullpath, "%s/nunit-console-runner-exe_exe.exe", manifestDir);
+		p = strrchr(Nunit, '/');
+		sprintf(fullpath, "%s%s", manifestDir, p);
 		args[c++] = strdup(fullpath);
 		sprintf(fullpath, "-result=%s", getenv("XML_OUTPUT_FILE"));
 		args[c++] = strdup(fullpath);
