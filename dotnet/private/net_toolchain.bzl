@@ -24,6 +24,7 @@ load(
 load("@io_bazel_rules_dotnet//dotnet/private:actions/binary_net.bzl", "emit_binary_net")
 load("@io_bazel_rules_dotnet//dotnet/private:actions/library_net.bzl", "emit_library_net")
 load("@io_bazel_rules_dotnet//dotnet/private:actions/resx_net.bzl", "emit_resx_net")
+load("@io_bazel_rules_dotnet//dotnet/private:actions/com_ref_net.bzl", "emit_com_ref_net")
 
 def _get_dotnet_runner(context_data, ext):
   return None
@@ -37,12 +38,18 @@ def _get_dotnet_mcs(context_data):
   fail("Could not find csc.exe in net_sdk (mcs_bin)")
 
 def _get_dotnet_resgen(context_data):
+  return _get_dotnet_tool(context_data, "resgen.exe")
+
+def _get_dotnet_tlbimp(context_data):
+  return _get_dotnet_tool(context_data, "tlbimp.exe")
+
+def _get_dotnet_tool(context_data, name):
   for f in context_data._tools.files:
     basename = paths.basename(f.path)
-    if basename.lower() != "resgen.exe":
+    if basename.lower() != name:
       continue
     return f
-  fail("Could not find resgen.exe in net_sdk (tools)")
+  fail("Could not find %s in net_sdk (tools)" % name)
 
 def _get_dotnet_stdlib(context_data):
   for f in context_data._lib.files:
@@ -61,11 +68,13 @@ def _net_toolchain_impl(ctx):
       get_dotnet_runner = _get_dotnet_runner,
       get_dotnet_mcs = _get_dotnet_mcs,
       get_dotnet_resgen = _get_dotnet_resgen,
+      get_dotnet_tlbimp = _get_dotnet_tlbimp,
       get_dotnet_stdlib = _get_dotnet_stdlib,
       actions = struct(
           binary = emit_binary_net,
           library = emit_library_net,
           resx = emit_resx_net,
+          com_ref = emit_com_ref_net
       ),
       flags = struct(
           compile = (),

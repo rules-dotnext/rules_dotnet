@@ -62,6 +62,9 @@ def _get_dotnet_resgen(context_data):
 
   fail("Could not find resgen.exe in dotnet_sdk (mcs_bin, lib)")
 
+def _get_dotnet_tlbimp(context_data):
+  return None
+
 def _get_dotnet_stdlib(context_data):
   for f in context_data._lib.files:
     basename = paths.basename(f.path)
@@ -82,11 +85,13 @@ def _dotnet_toolchain_impl(ctx):
       get_dotnet_runner = _get_dotnet_runner,
       get_dotnet_mcs = _get_dotnet_mcs,
       get_dotnet_resgen = _get_dotnet_resgen,
+      get_dotnet_tlbimp = _get_dotnet_tlbimp,
       get_dotnet_stdlib = _get_dotnet_stdlib,
       actions = struct(
           binary = emit_binary,
           library = emit_library,
           resx = emit_resx,
+          com_ref = None
       ),
       flags = struct(
           compile = (),
