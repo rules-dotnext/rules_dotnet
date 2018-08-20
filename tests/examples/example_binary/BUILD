@@ -1,4 +1,5 @@
-load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_binary", "core_binary", "net_binary")
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_binary", 
+        "core_binary", "net_binary", "net_com_library")
 
 
 dotnet_binary(
@@ -33,6 +34,28 @@ net_binary(
     ],
     deps = [
         "//tests/examples/example_lib:MyClass",
+        "@Microsoft.Build.Framework//:lib",
+    ]
+)
+
+net_com_library(
+    name = "com-ref-shell32",
+    guid = "50A7E9B0-70EF-11D1-B75A-00A0C90564FE",
+    major_version = 1,
+    minor_version = 0,
+    lcid = 0,
+    platform = "win32",
+    namespace = "Shell32",
+    out = "shell32.dll"
+)
+
+net_binary(
+    name = "shell-com-example",
+    srcs = [
+        "ShellComExample.cs",
+    ],
+    deps = [
+        ":com-ref-shell32",
         "@Microsoft.Build.Framework//:lib",
     ]
 )

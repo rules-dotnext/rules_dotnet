@@ -51,6 +51,9 @@ def _get_dotnet_mcs(context_data):
 def _get_dotnet_resgen(context_data):
   return None
 
+def _get_dotnet_tlbimp(context_data):
+  return None
+
 def _get_dotnet_stdlib(context_data):
   for f in context_data._shared.files:
     basename = paths.basename(f.path)
@@ -68,11 +71,13 @@ def _core_toolchain_impl(ctx):
       get_dotnet_runner = _get_dotnet_runner,
       get_dotnet_mcs = _get_dotnet_mcs,
       get_dotnet_resgen = _get_dotnet_resgen,
+      get_dotnet_tlbimp = _get_dotnet_tlbimp,
       get_dotnet_stdlib = _get_dotnet_stdlib,
       actions = struct(
           binary = emit_binary_core,
           library = emit_library_core,
           resx = emit_resx,
+          com_ref = None
       ),
       flags = struct(
           compile = (),

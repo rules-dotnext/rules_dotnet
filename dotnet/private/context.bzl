@@ -55,6 +55,7 @@ def dotnet_context(ctx, attr=None):
   mcs = toolchain.get_dotnet_mcs(context_data)
   stdlib = toolchain.get_dotnet_stdlib(context_data)
   resgen = toolchain.get_dotnet_resgen(context_data)
+  tlbimp = toolchain.get_dotnet_tlbimp(context_data)
 
   return DotnetContext(
       # Fields
@@ -64,11 +65,13 @@ def dotnet_context(ctx, attr=None):
       binary = toolchain.actions.binary,  
       library = toolchain.actions.library,
       resx = toolchain.actions.resx,
+      com_ref = toolchain.actions.com_ref,
       exe_extension = ext,
       runner = runner,
       mcs = mcs,
       stdlib = stdlib,
       resgen = resgen,
+      tlbimp = tlbimp,
       declare_file = _declare_file,
       new_library = _new_library,
       new_resource = _new_resource,

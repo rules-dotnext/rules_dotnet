@@ -103,6 +103,11 @@ load(
 )
 
 load(
+    "@io_bazel_rules_dotnet//dotnet/private:rules/com_ref.bzl", 
+    net_com_library = "net_com_library"
+)
+
+load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/test_core.bzl", 
     core_xunit_test = "core_xunit_test"
 )
