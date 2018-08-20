@@ -126,6 +126,18 @@ Example
     dotnet_import_library(
         name = "npgsqllib",
         src = "lib/net451/Npgsql.dll"
+    )
+    
+    net_gac2(
+        name = "Microsoft.VisualStudio.QualityTools.UnitTestFramework",
+        version = "10.1.0.0",
+        token = "b03f5f7f11d50a3a"
+    )
+
+    net_gac4(
+        name = "System.ComponentModel.DataAnnotations",
+        version = "4.0.0.0",
+        token = "31bf3856ad364e35"
     )    
         """
     )

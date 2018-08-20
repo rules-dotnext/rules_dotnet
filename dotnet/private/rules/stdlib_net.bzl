@@ -26,7 +26,7 @@ def _get_net_stdlib_byname(shared, libVersion, name):
 
 # TODO(tomek) we don't need special treatment for mscorlib.dll
 def _net_stdlib_impl(ctx):
-  """_net_stdlib_impl emits the assembly from @bnet_sdk//:shared."""
+  """_net_stdlib_impl emits the assembly from @net_sdk//:shared."""
   dotnet = dotnet_context(ctx)
   name = ctx.label.name
   result = _get_net_stdlib_byname(dotnet.shared, dotnet.libVersion, name)

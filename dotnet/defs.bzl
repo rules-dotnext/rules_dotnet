@@ -111,3 +111,9 @@ load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/test_core.bzl", 
     core_xunit_test = "core_xunit_test"
 )
+
+load(
+    "@io_bazel_rules_dotnet//dotnet/private:rules/gac_net.bzl",
+    net_gac4 = "net_gac4",
+    net_gac2 = "net_gac2"
+)
