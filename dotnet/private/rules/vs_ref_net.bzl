@@ -5,7 +5,7 @@ load(
 
 def _vs2017_ref_net_impl(ctx):
     prefix = "vs"
-    for vs_type in ["Professional", "Enterprise"]:
+    for vs_type in ["Community", "Professional", "Enterprise"]:
         vs_ref_path = paths.join("C:/Program Files (x86)/Microsoft Visual Studio/2017", 
             vs_type, "Common7/IDE/ReferenceAssemblies")
         if ctx.path(vs_ref_path).exists:
