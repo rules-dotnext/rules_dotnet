@@ -12,6 +12,10 @@ load(
     "net_toolchain",
 )
 load(
+    "@io_bazel_rules_dotnet//dotnet/private:net_empty_toolchain.bzl",
+    "net_empty_toolchain",
+)
+load(
     "@io_bazel_rules_dotnet//dotnet/private:sdk.bzl",
     "dotnet_download_sdk",
     "dotnet_host_sdk",
@@ -182,9 +186,17 @@ def declare_toolchains():
             host = toolchain["host"],
         )
     elif toolchain["impl"] == "net":
-        net_toolchain(
-            # Required fields
-            name = toolchain["name"],
-            host = toolchain["host"],
-        )
-    
+        if toolchain["name"] == "net_windows_amd64":
+            net_toolchain(
+                # Required fields
+                name = toolchain["name"],
+                host = toolchain["host"],
+            )
+        else:
+            # Hardcoded empty rules for .NET on Linux and ocx
+            net_empty_toolchain(
+                # Required fields
+                name = toolchain["name"],
+                host = toolchain["host"],
+            )
+  

@@ -16,6 +16,14 @@ const char * Nunit = "{}";
 def _dotnet_launcher_gen_impl(ctx):
   """dotnet_launcher_gen_impl emits actions that generates .c file necessary to build launcher."""
   name = ctx.label.name
+
+  # Handle case of empty toolchain on linux and darwin
+  if not ctx.attr.exe.files.to_list():
+    empty = ctx.actions.declare_file("empty.c")
+    ctx.actions.write(output = empty, content = "const char *Exe; const char *Nunit;int main(){return 0;}")
+    return [DefaultInfo(executable = empty)]
+
+
   exe = ctx.attr.exe.files.to_list()[0]
   nunit = ""
   if ctx.attr.nunit:

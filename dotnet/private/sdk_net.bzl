@@ -18,7 +18,8 @@ def _detect_net_tools(ctx, version):
 
 def _net_download_sdk_impl(ctx):
   if not ctx.os.name.startswith('windows'):
-    fail("Unsupported operating system: " + ctx.os.name)
+    _net_empty_download_sdk_impl(ctx)
+    return
 
   host = "net_windows_amd64"
 
@@ -37,6 +38,14 @@ def _net_download_sdk_impl(ctx):
   tools = _detect_net_tools(ctx, ctx.attr.version)
   ctx.symlink(tools, "tools")
 
+
+def _net_empty_download_sdk_impl(ctx):
+  sdks = ctx.attr.sdks
+  _sdk_build_file(ctx)
+  ctx.symlink("net/tools", "mcs_bin")
+  ctx.symlink("net/tools", "mono_bin")
+  ctx.symlink("net/tools", "lib")
+  ctx.symlink("net/tools", "tools")
 
 net_download_sdk = repository_rule(
     _net_download_sdk_impl,

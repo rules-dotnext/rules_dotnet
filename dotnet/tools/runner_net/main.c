@@ -1,3 +1,5 @@
+#ifdef _MSC_VER
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -59,10 +61,11 @@ static void RunExe(const char *manifestDir, int argc, char **argv) {
 		exit(-1);				
 	}
 }
-
+#endif
 
 int main(int argc, char *argv[], char *envp[])
 {
+#ifdef _MSC_VER	
 	const char *manifestDir;
 	char buffer[64*1024];
     int test = strlen(Nunit) > 0;
@@ -76,6 +79,7 @@ int main(int argc, char *argv[], char *envp[])
 	ReadManifest(manifestDir);
 	LinkFiles(manifestDir);
 	RunExe(manifestDir, argc, argv);
+#endif
 
 	return 0;
 }

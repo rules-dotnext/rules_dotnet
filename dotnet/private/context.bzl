@@ -51,11 +51,20 @@ def dotnet_context(ctx, attr=None):
   ext = ""
   if toolchain.default_dotnetos == "windows":
     ext = ".exe"
-  runner = toolchain.get_dotnet_runner(context_data, ext)
-  mcs = toolchain.get_dotnet_mcs(context_data)
-  stdlib = toolchain.get_dotnet_stdlib(context_data)
-  resgen = toolchain.get_dotnet_resgen(context_data)
-  tlbimp = toolchain.get_dotnet_tlbimp(context_data)
+
+  # Handle empty toolchain for .NET on linux and osx
+  if toolchain.get_dotnet_runner == None:
+    runner = None
+    mcs = None
+    stdlib = None
+    resgen = None
+    tlbimp = None
+  else:
+    runner = toolchain.get_dotnet_runner(context_data, ext)
+    mcs = toolchain.get_dotnet_mcs(context_data)
+    stdlib = toolchain.get_dotnet_stdlib(context_data)
+    resgen = toolchain.get_dotnet_resgen(context_data)
+    tlbimp = toolchain.get_dotnet_tlbimp(context_data)
 
   return DotnetContext(
       # Fields

@@ -22,6 +22,8 @@ DOTNETIMPL_OS_ARCH = (
     ("core", "linux", "amd64"),
     ("core", "windows", "amd64"),
     ("net", "windows", "amd64"),
+    ("net", "linux", "amd64"),
+    ("net", "darwin", "amd64"),
 )
 
 def declare_config_settings():
