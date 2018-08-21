@@ -138,6 +138,8 @@ Example
         name = "System.ComponentModel.DataAnnotations",
         version = "4.0.0.0",
         token = "31bf3856ad364e35"
-    )    
+    )
+    
+    vs2017_ref_net(name = "vs_ref_2017")
         """
     )

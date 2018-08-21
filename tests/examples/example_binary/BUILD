@@ -57,5 +57,7 @@ net_binary(
     deps = [
         ":com-ref-shell32",
         "@Microsoft.Build.Framework//:lib",
+        "@System.ComponentModel.DataAnnotations//:GAC_MSIL",
+        "@vs2017_ref//:vs/v2.0/Microsoft.VisualStudio.QualityTools.UnitTestFramework"
     ]
 )
