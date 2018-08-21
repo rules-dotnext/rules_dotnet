@@ -29,6 +29,12 @@ def _net_stdlib_impl(ctx):
   """_net_stdlib_impl emits the assembly from @bnet_sdk//:shared."""
   dotnet = dotnet_context(ctx)
   name = ctx.label.name
+
+  # Handle case of empty toolchain on linux and darwin
+  if dotnet.library == None:
+    library = dotnet.new_library(dotnet = dotnet)
+    return [library]
+
   result = _get_net_stdlib_byname(dotnet.shared, dotnet.libVersion, name)
 
   deps = ctx.attr.deps

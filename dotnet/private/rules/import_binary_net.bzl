@@ -24,6 +24,12 @@ def _net_import_binary_impl(ctx):
   dotnet = dotnet_context(ctx)
   name = ctx.label.name
  
+  # Handle case of empty toolchain on linux and darwin
+  if dotnet.library == None:
+    empty = dotnet.declare_file(dotnet, path="empty.sh")
+    dotnet.actions.write(output = empty, content = "echo '.net not supported on this platform'")
+    return [DefaultInfo(executable = empty)]
+
   deps = ctx.attr.deps
   src = ctx.attr.src
 

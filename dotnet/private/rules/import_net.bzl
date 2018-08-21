@@ -19,6 +19,11 @@ def _net_import_library_impl(ctx):
   dotnet = dotnet_context(ctx)
   name = ctx.label.name
  
+  # Handle case of empty toolchain on linux and darwin
+  if dotnet.library == None:
+    library = dotnet.new_library(dotnet = dotnet)
+    return [library]
+
   deps = ctx.attr.deps
   src = ctx.attr.src
 
