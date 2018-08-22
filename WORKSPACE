@@ -1,6 +1,7 @@
 workspace(name = "io_bazel_rules_dotnet")
 
-load("//dotnet:defs.bzl", "dotnet_register_toolchains", "dotnet_repositories", "dotnet_nuget_new")
+load("//dotnet:defs.bzl", "dotnet_register_toolchains", "dotnet_repositories", 
+        "dotnet_nuget_new", "net_gac4", "vs2017_ref_net")
 
 dotnet_repositories()
 dotnet_register_toolchains("host")
@@ -53,7 +54,13 @@ net_import_library(
     """
 )
 
+net_gac4(
+  name = "System.ComponentModel.DataAnnotations",
+  version = "4.0.0.0",
+  token = "31bf3856ad364e35"
+)
 
+vs2017_ref_net(name = "vs2017_ref")
 
 load("@io_bazel_rules_dotnet//tests:bazel_tests.bzl", "test_environment")
 
