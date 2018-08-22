@@ -49,15 +49,16 @@ net_com_library(
     out = "shell32.dll"
 )
 
-net_binary(
-    name = "shell-com-example",
-    srcs = [
-        "ShellComExample.cs",
-    ],
-    deps = [
-        ":com-ref-shell32",
-        "@Microsoft.Build.Framework//:lib",
-        "@System.ComponentModel.DataAnnotations//:GAC_MSIL",
-        "@vs2017_ref//:vs/v2.0/Microsoft.VisualStudio.QualityTools.UnitTestFramework"
-    ]
-)
+# The rule is left as an example. It is commented out, because our CI server doesn't have VS2017 installed
+#net_binary(
+#    name = "shell-com-example",
+#    srcs = [
+#        "ShellComExample.cs",
+#    ],
+#    deps = [
+#        ":com-ref-shell32",
+#        "@Microsoft.Build.Framework//:lib",
+#        "@System.ComponentModel.DataAnnotations//:GAC_MSIL",
+#        "@vs2017_ref//:vs/v2.0/Microsoft.VisualStudio.QualityTools.UnitTestFramework"
+#    ]
+#)

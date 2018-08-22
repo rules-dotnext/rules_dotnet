@@ -60,7 +60,8 @@ net_gac4(
   token = "31bf3856ad364e35"
 )
 
-vs2017_ref_net(name = "vs2017_ref")
+# The rule is left as an example. It is commented out, because our CI server doesn't have VS2017 installed
+# vs2017_ref_net(name = "vs2017_ref")
 
 load("@io_bazel_rules_dotnet//tests:bazel_tests.bzl", "test_environment")
 
