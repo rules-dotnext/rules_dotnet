@@ -17,18 +17,14 @@ C# Rules for Bazel_
 .. _dotnet_nuget_new: dotnet/workspace.rst#dotnet_nuget_new
 .. ;;
 
-========
-Buildkit
-========
-|badge | 
-========
+|badge| 
 
 .. contents:: 
   :depth: 2
 
 
 Documentation
-~~~~~~~~~~~~~
+-------------
 
 * `Core API <dotnet/core.rst>`_
   
@@ -42,16 +38,18 @@ Documentation
 
 * `Toolchains <dotnet/toolchains.rst>`_
 
+* `Tests <tests/README.rst>`_
+
 
 Overview
-~~~~~~~~
+--------
 
 This is a minimal viable set of C# bindings for building C# code with
 Mono_. It's still pretty rough but it works as a proof of concept that 
 could grow into something more.
 
 Caveats
-~~~~~~~
+-------
 
 These rules are not compatible with sandboxing_.
 
@@ -66,7 +64,7 @@ Due to Windows short path limit (260) of cl compiler TMP env variable should be
 set to something short (like X:\ or c:\TEMP).
 
 Setup
-~~~~~
+-----
 
 * Add the following to your `WORKSPACE` file to add the external repositories:
 
@@ -102,7 +100,7 @@ Setup
   (applies to Linux).
 
 Examples
-~~~~~~~~
+--------
 
 * dotnet_library_
 
