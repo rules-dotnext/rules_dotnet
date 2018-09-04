@@ -6,7 +6,7 @@ Dotnet toolchains
 .. _DotnetLibrary: providers.bzl#DotnetLibrary
 .. _DotnetResource: providers.bzl#DotnetResource
 
-.. role:: param(kbd)
+.. role:: param(literal)
 .. role:: type(emphasis)
 .. role:: value(code)
 .. |mandatory| replace:: **mandatory value**
@@ -47,7 +47,7 @@ platforms. It should be considered an opaqute type, you only ever use it through
 Declaration
 ^^^^^^^^^^^
 
-Toolchains are declared using the dotnet_toolchain_ macro.
+Toolchains are declared using the dotnet_toolchain macro.
 
 Toolchains are pre-declared for all the known combinations of host and target, and the names
 are a predictable
@@ -382,7 +382,7 @@ Fields
 +--------------------------------+-----------------------------------------------------------------+
 | The main "mcs" (C# compiler) binary used.                                                        |
 +--------------------------------+-----------------------------------------------------------------+
-| :param:`resgen`               | :type:`File`                                                    |
+| :param:`resgen`                | :type:`File`                                                    |
 +--------------------------------+-----------------------------------------------------------------+
 | The resource compiler (dotnet executable).                                                       |
 +--------------------------------+-----------------------------------------------------------------+

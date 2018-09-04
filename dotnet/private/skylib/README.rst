@@ -1,3 +1,6 @@
+Skylib
+======
+
 This directory is a copy of github.com/bazelbuild/bazel-skylib/lib.
 Commit 2169ae1, retrieved on 2018-01-12
 

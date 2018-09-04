@@ -3,10 +3,8 @@ C# Rules for Bazel_
 
 .. All external links are here
 .. _Bazel: https://bazel.build/
-.. |travis| image:: https://travis-ci.org/tomaszstrejczek/rules_dotnet.svg?branch=master
-   :target: https://travis-ci.org/tomaszstrejczek/rules_dotnet
-.. |appvey| image:: https://ci.appveyor.com/api/projects/status/4wlsdo9kgwvt8b97/branch/master?svg=true      
-   :target: https://ci.appveyor.com/project/tomaszstrejczek/rules-dotnet/branch/master
+.. |badge| image:: https://badge.buildkite.com/703775290818dcb2af754f503ed54dc11bb124fce2a6bf1606.svg
+   :target: https://buildkite.com/bazel/rules-dotnet-edge
 .. _Mono: http://www.mono-project.com/
 .. _sandboxing: https://bazel.io/blog/2015/09/11/sandboxing.html 
 .. _dotnet_library: dotnet/core.rst#dotnet_library
@@ -19,18 +17,14 @@ C# Rules for Bazel_
 .. _dotnet_nuget_new: dotnet/workspace.rst#dotnet_nuget_new
 .. ;;
 
-======== ========
-Travis   Appveyor
-======== ========
-|travis| |appvey|
-======== ========
+|badge| 
 
 .. contents:: 
   :depth: 2
 
 
 Documentation
-~~~~~~~~~~~~~
+-------------
 
 * `Core API <dotnet/core.rst>`_
   
@@ -44,16 +38,18 @@ Documentation
 
 * `Toolchains <dotnet/toolchains.rst>`_
 
+* `Tests <tests/README.rst>`_
+
 
 Overview
-~~~~~~~~
+--------
 
 This is a minimal viable set of C# bindings for building C# code with
 Mono_. It's still pretty rough but it works as a proof of concept that 
 could grow into something more.
 
 Caveats
-~~~~~~~
+-------
 
 These rules are not compatible with sandboxing_.
 
@@ -68,7 +64,7 @@ Due to Windows short path limit (260) of cl compiler TMP env variable should be
 set to something short (like X:\ or c:\TEMP).
 
 Setup
-~~~~~
+-----
 
 * Add the following to your `WORKSPACE` file to add the external repositories:
 
@@ -104,7 +100,7 @@ Setup
   (applies to Linux).
 
 Examples
-~~~~~~~~
+--------
 
 * dotnet_library_
 

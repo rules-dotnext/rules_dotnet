@@ -10,7 +10,7 @@ Dotnet workspace rules
 .. _nested workspaces: https://bazel.build/designs/2016/09/19/recursive-ws-parsing.html
 .. _dotnet_import_library: core.rst#dotnet_import_library
 
-.. role:: param(kbd)
+.. role:: param(literal)
 .. role:: type(emphasis)
 .. role:: value(code)
 .. |mandatory| replace:: **mandatory value**

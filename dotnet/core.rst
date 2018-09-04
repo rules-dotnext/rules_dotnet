@@ -14,7 +14,7 @@ Core dotnet rules
 .. _config_setting: https://docs.bazel.build/versions/master/be/general.html#config_setting
 .. _dotnet_nuget_new: workspace.rst#dotnet_nuget_new
 
-.. role:: param(kbd)
+.. role:: param(literal)
 .. role:: type(emphasis)
 .. role:: value(code)
 .. |mandatory| replace:: **mandatory value**

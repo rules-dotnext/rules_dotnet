@@ -15,6 +15,7 @@ Welcome to rules_dotnet's documentation!
    dotnet/workspace
    dotnet/providers
    dotnet/toolchains
+   tests/README
    dotnet/private/skylib/README
 
 
