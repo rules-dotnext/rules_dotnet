@@ -78,40 +78,6 @@ dotnet_nuget_new = repository_rule(
     }),
 )
 
-_TEMPLATE = """
-package(default_visibility = [ "//visibility:public" ])
-load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_import_library")
-
-dotnet_import_library(
-    name = "{}lib",
-    src = "{}"
-)    
-"""
-
-def _dotnet_nuget_simple_impl(ctx):
-  """dotnet_nuget_impl emits actions for exposing nuget assmeblies."""
-
-  content = _TEMPLATE.format(ctx.attr.name, ctx.attr.lib)
-  _dotnet_nuget_impl(ctx, build_file = None, build_file_content = content)
-
-_dotnet_nuget_simple_attrs = {
-    "_nuget_exe": attr.label(default=Label("@nuget//file:nuget.exe")),
-    # Sources to download the nuget packages from
-    "source": attr.string(default = "https://www.nuget.org/api/v2/package"),
-    # The name of the nuget package
-    "package": attr.string(mandatory=True),
-    # The version of the nuget package
-    "version": attr.string(mandatory=True),
-    "sha256": attr.string(mandatory=True),
-    "use_nuget_client": attr.bool(default=False),
-    "lib": attr.string(mandatory=True),
-}
-
-dotnet_nuget_simple = repository_rule(
-    _dotnet_nuget_simple_impl,
-    attrs = _dotnet_nuget_simple_attrs,
-)
-
 _FUNC = """
 {}(
     name = "{}",

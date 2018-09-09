@@ -35,7 +35,6 @@ net_binary(
     ],
     deps = [
         "//tests/examples/example_lib:MyClass",
-        "@Microsoft.Build.Framework//:lib",
         "@npgsql//:net",
     ]
 )
