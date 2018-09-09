@@ -85,7 +85,8 @@ load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/nuget.bzl", 
     dotnet_nuget = "dotnet_nuget",
     dotnet_nuget_new = "dotnet_nuget_new",
-    dotnet_nuget_simple = "dotnet_nuget_simple"
+    dotnet_nuget_simple = "dotnet_nuget_simple",
+    nuget_package = "nuget_package"
 )
 
 
@@ -102,6 +103,11 @@ load(
 load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/import_net.bzl", 
     net_import_library = "net_import_library"
+)
+
+load(
+    "@io_bazel_rules_dotnet//dotnet/private:rules/import_core.bzl", 
+    core_import_library = "core_import_library"
 )
 
 load(

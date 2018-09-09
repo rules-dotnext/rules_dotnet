@@ -14,11 +14,16 @@ load(
 )
 
 
-def _dotnet_import_library_impl(ctx):
-  """dotnet_import_library_impl emits actions for importing an external dll (for example provided by nuget)."""
+def _core_import_library_impl(ctx):
+  """core_import_library_impl emits actions for importing an external dll (for example provided by nuget)."""
   dotnet = dotnet_context(ctx)
   name = ctx.label.name
  
+  # Handle case of empty toolchain on linux and darwin
+  if dotnet.library == None:
+    library = dotnet.new_library(dotnet = dotnet)
+    return [library]
+
   deps = ctx.attr.deps
   src = ctx.attr.src
 
@@ -42,13 +47,13 @@ def _dotnet_import_library_impl(ctx):
       ),
   ]
   
-dotnet_import_library = rule(
-    _dotnet_import_library_impl,
+core_import_library = rule(
+    _core_import_library_impl,
     attrs = {
         "deps": attr.label_list(providers=[DotnetLibrary]),
-        "src": attr.label(allow_files = FileType([".dll"]), mandatory=True),        
-        "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data"))
+        "src": attr.label(allow_files = FileType([".dll", ".exe"]), mandatory=True),        
+        "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:core_context_data"))
     },
-    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
+    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_core"],
     executable = False,
 )
