@@ -20,7 +20,7 @@ core_binary(
         "Program.cs",
     ],
     deps = [
-        "//tests/examples/example_lib:MyClass",
+        "//tests/examples/example_lib:MyClass-core",
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.CoreLib.dll",
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Console.dll",

@@ -16,7 +16,7 @@ core_binary(
         "MyTool.cs",
     ],
     deps = [
-        "//tests/examples/example_lib:MyClass",
+        "//tests/examples/example_lib:MyClass-core",
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.Extensions.dll",
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.IO.FileSystem.dll",
