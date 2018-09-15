@@ -29,7 +29,7 @@ def _core_binary_impl(ctx):
       unsafe = ctx.attr.unsafe,
   )
 
-  transitive_files = [d.result for d in executable.transitive.to_list()]
+  transitive_files = [d[DotnetLibrary].result for d in executable.transitive.to_list()]
   native_deps = ctx.attr._native_deps.files.to_list()
 
   if executable.pdb:

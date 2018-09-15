@@ -32,8 +32,7 @@ def _core_stdlib_impl(ctx):
   result = _get_dotnet_stdlib_byname(dotnet.shared, dotnet.libVersion, name)
 
   deps = ctx.attr.deps
-  deps_libraries = [d[DotnetLibrary] for d in deps]
-  transitive = sets.union(deps_libraries, *[a[DotnetLibrary].transitive for a in deps])
+  transitive = depset(direct = deps, transitive = [a[DotnetLibrary].transitive for a in deps])
 
   library = dotnet.new_library(
     dotnet = dotnet, 
@@ -41,7 +40,7 @@ def _core_stdlib_impl(ctx):
     deps = deps, 
     transitive = transitive,
     result = result)
- 
+
   return [
       library,
       DefaultInfo(

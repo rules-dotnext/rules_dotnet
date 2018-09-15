@@ -14,7 +14,7 @@ def _core_library_impl(ctx):
   """core_library_impl emits actions for compiling dotnet executable assembly."""
   dotnet = dotnet_context(ctx)
   name = ctx.label.name
- 
+
   library = dotnet.library(dotnet,
       name = name,
       srcs = ctx.attr.srcs,
@@ -25,7 +25,7 @@ def _core_library_impl(ctx):
       unsafe = ctx.attr.unsafe,
   )
 
-  transitive_files = [d.result for d in library.transitive.to_list()]
+  transitive_files = [d[DotnetLibrary].result for d in library.transitive.to_list()]
 
   if library.pdb:
     pdbs = [library.pdb]

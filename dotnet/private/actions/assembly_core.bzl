@@ -114,21 +114,16 @@ def emit_assembly_core(dotnet,
   else:
     pdb = None
 
-  runner_args = _make_runner_arglist(dotnet, deps, resources, result, pdb, executable, defines, unsafe)
+  deps_libraries = [d[DotnetLibrary] for d in deps]  
+  transitive = depset(direct = deps, transitive = [d[DotnetLibrary].transitive for d in deps])
+
+  runner_args = _make_runner_arglist(dotnet, transitive.to_list(), resources, result, pdb, executable, defines, unsafe)
 
   attr_srcs = [f for t in srcs for f in as_iterable(t.files)]
   runner_args.add(attr_srcs)
 
   runner_args.set_param_file_format("multiline")
 
-  # Use a "response file" to pass arguments to csc.
-  # Windows has a max command-line length of around 32k bytes. The default for
-  # Args is to spill to param files if the length of the executable, params
-  # and spaces between them sum to that number. Unfortunately the math doesn't
-  # work out exactly like that on Windows (e.g. there is also a null
-  # terminator, escaping.) For now, setting use_always to True is the
-  # conservative option. Long command lines are probable with C# due to
-  # organizing files by namespace.
   paramfilepath = name+extension+".param"
   paramfile = dotnet.declare_file(dotnet, path=paramfilepath)
 
@@ -142,9 +137,6 @@ def emit_assembly_core(dotnet,
       arguments = [dotnet.mcs.path, "@"+paramfile.path],
       progress_message = (
           "Compiling " + dotnet.label.package + ":" + dotnet.label.name))
-
-  deps_libraries = [d[DotnetLibrary] for d in deps]
-  transitive = sets.union(deps_libraries, *[a[DotnetLibrary].transitive for a in deps])
 
   runfiles = dotnet._ctx.runfiles(files = [pdb]) if pdb else None
   for d in deps_libraries:
