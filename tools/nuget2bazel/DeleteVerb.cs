@@ -16,7 +16,7 @@ namespace nuget2bazel
         public string Package { get; set; }
 
         [Option('p', "path",
-            Default = ".",
+            Default = null,
             HelpText = "Path to the directory with the WORKSPACE file")]
         public string RootPath { get; set; }
     }

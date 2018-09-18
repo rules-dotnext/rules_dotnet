@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
@@ -20,6 +21,9 @@ namespace nuget2bazel
     {
         public async Task Do(string package, string rootPath)
         {
+            if (rootPath == null)
+                rootPath = Directory.GetCurrentDirectory();
+
             var providers = new List<Lazy<INuGetResourceProvider>>();
             providers.AddRange(Repository.Provider.GetCoreV3());  // Add v3 API support
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,24 +16,39 @@ namespace nuget2bazel
         public WorkspaceEntry()
         {
         }
-        public WorkspaceEntry(PackageIdentity identity, string sha256, IEnumerable<PackageDependency> deps,
+        public WorkspaceEntry(PackageIdentity identity, string sha256, IEnumerable<PackageDependencyGroup> deps,
             IEnumerable<FrameworkSpecificGroup> libs, IEnumerable<FrameworkSpecificGroup> references)
         {
             PackageIdentity = identity;
             Sha256 = sha256;
-            Dependencies = deps;
 
-            var coreFramework = NuGetFramework.Parse("netcoreapp2.0");
-            var netFramework = NuGetFramework.Parse("net46");
-            var monoFramework = NuGetFramework.Parse("net45");
+            var coreFramework = NuGetFramework.Parse("netcoreapp5.0");
+            var netFramework = NuGetFramework.Parse("net70");
+            var monoFramework = NuGetFramework.Parse("net70");
 
             Core_Files = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(coreFramework, libs)?.Items;
             Net_Files = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(netFramework, libs)?.Items;
             Mono_Files = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(monoFramework, libs)?.Items;
 
-            CoreLib = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(coreFramework, references)?.Items.FirstOrDefault();
-            NetLib = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(netFramework, references)?.Items.FirstOrDefault();
-            MonoLib = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(monoFramework, references)?.Items.FirstOrDefault();
+            var depConverted = deps.Select(x =>
+                new FrameworkSpecificGroup(x.TargetFramework, x.Packages.Select(y => y.Id.ToLower())));
+            Core_Deps = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(coreFramework, depConverted)?.Items;
+            Net_Deps = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(netFramework, depConverted)?.Items; ;
+            Mono_Deps = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(monoFramework, depConverted)?.Items; 
+
+            CoreLib = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(coreFramework, references)?.Items.FirstOrDefault(x => Path.GetExtension(x) == ".dll");
+            NetLib = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(netFramework, references)?.Items.FirstOrDefault(x => Path.GetExtension(x) == ".dll");
+            MonoLib = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(monoFramework, references)?.Items.FirstOrDefault(x => Path.GetExtension(x) == ".dll");
+
+            if (CoreLib == null)
+                CoreLib = Core_Files?.FirstOrDefault(x => Path.GetExtension(x) == ".dll");
+            if (NetLib == null)
+                NetLib = Net_Files?.FirstOrDefault(x => Path.GetExtension(x) == ".dll");
+            if (CoreLib == null)
+                CoreLib = NetLib;
+
+            if (MonoLib == null)
+                MonoLib = Mono_Files?.FirstOrDefault(x => Path.GetExtension(x) == ".dll");
         }
 
         public string Generate()
@@ -46,11 +62,23 @@ namespace nuget2bazel
             sb.Append($"   core_lib = \"{CoreLib}\",\n");
             sb.Append($"   net_lib = \"{NetLib}\",\n");
             sb.Append($"   mono_lib = \"{MonoLib}\",\n");
-            sb.Append($"   deps = [\n");
-            if (Dependencies != null)
-            foreach (var s in Dependencies)
-                sb.Append($"       \"{s.Id}\",\n");
+
+            sb.Append($"   core_deps = [\n");
+            if (Core_Deps != null)
+            foreach (var s in Core_Deps)
+                sb.Append($"       \"{ToRef(s, "core")}\",\n");
             sb.Append($"   ],\n");
+            sb.Append($"   net_deps = [\n");
+            if (Net_Deps != null)
+                foreach (var s in Net_Deps)
+                    sb.Append($"       \"{ToRef(s, "net")}\",\n");
+            sb.Append($"   ],\n");
+            sb.Append($"   mono_deps = [\n");
+            if (Mono_Deps != null)
+                foreach (var s in Mono_Deps)
+                    sb.Append($"       \"{ToRef(s, "mono")}\",\n");
+            sb.Append($"   ],\n");
+
             sb.Append($"   core_files = [\n");
             if (Core_Files != null)
             foreach (var s in Core_Files)
@@ -70,13 +98,23 @@ namespace nuget2bazel
             return sb.ToString();
         }
 
+        private string ToRef(string id, string kind)
+        {
+            if (SdkList.Dlls.Contains(id.ToLower()))
+                return $"@io_bazel_rules_dotnet//dotnet/stdlib.core:{id.ToLower()}.dll";
+
+            return $"@{id.ToLower()}//:{kind}";
+        }
+
 
         public PackageIdentity PackageIdentity { get; set; }
         public string Sha256 { get; set; }
         public string CoreLib { get; set; }
         public string NetLib { get; set; }
         public string MonoLib { get; set; }
-        public IEnumerable<PackageDependency> Dependencies { get; set; }
+        public IEnumerable<string> Core_Deps { get; set; }
+        public IEnumerable<string> Net_Deps { get; set; }
+        public IEnumerable<string> Mono_Deps { get; set; }
         public IEnumerable<string> Core_Files { get; set; }
         public IEnumerable<string> Net_Files { get; set; }
         public IEnumerable<string> Mono_Files { get; set; }

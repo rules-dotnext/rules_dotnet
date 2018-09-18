@@ -520,6 +520,9 @@ core_stdlib(name = "system.io.compression.zipfile.dll", deps = [
       ":system.io.compression.dll",
       ":system.io.filesystem.dll",
       ":system.buffers.dll",
+    ],
+    runfiles = [
+      ":clrcompression.dll"
     ]
 )
 core_stdlib(name = "system.io.dll", deps = [

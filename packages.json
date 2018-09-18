@@ -1,6 +1,23 @@
 ﻿{
   "dependencies": {
     "CommandLineParser": "2.3.0",
+    "Microsoft.Web.Xdt": "2.1.2",
+    "Newtonsoft.Json": "11.0.2",
+    "Ninject": "3.3.4",
+    "NuGet.Commands": "4.8.0",
+    "NuGet.Common": "4.8.0",
+    "NuGet.Configuration": "4.8.0",
+    "NuGet.Credentials": "4.8.0",
+    "NuGet.DependencyResolver.Core": "4.8.0",
+    "NuGet.Frameworks": "4.8.0",
+    "NuGet.LibraryModel": "4.8.0",
+    "NuGet.PackageManagement": "4.8.0",
+    "NuGet.Packaging": "4.8.0",
+    "NuGet.Packaging.Core": "4.8.0",
+    "NuGet.ProjectModel": "4.8.0",
+    "NuGet.Protocol": "4.8.0",
+    "NuGet.Resolver": "4.8.0",
+    "NuGet.Versioning": "4.8.0",
     "System.Collections": "4.3.0",
     "System.Console": "4.3.1",
     "System.Diagnostics.Debug": "4.3.0",
@@ -13,6 +30,7 @@
     "System.Reflection.TypeExtensions": "4.5.1",
     "System.Resources.ResourceManager": "4.3.0",
     "System.Runtime": "4.3.0",
-    "System.Runtime.Extensions": "4.3.0"
+    "System.Runtime.Extensions": "4.3.0",
+    "System.Xml.XDocument": "4.3.0"
   }
 }

@@ -14,9 +14,8 @@ namespace nuget2bazel
         {
             var section = extractSection(currentWorkspace);
             var parser = new WorkspaceParser(section);
-            var parsed = parser.Parse().ToList();
-            if (parsed.All(x => x.PackageIdentity.Id != toadd.PackageIdentity.Id))
-                parsed.Add(toadd);
+            var parsed = parser.Parse().Where(x => x.PackageIdentity.Id.ToLower() != toadd.PackageIdentity.Id.ToLower()).ToList();
+            parsed.Add(toadd);
 
             var sb = new StringBuilder();
             foreach (var entry in parsed)
@@ -30,7 +29,7 @@ namespace nuget2bazel
         {
             var section = extractSection(currentWorkspace);
             var parser = new WorkspaceParser(section);
-            var parsed = parser.Parse().Where(x => x.PackageIdentity.Id != toremove);
+            var parsed = parser.Parse().Where(x => x.PackageIdentity.Id.ToLower() != toremove.ToLower());
 
             var sb = new StringBuilder();
             foreach (var entry in parsed)
@@ -59,11 +58,11 @@ namespace nuget2bazel
             // Locate the section that contains nuget references
             var pos = currentWorkspace.IndexOf(_beginHeader);
             if (pos < 0)
-                return $"{_beginHeader}\n{newSection}{_endHeader}\n";
+                return $"{currentWorkspace}\n{_beginHeader}\n{newSection}{_endHeader}\n";
 
             var rpos = currentWorkspace.IndexOf(_endHeader, pos + _beginHeader.Length);
             if (rpos < 0)
-                return $"{_beginHeader}\n{newSection}{_endHeader}\n";
+                return $"{currentWorkspace}\n{_beginHeader}\n{newSection}{_endHeader}\n";
 
             return $"{currentWorkspace.Substring(0, pos)}{_beginHeader}\n{newSection}{currentWorkspace.Substring(rpos, currentWorkspace.Length - rpos)}";
         }

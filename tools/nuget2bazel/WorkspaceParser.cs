@@ -56,7 +56,9 @@ namespace nuget2bazel
             result.CoreLib= RequireAssignment(Token.CORE_LIB);
             result.NetLib = RequireAssignment(Token.NET_LIB);
             result.MonoLib= RequireAssignment(Token.MONO_LIB);
-            RequireArray(Token.DEPS);
+            RequireArray(Token.CORE_DEPS);
+            RequireArray(Token.NET_DEPS);
+            RequireArray(Token.MONO_DEPS);
             result.Core_Files = RequireArray(Token.CORE_FILES);
             result.Net_Files = RequireArray(Token.NET_FILES);
             result.Mono_Files = RequireArray(Token.MONO_FILES);
@@ -113,7 +115,9 @@ namespace nuget2bazel
             CORE_LIB,
             NET_LIB,
             MONO_LIB,
-            DEPS,
+            CORE_DEPS,
+            NET_DEPS,
+            MONO_DEPS,
             LBRACKET,
             RBRACKET,
             LPAR,
@@ -168,7 +172,9 @@ namespace nuget2bazel
             if (str == "core_lib") return (Token.CORE_LIB, null);
             if (str == "net_lib") return (Token.NET_LIB, null);
             if (str == "mono_lib") return (Token.MONO_LIB, null);
-            if (str == "deps") return (Token.DEPS, null);
+            if (str == "core_deps") return (Token.CORE_DEPS, null);
+            if (str == "net_deps") return (Token.NET_DEPS, null);
+            if (str == "mono_deps") return (Token.MONO_DEPS, null);
             if (str == "core_files") return (Token.CORE_FILES, null);
             if (str == "net_files") return (Token.NET_FILES, null);
             if (str == "mono_files") return (Token.MONO_FILES, null);

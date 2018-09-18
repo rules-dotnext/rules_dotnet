@@ -71,7 +71,7 @@ namespace nuget2bazel
 
         private async Task SaveWorkspaceAsync(string workspace)
         {
-            using (var writer = new StreamWriter(WorkspacePath, false, Encoding.UTF8))
+            using (var writer = new StreamWriter(WorkspacePath, false, Encoding.Default))
             {
                 await writer.WriteAsync(workspace);
             }
@@ -134,15 +134,26 @@ namespace nuget2bazel
             var contentFileGroups = await packageContentReader.GetContentItemsAsync(token);
             var buildFileGroups = await packageContentReader.GetBuildItemsAsync(token);
             var toolItemGroups = await packageContentReader.GetToolItemsAsync(token);
+            var depsGroups = await packageContentReader.GetPackageDependenciesAsync(token);
+
+            IEnumerable<FrameworkSpecificGroup> refItemGroups = null;
+
+            if (packageReader is PackageArchiveReader reader)
+                refItemGroups = await reader.GetItemsAsync(PackagingConstants.Folders.Ref, token);
+            else if (packageReader is PackageFolderReader reader2)
+                refItemGroups  = await reader2.GetItemsAsync(PackagingConstants.Folders.Ref, token);
 
             var deps = (PackageDependencyInfo) NuGetProjectActions.First(x => x.PackageIdentity.Equals(packageIdentity)).PackageIdentity;
             var entry = new WorkspaceEntry(packageIdentity, GetSha(downloadResourceResult.PackageStream),
-                deps.Dependencies, libItemGroups, referenceItemGroups);
+                depsGroups, libItemGroups, refItemGroups);
 
-            var workspace = await GetWorkspaceAsync();
-            var updater = new WorkspaceWriter();
-            var updated = updater.AddEntry(workspace, entry);
-            await SaveWorkspaceAsync(updated);
+            if (!SdkList.Dlls.Contains(entry.PackageIdentity.Id.ToLower()))
+            {
+                var workspace = await GetWorkspaceAsync();
+                var updater = new WorkspaceWriter();
+                var updated = updater.AddEntry(workspace, entry);
+                await SaveWorkspaceAsync(updated);
+            }
 
             return await base.InstallPackageAsync(packageIdentity, downloadResourceResult, nuGetProjectContext, token);
         }
