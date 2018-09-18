@@ -27,8 +27,7 @@ def _core_import_library_impl(ctx):
   deps = ctx.attr.deps
   src = ctx.attr.src
 
-  deps_libraries = [d[DotnetLibrary] for d in deps]
-  transitive = sets.union(deps_libraries, *[a[DotnetLibrary].transitive for a in deps])
+  transitive = depset(direct = deps, transitive = [d[DotnetLibrary].transitive for d in deps])
 
   library = dotnet.new_library(
     dotnet = dotnet, 
@@ -37,7 +36,7 @@ def _core_import_library_impl(ctx):
     transitive = transitive,
     result = src.files.to_list()[0])
 
-  transitive_files = [d.result for d in library.transitive.to_list()]
+  transitive_files = [d[DotnetLibrary].result for d in library.transitive.to_list()]
 
   return [
       library,

@@ -17,11 +17,11 @@ core_binary(
     ],
     deps = [
         "//tests/examples/example_lib:MyClass-core",
-        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
-        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.Extensions.dll",
-        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.IO.FileSystem.dll",
-        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.CoreLib.dll",
-        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Console.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:system.runtime.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:system.runtime.extensions.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:system.io.filesystem.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:system.private.corelib.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:system.console.dll",
     ],
 )
 
