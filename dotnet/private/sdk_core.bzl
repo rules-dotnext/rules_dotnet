@@ -1,5 +1,14 @@
 load("@io_bazel_rules_dotnet//dotnet/private:common.bzl", "executable_extension", "bat_extension", "paths")
 
+def _get_shared_dir(ctx):
+  p = ctx.path("core/shared/Microsoft.NETCore.App")
+  content = p.readdir()
+  for c in content:
+    result = c.get_child("System.dll")
+    if result.exists:
+      return c
+
+  fail("System.dll doesn't exist in " + p)
 
 def _core_download_sdk_impl(ctx):
   if ctx.os.name == 'linux':
@@ -18,7 +27,7 @@ def _core_download_sdk_impl(ctx):
   ctx.symlink("core/sdk/" + ctx.attr.version + "/Roslyn/bincore", "mcs_bin")
   ctx.symlink("core/.", "mono_bin")
   ctx.symlink("core/sdk/" + ctx.attr.version, "lib")
-  ctx.symlink("core/shared/", "shared")
+  ctx.symlink(_get_shared_dir(ctx), "shared")
   ctx.symlink("core/host/", "host")
 
 
