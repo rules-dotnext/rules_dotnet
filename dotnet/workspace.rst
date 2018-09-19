@@ -9,7 +9,7 @@ Dotnet workspace rules
 .. _git_repository: https://docs.bazel.build/versions/master/be/workspace.html#git_repository
 .. _nested workspaces: https://bazel.build/designs/2016/09/19/recursive-ws-parsing.html
 .. _dotnet_import_library: core.rst#dotnet_import_library
-.. _nuget2bazel: ../tools/nuget2bazel/readme.rst
+.. _nuget2bazel: /tools/nuget2bazel/README.rst
 
 .. role:: param(literal)
 .. role:: type(emphasis)
@@ -155,8 +155,7 @@ Attributes
 ^^^^^^^^^^
 
 +----------------------------+------------------------------+-----------------------------------------------+
-| **Name**                   | **Type**                     | **Default value**                            |
-+----------------------------+------------------------------+-----------------------------------------------+
+| **Name**                   | **Type**                     | **Default value**                             |
 | :param:`name`              | :type:`string`               | |mandatory|                                   |
 +----------------------------+------------------------------+-----------------------------------------------+
 | A unique name for this rule.                                                                              |
@@ -224,7 +223,6 @@ Example
     nuget_package(
         name = "commandlineparser",
         package = "commandlineparser",
-        version = "2.3.0",
         sha256 = "09e60ff23e6953b4fe7d267ef552d8ece76404acf44842012f84430e8b877b13",
         core_lib = "lib/netstandard1.5/CommandLine.dll",
         net_lib = "lib/net45/CommandLine.dll",

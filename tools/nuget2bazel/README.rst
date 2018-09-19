@@ -3,7 +3,7 @@ nuget2bazel
 
 .. All external links are here
 .. _Bazel: https://bazel.build/
-.. _nuget_package: ../dotnet/workspace.rst#nuget_package
+.. _nuget_package: /dotnet/workspace.rst#nuget_package
 .. ;;
 
 Documentation
