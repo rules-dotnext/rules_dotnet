@@ -164,6 +164,8 @@ namespace nuget2bazel
             "system.xml.xpath",
             "system.xml.xpath.xdocument",
             "windowsbase",
+            "netstandard.library",
+            "system.security.cryptography.protecteddata",
         };
     }
 }

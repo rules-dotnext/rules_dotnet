@@ -56,9 +56,9 @@ namespace nuget2bazel
             result.CoreLib= RequireAssignment(Token.CORE_LIB);
             result.NetLib = RequireAssignment(Token.NET_LIB);
             result.MonoLib= RequireAssignment(Token.MONO_LIB);
-            RequireArray(Token.CORE_DEPS);
-            RequireArray(Token.NET_DEPS);
-            RequireArray(Token.MONO_DEPS);
+            result.Core_Deps = RequireArray(Token.CORE_DEPS);
+            result.Net_Deps = RequireArray(Token.NET_DEPS);
+            result.Mono_Deps = RequireArray(Token.MONO_DEPS);
             result.Core_Files = RequireArray(Token.CORE_FILES);
             result.Net_Files = RequireArray(Token.NET_FILES);
             result.Mono_Files = RequireArray(Token.MONO_FILES);

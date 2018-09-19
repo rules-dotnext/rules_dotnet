@@ -32,9 +32,9 @@ namespace nuget2bazel
 
             var depConverted = deps.Select(x =>
                 new FrameworkSpecificGroup(x.TargetFramework, x.Packages.Select(y => y.Id.ToLower())));
-            Core_Deps = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(coreFramework, depConverted)?.Items;
-            Net_Deps = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(netFramework, depConverted)?.Items; ;
-            Mono_Deps = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(monoFramework, depConverted)?.Items; 
+            Core_Deps = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(coreFramework, depConverted)?.Items?.Select(x => ToRef(x, "core"));
+            Net_Deps = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(netFramework, depConverted)?.Items?.Select(x => ToRef(x, "net"));
+            Mono_Deps = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(monoFramework, depConverted)?.Items?.Select(x => ToRef(x, "mono"));
 
             CoreLib = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(coreFramework, references)?.Items.FirstOrDefault(x => Path.GetExtension(x) == ".dll");
             NetLib = MSBuildNuGetProjectSystemUtility.GetMostCompatibleGroup(netFramework, references)?.Items.FirstOrDefault(x => Path.GetExtension(x) == ".dll");
@@ -66,17 +66,17 @@ namespace nuget2bazel
             sb.Append($"   core_deps = [\n");
             if (Core_Deps != null)
             foreach (var s in Core_Deps)
-                sb.Append($"       \"{ToRef(s, "core")}\",\n");
+                sb.Append($"       \"{s}\",\n");
             sb.Append($"   ],\n");
             sb.Append($"   net_deps = [\n");
             if (Net_Deps != null)
                 foreach (var s in Net_Deps)
-                    sb.Append($"       \"{ToRef(s, "net")}\",\n");
+                    sb.Append($"       \"{s}\",\n");
             sb.Append($"   ],\n");
             sb.Append($"   mono_deps = [\n");
             if (Mono_Deps != null)
                 foreach (var s in Mono_Deps)
-                    sb.Append($"       \"{ToRef(s, "mono")}\",\n");
+                    sb.Append($"       \"{s}\",\n");
             sb.Append($"   ],\n");
 
             sb.Append($"   core_files = [\n");
