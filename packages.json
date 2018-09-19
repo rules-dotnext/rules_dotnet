@@ -3,7 +3,6 @@
     "CommandLineParser": "2.3.0",
     "Microsoft.Web.Xdt": "2.1.2",
     "Newtonsoft.Json": "11.0.2",
-    "Ninject": "3.3.4",
     "NuGet.Commands": "4.8.0",
     "NuGet.Common": "4.8.0",
     "NuGet.Configuration": "4.8.0",

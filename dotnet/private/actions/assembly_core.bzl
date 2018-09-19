@@ -93,7 +93,8 @@ def emit_assembly_core(dotnet,
     resources = None,
     executable = True,
     defines = None,
-    unsafe = False):
+    unsafe = False,
+    data = None):
   """See dotnet/toolchains.rst#binary for full documentation."""
 
   if name == "" and out == None:
@@ -138,14 +139,9 @@ def emit_assembly_core(dotnet,
       progress_message = (
           "Compiling " + dotnet.label.package + ":" + dotnet.label.name))
 
-  runfiles = dotnet._ctx.runfiles(files = [pdb]) if pdb else None
-  for d in deps_libraries:
-    if d.runfiles:
-      if not runfiles:
-        runfiles = d.runfiles
-      else:
-        runfiles.merge(d.runfiles)
-
+  extra = depset(direct = [result] + [dotnet.stdlib] + ([pdb] if pdb else []), transitive = [t.files for t in data] if data else [])
+  direct = extra.to_list()   
+  runfiles = depset(direct = direct, transitive = [a[DotnetLibrary].runfiles for a in deps])
 
   return dotnet.new_library(
     dotnet = dotnet, 

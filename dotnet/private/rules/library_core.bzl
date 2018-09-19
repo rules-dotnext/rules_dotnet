@@ -23,24 +23,14 @@ def _core_library_impl(ctx):
       out = ctx.attr.out,
       defines = ctx.attr.defines,
       unsafe = ctx.attr.unsafe,
+      data = ctx.attr.data,
   )
-
-  transitive_files = [d[DotnetLibrary].result for d in library.transitive.to_list()]
-
-  if library.pdb:
-    pdbs = [library.pdb]
-  else:
-    pdbs = []
-
-  runfiles = ctx.runfiles(files = [dotnet.stdlib, library.result] + pdbs, transitive_files=depset(direct=transitive_files))
-  if library.runfiles:
-    runfiles.merge(library.runfiles)
 
   return [
       library,
       DefaultInfo(
           files = depset([library.result]),
-          runfiles = runfiles,
+          runfiles = ctx.runfiles(files = [], transitive_files = library.runfiles),
       ),
   ]
   
@@ -53,6 +43,7 @@ core_library = rule(
         "out": attr.string(),
         "defines": attr.string_list(),
         "unsafe": attr.bool(default = False),
+        "data": attr.label_list(allow_files = True),        
         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:core_context_data"))
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_core"],

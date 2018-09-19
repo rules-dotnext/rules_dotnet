@@ -152,6 +152,8 @@ core_stdlib(name = "netstandard.dll", deps = [
       ":system.xml.xpath.dll",
     ]
 )
+alias(name = "netstandard.library.dll", actual=":netstandard.dll")
+
 core_stdlib(name = "sos.netcore.dll", deps = [
       ":system.runtime.dll",
       ":system.runtime.interopservices.dll",
@@ -521,7 +523,7 @@ core_stdlib(name = "system.io.compression.zipfile.dll", deps = [
       ":system.io.filesystem.dll",
       ":system.buffers.dll",
     ],
-    runfiles = [
+    data = [
       "@core_sdk//:shared/clrcompression.dll"
     ]
 )
@@ -1468,4 +1470,8 @@ core_stdlib(name = "windowsbase.dll", deps = [
       ":system.runtime.dll",
       ":system.objectmodel.dll",
     ]
+)
+
+core_stdlib(name = "system.security.cryptography.protecteddata.dll", deps = [
+  ]
 )

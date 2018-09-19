@@ -27,29 +27,14 @@ def _core_binary_impl(ctx):
       out = ctx.attr.out,
       defines = ctx.attr.defines,
       unsafe = ctx.attr.unsafe,
+      data = ctx.attr.data,
   )
 
-  transitive_files = [d[DotnetLibrary].result for d in executable.transitive.to_list()]
-  native_deps = ctx.attr._native_deps.files.to_list()
-
-  if executable.pdb:
-    pdbs = [executable.pdb]
-  else:
-    pdbs = []
-
-  runfiles = ctx.runfiles(files = [dotnet.stdlib, dotnet.runner] + native_deps + pdbs, transitive_files=depset(direct=transitive_files))
-
-  if executable.runfiles:
-    runfiles.merge(executable.runfiles)
-
-  for f in runfiles.files:
-    if f.extension == "pdb":
-        print("f %s" % f)
 
   return [
       DefaultInfo(
           files = depset([executable.result]),
-          runfiles = runfiles,
+          runfiles = ctx.runfiles(files = ctx.attr._native_deps.files.to_list() + [dotnet.runner], transitive_files = executable.runfiles),
           executable = executable.result,
       ),
   ]
@@ -63,6 +48,7 @@ _core_binary = rule(
         "out": attr.string(),
         "defines": attr.string_list(),
         "unsafe": attr.bool(default = False),
+        "data": attr.label_list(allow_files = True),        
         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:core_context_data")),
         "_native_deps": attr.label(default = Label("@core_sdk//:native_deps"))
     },
