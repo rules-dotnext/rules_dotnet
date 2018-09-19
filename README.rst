@@ -14,6 +14,7 @@ C# Rules for Bazel_
 .. _dotnet_import_library: dotnet/core.rst#dotnet_import_library
 .. _dotnet_repositories: dotnet/workspace.rst#dotnet_repositories
 .. _dotnet_register_toolchains: dotnet/toolchains.rst#dotnet_register_toolchains
+.. _nuget_package: dotnet/workspace.rst#nuget_package
 .. _dotnet_nuget_new: dotnet/workspace.rst#dotnet_nuget_new
 .. ;;
 
@@ -154,6 +155,60 @@ Examples
     )
 
 
+* nuget_package_
+
+  In the `WORKSPACE` file for your project record a nuget dependency like so.
+  This is a repository rule so it will not work unless it is in a workspace
+  file.
+
+  .. code:: python
+
+    nuget_package(
+        name = "newtonsoft.json",
+        package = "newtonsoft.json",
+        version = "11.0.2",
+        sha256 = "679e438d5eb7d7e5599aa71b65fd23ee50dabf57579607873b87d34aec11ca1e",
+        core_lib = "lib/netstandard2.0/Newtonsoft.Json.dll",
+        net_lib = "lib/net45/Newtonsoft.Json.dll",
+        mono_lib = "lib/net45/Newtonsoft.Json.dll",
+        core_deps = [
+        ],
+        net_deps = [
+        ],
+        mono_deps = [
+        ],
+        core_files = [
+            "lib/netstandard2.0/Newtonsoft.Json.dll",
+            "lib/netstandard2.0/Newtonsoft.Json.xml",
+        ],
+        net_files = [
+            "lib/net45/Newtonsoft.Json.dll",
+            "lib/net45/Newtonsoft.Json.xml",
+        ],
+        mono_files = [
+            "lib/net45/Newtonsoft.Json.dll",
+            "lib/net45/Newtonsoft.Json.xml",
+        ],
+    )
+
+  Now, in a `BUILD` file, you can add the package to your `deps`
+
+  .. code:: python
+
+    dotnet_binary(
+        name = "foo_bar",
+        srcs = [
+            "foo.cs",
+            "bar.cs",
+        ],
+        deps = [
+            "//examples/example_lib:MyClass",
+            "@newtonsoft.json//:dotnet",
+        ],
+        visibility = ["//visibility:public"],
+    )
+
+
 * dotnet_nuget_new_
 
   In the `WORKSPACE` file for your project record a nuget dependency like so.
@@ -194,5 +249,3 @@ Examples
         ],
         visibility = ["//visibility:public"],
     )
-
-

@@ -21,8 +21,8 @@ core_library(
     visibility = ["//visibility:public"],
     deps = [
         "//tests/examples/example_transitive_lib:TransitiveClass-core",
-        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
-        "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.CoreLib.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:system.runtime.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:system.private.corelib.dll",
     ]
 )
 

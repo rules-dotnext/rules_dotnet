@@ -26,24 +26,27 @@ def _core_import_library_impl(ctx):
 
   deps = ctx.attr.deps
   src = ctx.attr.src
+  result = src.files.to_list()[0]
+  data = ctx.attr.data
 
-  deps_libraries = [d[DotnetLibrary] for d in deps]
-  transitive = sets.union(deps_libraries, *[a[DotnetLibrary].transitive for a in deps])
+  transitive = depset(direct = deps, transitive = [d[DotnetLibrary].transitive for d in deps])
+  extra = depset(direct = [result], transitive = [t.files for t in data])
+  direct = extra.to_list()    
+  runfiles = depset(direct = direct, transitive = [a[DotnetLibrary].runfiles for a in deps])
 
   library = dotnet.new_library(
     dotnet = dotnet, 
     name = name, 
     deps = deps, 
     transitive = transitive,
-    result = src.files.to_list()[0])
-
-  transitive_files = [d.result for d in library.transitive.to_list()]
+    result = result,
+    runfiles = runfiles)
 
   return [
       library,
       DefaultInfo(
           files = depset([library.result]),
-          runfiles = ctx.runfiles(files = [dotnet.stdlib, library.result], transitive_files=depset(direct=transitive_files)),
+          runfiles = ctx.runfiles(files = [], transitive_files = runfiles),
       ),
   ]
   
@@ -52,6 +55,7 @@ core_import_library = rule(
     attrs = {
         "deps": attr.label_list(providers=[DotnetLibrary]),
         "src": attr.label(allow_files = FileType([".dll", ".exe"]), mandatory=True),        
+        "data": attr.label_list(allow_files = True),        
         "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:core_context_data"))
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_core"],

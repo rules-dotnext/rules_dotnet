@@ -10,7 +10,8 @@ def emit_library_core(dotnet,
     resources = None,
     out = None,
     defines = None,
-    unsafe = False):
+    unsafe = False,
+    data = None):
 
   return emit_assembly_core(
     dotnet = dotnet,
@@ -22,4 +23,5 @@ def emit_library_core(dotnet,
     executable = False,
     defines = defines,
     unsafe = unsafe,
+    data = data,
   )
