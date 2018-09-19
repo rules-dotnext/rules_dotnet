@@ -10,7 +10,7 @@ dotnet_binary(
     ],
     deps = [
         "//tests/examples/example_lib:MyClass",
-        "@npgsql//:npgsqllib",
+        "@npgsql//:mono",
     ],
 )
 
@@ -24,6 +24,7 @@ core_binary(
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Runtime.dll",
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Private.CoreLib.dll",
         "@io_bazel_rules_dotnet//dotnet/stdlib.core:System.Console.dll",
+        "@npgsql//:core",
     ]
 )
 
@@ -34,7 +35,7 @@ net_binary(
     ],
     deps = [
         "//tests/examples/example_lib:MyClass",
-        "@Microsoft.Build.Framework//:lib",
+        "@npgsql//:net",
     ]
 )
 

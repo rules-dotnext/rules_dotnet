@@ -78,24 +78,46 @@ dotnet_nuget_new = repository_rule(
     }),
 )
 
-_TEMPLATE = """
-package(default_visibility = [ "//visibility:public" ])
-load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_import_library")
-
-dotnet_import_library(
-    name = "{}lib",
+_FUNC = """
+{}(
+    name = "{}",
     src = "{}"
-)    
+)
+
 """
 
-def _dotnet_nuget_simple_impl(ctx):
-  """dotnet_nuget_impl emits actions for exposing nunit assmebly."""
 
-  content = _TEMPLATE.format(ctx.attr.name, ctx.attr.lib)
-  _dotnet_nuget_impl(ctx, build_file = None, build_file_content = content)
+def _get_importlib(func, name, lib, deps, files):
+    result = _FUNC.format(func, name, lib)
+    return result
 
-_dotnet_nuget_simple_attrs = {
-    "_nuget_exe": attr.label(default=Label("@nuget//file:nuget.exe")),
+_TEMPLATE2 = """
+package(default_visibility = [ "//visibility:public" ])
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_import_library", "core_import_library", "net_import_library")
+"""
+
+def _nuget_package_impl(ctx):
+    """nuget_package_impl emits actions for exposing nuget assmeblies."""
+
+    content = _TEMPLATE2
+    if ctx.attr.core_lib != "":
+        content += _get_importlib("core_import_library", "core", ctx.attr.core_lib, ctx.attr.deps, ctx.attr.core_files)
+    if ctx.attr.net_lib != "":
+        content += _get_importlib("net_import_library", "net", ctx.attr.net_lib, ctx.attr.deps, ctx.attr.net_files)
+    if ctx.attr.mono_lib != "":
+        content += _get_importlib("dotnet_import_library", "mono", ctx.attr.mono_lib, ctx.attr.deps, ctx.attr.mono_files)
+
+    package = ctx.attr.package
+    output_dir = ctx.path("")
+    url = ctx.attr.source + "/" + ctx.attr.package + "/" + ctx.attr.version
+    ctx.download_and_extract(url, output_dir, ctx.attr.sha256, type="zip")  
+
+    build_file_name = "BUILD" if not ctx.path("BUILD").exists else "BUILD.bazel"
+
+    ctx.file(build_file_name, content)
+
+
+_nuget_package_attrs = {
     # Sources to download the nuget packages from
     "source": attr.string(default = "https://www.nuget.org/api/v2/package"),
     # The name of the nuget package
@@ -103,11 +125,16 @@ _dotnet_nuget_simple_attrs = {
     # The version of the nuget package
     "version": attr.string(mandatory=True),
     "sha256": attr.string(mandatory=True),
-    "use_nuget_client": attr.bool(default=False),
-    "lib": attr.string(mandatory=True),
+    "core_lib": attr.string(mandatory=True),
+    "net_lib": attr.string(mandatory=True),
+    "mono_lib": attr.string(mandatory=True),
+    "deps": attr.label_list(providers=[DotnetLibrary]),
+    "core_files": attr.string_list(),
+    "net_files": attr.string_list(),
+    "mono_files": attr.string_list(),
 }
 
-dotnet_nuget_simple = repository_rule(
-    _dotnet_nuget_simple_impl,
-    attrs = _dotnet_nuget_simple_attrs,
+nuget_package = repository_rule(
+    _nuget_package_impl,
+    attrs = _nuget_package_attrs,
 )
