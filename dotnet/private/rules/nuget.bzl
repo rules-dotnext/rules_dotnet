@@ -81,14 +81,20 @@ dotnet_nuget_new = repository_rule(
 _FUNC = """
 {}(
     name = "{}",
-    src = "{}"
+    src = "{}",
+    deps = [
+        {}
+    ]
 )
 
 """
 
 
 def _get_importlib(func, name, lib, deps, files):
-    result = _FUNC.format(func, name, lib)
+    depsstr = ""
+    for d in deps:
+        depsstr += "    \"{}\",\n".format(d)
+    result = _FUNC.format(func, name, lib, depsstr)
     return result
 
 _TEMPLATE2 = """
@@ -101,11 +107,11 @@ def _nuget_package_impl(ctx):
 
     content = _TEMPLATE2
     if ctx.attr.core_lib != "":
-        content += _get_importlib("core_import_library", "core", ctx.attr.core_lib, ctx.attr.deps, ctx.attr.core_files)
+        content += _get_importlib("core_import_library", "core", ctx.attr.core_lib, ctx.attr.core_deps, ctx.attr.core_files)
     if ctx.attr.net_lib != "":
-        content += _get_importlib("net_import_library", "net", ctx.attr.net_lib, ctx.attr.deps, ctx.attr.net_files)
+        content += _get_importlib("net_import_library", "net", ctx.attr.net_lib, ctx.attr.net_deps, ctx.attr.net_files)
     if ctx.attr.mono_lib != "":
-        content += _get_importlib("dotnet_import_library", "mono", ctx.attr.mono_lib, ctx.attr.deps, ctx.attr.mono_files)
+        content += _get_importlib("dotnet_import_library", "mono", ctx.attr.mono_lib, ctx.attr.mono_deps, ctx.attr.mono_files)
 
     package = ctx.attr.package
     output_dir = ctx.path("")
@@ -128,7 +134,9 @@ _nuget_package_attrs = {
     "core_lib": attr.string(mandatory=True),
     "net_lib": attr.string(mandatory=True),
     "mono_lib": attr.string(mandatory=True),
-    "deps": attr.label_list(providers=[DotnetLibrary]),
+    "core_deps": attr.label_list(providers=[DotnetLibrary]),
+    "net_deps": attr.label_list(providers=[DotnetLibrary]),
+    "mono_deps": attr.label_list(providers=[DotnetLibrary]),
     "core_files": attr.string_list(),
     "net_files": attr.string_list(),
     "mono_files": attr.string_list(),

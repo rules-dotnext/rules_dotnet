@@ -53,6 +53,19 @@ This represents a compile dotnet binary.
 | The full set of transitive dependencies. This includes ``deps`` for this                         |
 | library and all ``deps`` members transitively reachable through ``deps``.                        |
 +--------------------------------+-----------------------------------------------------------------+
+| :param:`result`                | :type:`file`                                                    |
++--------------------------------+-----------------------------------------------------------------+
+| The assembly file                                                                                |
++--------------------------------+-----------------------------------------------------------------+
+| :param:`pdb`                   | :type:`file`                                                    |
++--------------------------------+-----------------------------------------------------------------+
+| The pdb file (with compilation mode dbg)                                                         |
++--------------------------------+-----------------------------------------------------------------+
+| :param:`runfiles`              | :type:`depset of File`                                          |
++--------------------------------+-----------------------------------------------------------------+
+| The depset of files required to run given assembly. It should include result and pdb             |
+| (if generated).                                                                                  |
++--------------------------------+-----------------------------------------------------------------+
 
 DotnetResource
 ~~~~~~~~~~~~~~
