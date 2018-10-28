@@ -16,7 +16,7 @@ def dotnet_repositories():
   native.new_http_archive(
     name = "nunit3",
     url = "https://www.nuget.org/api/v2/package/NUnit/3.10.1",
-    sha256 = "b1e3dc91f692c1431bb451a800902cf2df290f3180dad3cfe9c2fbb42e0f3595",
+    sha256 = "3529193f6028d7f7ccc65c6cb83d62d1b1c39a7d7ba5f74036cd6b69f55b10b6",
     build_file = "@io_bazel_rules_dotnet//dotnet/externals:BUILD.nunit3",
     type = "zip",
   )
@@ -24,7 +24,7 @@ def dotnet_repositories():
   native.new_http_archive(
     name = "nunit3_consolerunner",
     url = "https://www.nuget.org/api/v2/package/NUnit.ConsoleRunner/3.8.0",
-    sha256 = "f3dfe17c1d1411b00fe00c9d0d23d745002f60c9ec9f68aff288dd0dddc757bf",
+    sha256 = "785d80095c50f142727e741578297b2ef5e1a0e537e2511697ac25e8bd9fa2ae", 
     build_file = "@io_bazel_rules_dotnet//dotnet/externals:BUILD.nunit3-consolerunner",
     type = "zip",
   )
