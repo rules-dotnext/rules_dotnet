@@ -1,21 +1,12 @@
 load(
-    "@io_bazel_rules_dotnet//dotnet/private:common.bzl",
-    "as_iterable",
-    "sets",
-)
-load(
     "@io_bazel_rules_dotnet//dotnet/private:providers.bzl",
     "DotnetLibrary",
-)
-load(
-    "@io_bazel_rules_dotnet//dotnet/private:common.bzl",
-    "paths",
 )
 
 def _make_runner_arglist(dotnet, source, output):
     args = dotnet.actions.args()
 
-    args.add(source.files, format = "%s")
+    args.add_all(source.files)
     args.add(output)
 
     return args

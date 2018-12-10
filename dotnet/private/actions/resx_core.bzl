@@ -1,22 +1,17 @@
 load(
     "@io_bazel_rules_dotnet//dotnet/private:common.bzl",
     "as_iterable",
-    "sets",
 )
 load(
     "@io_bazel_rules_dotnet//dotnet/private:providers.bzl",
     "DotnetLibrary",
-)
-load(
-    "@io_bazel_rules_dotnet//dotnet/private:common.bzl",
-    "paths",
 )
 
 def _make_runner_arglist(dotnet, source, output, resgen):
     args = dotnet.actions.args()
 
     args.add(resgen)
-    args.add(source.files, format = "%s")
+    args.add_all(source.files)
     args.add(output)
 
     return args
@@ -42,7 +37,7 @@ def emit_resx_core(
     resolve = dotnet._ctx.resolve_command(command = customresgen.files_to_run.executable.path, tools = [customresgen])
 
     dotnet.actions.run(
-        inputs = src.files + resolve[0],
+        inputs = src.files.to_list() + resolve[0],
         tools = customresgen.files,
         outputs = [result],
         executable = resolve[1][0],
