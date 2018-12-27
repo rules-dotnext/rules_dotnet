@@ -13,7 +13,7 @@ namespace nuget2bazel
             var result = parsed.MapResult<AddVerb, DeleteVerb, int>(
                 (AddVerb opts) =>
                 {
-                    var res = new AddCommand().Do(opts.Package, opts.Version, opts.RootPath, opts.MainFile);
+                    var res = new AddCommand().Do(opts.Package, opts.Version, opts.RootPath, opts.MainFile, opts.SkipSha256);
                     res.Wait();
                     return 0;
                 },

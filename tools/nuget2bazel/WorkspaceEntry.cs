@@ -95,7 +95,8 @@ namespace nuget2bazel
             sb.Append($"    name = \"{PackageIdentity.Id.ToLower()}\",\n");
             sb.Append($"    package = \"{PackageIdentity.Id.ToLower()}\",\n");
             sb.Append($"    version = \"{PackageIdentity.Version}\",\n");
-            sb.Append($"    sha256 = \"{Sha256}\",\n");
+            if (!String.IsNullOrEmpty(Sha256)) 
+                sb.Append($"    sha256 = \"{Sha256}\",\n");
             if (!String.IsNullOrEmpty(CoreLib))
                 sb.Append($"    core_lib = \"{CoreLib}\",\n");
             if (!String.IsNullOrEmpty(NetLib))

@@ -30,5 +30,9 @@ namespace nuget2bazel
             Default = null,
             HelpText = "Basename of the main file in the libs or tools folder if multiple are present")]
         public string MainFile { get; set; }
+
+        [Option('s', "skipSha256",
+            HelpText = "If true, do not emit the sha256 value for generated nuget_package rules")]
+        public bool SkipSha256 { get; set; }
     }
 }
