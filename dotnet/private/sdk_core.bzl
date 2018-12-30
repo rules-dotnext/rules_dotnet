@@ -31,12 +31,19 @@ def _core_download_sdk_impl(ctx):
     ctx.symlink(_get_shared_dir(ctx), "shared")
     ctx.symlink("core/host/", "host")
 
+    # Generate file with target framework attribute
+    content = """
+    [assembly:System.Runtime.Versioning.TargetFramework("{}")]
+    """.format(ctx.attr.targetFrameworkString)
+    ctx.file("targetframework.cs", content)
+
 core_download_sdk = repository_rule(
     _core_download_sdk_impl,
     attrs = {
         "sdks": attr.string_list_dict(),
         "urls": attr.string_list(),
         "version": attr.string(),
+        "targetFrameworkString": attr.string(),
         "strip_prefix": attr.string(default = ""),
     },
 )

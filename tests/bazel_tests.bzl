@@ -95,13 +95,6 @@ trap at_exit EXIT
 exit $result
 """
 
-# _basic_workspace is the content appended to all test workspace files
-# it contains the calls required to make the dotnet rules work
-_basic_workspace = """
-load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "dotnet_repositories", "dotnet_register_toolchains")
-dotnet_repositories()
-"""
-
 def _test_environment_impl(ctx):
     # Find bazel
     bazel = ""
@@ -159,11 +152,6 @@ def _bazel_test_script_impl(ctx):
         ctx.actions.write(script_file, "", is_executable = True)
         return [DefaultInfo(files = depset([script_file]))]
 
-    if ctx.attr.dotnet_version == CURRENT_VERSION:
-        register = "dotnet_register_toolchains()\n"
-    elif ctx.attr.dotnet_version != None:
-        register = 'dotnet_register_toolchains(dotnet_version="{}")\n'.format(ctx.attr.dotnet_version)
-
     workspace_content = 'workspace(name = "bazel_test")\n\n'
     for ext in ctx.attr.externals:
         root = ext.label.workspace_root
@@ -175,12 +163,6 @@ def _bazel_test_script_impl(ctx):
         )
     if ctx.attr.workspace:
         workspace_content += ctx.attr.workspace
-    else:
-        if ctx.attr.workspace_in:
-            workspace_content += _basic_workspace.format()
-        else:
-            workspace_content += _basic_workspace.format()
-            workspace_content += register
 
     workspace_file = dotnet.declare_file(dotnet, path = "WORKSPACE.in")
     ctx.actions.write(workspace_file, workspace_content)
@@ -279,7 +261,7 @@ _bazel_test_script = rule(
         ),
         "_manifest_prep": attr.label(default = Label("//dotnet/tools/manifest_prep")),
         "_settings": attr.label(default = Label("@bazel_test//:settings")),
-        "_dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data")),
+        "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data")),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
 )

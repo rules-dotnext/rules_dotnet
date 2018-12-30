@@ -1,16 +1,16 @@
 load(
     "@io_bazel_rules_dotnet//dotnet/private:context.bzl",
+    _core_context_data = "core_context_data",
     _dotnet_context = "dotnet_context",
+    _dotnet_context_data = "dotnet_context_data",
+    _net_context_data = "net_context_data",
 )
 load(
     "@io_bazel_rules_dotnet//dotnet/toolchain:toolchains.bzl",
+    _core_register_sdk = "core_register_sdk",
     _dotnet_register_toolchains = "dotnet_register_toolchains",
-)
-load(
-    "@io_bazel_rules_dotnet//dotnet/private:sdk.bzl",
-    _dotnet_download_sdk = "dotnet_download_sdk",
-    _dotnet_host_sdk = "dotnet_host_sdk",
-    _dotnet_local_sdk = "dotnet_local_sdk",
+    _mono_register_sdk = "mono_register_sdk",
+    _net_register_sdk = "net_register_sdk",
 )
 load(
     "@io_bazel_rules_dotnet//dotnet/private:dotnet_toolchain.bzl",
@@ -79,12 +79,17 @@ load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/vs_ref_net.bzl",
     _vs2017_ref_net = "vs2017_ref_net",
 )
+load(
+    "@io_bazel_rules_dotnet//dotnet/platform:list.bzl",
+    _DOTNET_CORE_FRAMEWORKS = "DOTNET_CORE_FRAMEWORKS",
+    _DOTNET_NET_FRAMEWORKS = "DOTNET_NET_FRAMEWORKS",
+)
 
 dotnet_context = _dotnet_context
 dotnet_register_toolchains = _dotnet_register_toolchains
-dotnet_download_sdk = _dotnet_download_sdk
-dotnet_host_sdk = _dotnet_host_sdk
-dotnet_local_sdk = _dotnet_local_sdk
+mono_register_sdk = _mono_register_sdk
+net_register_sdk = _net_register_sdk
+core_register_sdk = _core_register_sdk
 dotnet_toolchain = _dotnet_toolchain
 dotnet_repositories = _dotnet_repositories
 core_binary = _core_binary
@@ -116,3 +121,8 @@ net_com_library = _net_com_library
 net_gac2 = _net_gac2
 net_gac4 = _net_gac4
 vs2017_ref_net = _vs2017_ref_net
+DOTNET_NET_FRAMEWORKS = _DOTNET_NET_FRAMEWORKS
+DOTNET_CORE_FRAMEWORKS = _DOTNET_CORE_FRAMEWORKS
+core_context_data = _core_context_data
+dotnet_context_data = _dotnet_context_data
+net_context_data = _net_context_data

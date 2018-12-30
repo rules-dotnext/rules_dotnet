@@ -12,7 +12,7 @@ def _declare_file(dotnet, path = None, ext = None):
         result += ext
     return dotnet.actions.declare_file(result)
 
-def _new_library(dotnet, name = None, deps = None, transitive = None, result = None, pdb = None, runfiles = None, **kwargs):
+def new_library(dotnet, name = None, deps = None, transitive = None, result = None, pdb = None, runfiles = None, **kwargs):
     return DotnetLibrary(
         name = dotnet.label.name if not name else name,
         label = dotnet.label,
@@ -37,7 +37,7 @@ def dotnet_context(ctx, attr = None):
     if not attr:
         attr = ctx.attr
 
-    context_data = attr._dotnet_context_data
+    context_data = attr.dotnet_context_data
     toolchain = ctx.toolchains[context_data._toolchain_type]
 
     ext = ""
@@ -74,60 +74,66 @@ def dotnet_context(ctx, attr = None):
         resgen = resgen,
         tlbimp = tlbimp,
         declare_file = _declare_file,
-        new_library = _new_library,
+        new_library = new_library,
         new_resource = _new_resource,
         workspace_name = ctx.workspace_name,
         libVersion = context_data._libVersion,
         lib = context_data._lib,
         shared = context_data._shared,
         debug = ctx.var["COMPILATION_MODE"] == "dbg",
+        extra_srcs = context_data._extra_srcs,
         _ctx = ctx,
     )
 
 def _dotnet_context_data(ctx):
     return struct(
-        _mcs_bin = ctx.attr._mcs_bin,
-        _mono_bin = ctx.attr._mono_bin,
-        _lib = ctx.attr._lib,
-        _tools = ctx.attr._tools,
-        _shared = ctx.attr._shared,
-        _host = ctx.attr._host,
-        _libVersion = ctx.attr._libVersion,
+        _mcs_bin = ctx.attr.mcs_bin,
+        _mono_bin = ctx.attr.mono_bin,
+        _lib = ctx.attr.lib,
+        _tools = ctx.attr.tools,
+        _shared = ctx.attr.shared,
+        _host = ctx.attr.host,
+        _libVersion = ctx.attr.libVersion,
         _toolchain_type = ctx.attr._toolchain_type,
+        _extra_srcs = ctx.attr.extra_srcs,
     )
 
 dotnet_context_data = rule(
     _dotnet_context_data,
     attrs = {
-        "_mcs_bin": attr.label(
+        "mcs_bin": attr.label(
             allow_files = True,
             default = "@dotnet_sdk//:mcs_bin",
         ),
-        "_mono_bin": attr.label(
+        "mono_bin": attr.label(
             allow_files = True,
             default = "@dotnet_sdk//:mono_bin",
         ),
-        "_lib": attr.label(
+        "lib": attr.label(
             allow_files = True,
             default = "@dotnet_sdk//:lib",
         ),
-        "_tools": attr.label(
-            allow_files = True,
-            default = "@net_sdk//:lib",
-        ),
-        "_shared": attr.label(
+        "tools": attr.label(
             allow_files = True,
             default = "@dotnet_sdk//:lib",
         ),
-        "_host": attr.label(
+        "shared": attr.label(
             allow_files = True,
             default = "@dotnet_sdk//:lib",
         ),
-        "_libVersion": attr.string(
+        "host": attr.label(
+            allow_files = True,
+            default = "@dotnet_sdk//:lib",
+        ),
+        "libVersion": attr.string(
             default = "4.5",
         ),
         "_toolchain_type": attr.string(
             default = "@io_bazel_rules_dotnet//dotnet:toolchain",
+        ),
+        "extra_srcs": attr.label_list(
+            allow_files = True,
+            default = [],
         ),
     },
 )
@@ -135,35 +141,39 @@ dotnet_context_data = rule(
 core_context_data = rule(
     _dotnet_context_data,
     attrs = {
-        "_mcs_bin": attr.label(
+        "mcs_bin": attr.label(
             allow_files = True,
             default = "@core_sdk//:mcs_bin",
         ),
-        "_mono_bin": attr.label(
+        "mono_bin": attr.label(
             allow_files = True,
             default = "@core_sdk//:mono_bin",
         ),
-        "_lib": attr.label(
+        "lib": attr.label(
             allow_files = True,
             default = "@core_sdk//:lib",
         ),
-        "_tools": attr.label(
+        "tools": attr.label(
             allow_files = True,
             default = "@core_sdk//:lib",
         ),
-        "_shared": attr.label(
+        "shared": attr.label(
             allow_files = True,
             default = "@core_sdk//:shared",
         ),
-        "_host": attr.label(
+        "host": attr.label(
             allow_files = True,
             default = "@core_sdk//:host",
         ),
-        "_libVersion": attr.string(
+        "libVersion": attr.string(
             default = "",
         ),
         "_toolchain_type": attr.string(
             default = "@io_bazel_rules_dotnet//dotnet:toolchain_core",
+        ),
+        "extra_srcs": attr.label_list(
+            allow_files = True,
+            default = ["@core_sdk//:tagetframework"],
         ),
     },
 )
@@ -171,35 +181,39 @@ core_context_data = rule(
 net_context_data = rule(
     _dotnet_context_data,
     attrs = {
-        "_mcs_bin": attr.label(
+        "mcs_bin": attr.label(
             allow_files = True,
             default = "@net_sdk//:mcs_bin",
         ),
-        "_mono_bin": attr.label(
+        "mono_bin": attr.label(
             allow_files = True,
             default = "@net_sdk//:mono_bin",
         ),
-        "_lib": attr.label(
+        "lib": attr.label(
             allow_files = True,
             default = "@net_sdk//:lib",
         ),
-        "_tools": attr.label(
+        "tools": attr.label(
             allow_files = True,
             default = "@net_sdk//:tools",
         ),
-        "_shared": attr.label(
+        "shared": attr.label(
             allow_files = True,
             default = "@net_sdk//:lib",
         ),
-        "_host": attr.label(
+        "host": attr.label(
             allow_files = True,
             default = "@net_sdk//:mcs_bin",
         ),
-        "_libVersion": attr.string(
-            default = "",
+        "libVersion": attr.string(
+            mandatory = True,
         ),
         "_toolchain_type": attr.string(
             default = "@io_bazel_rules_dotnet//dotnet:toolchain_net",
+        ),
+        "extra_srcs": attr.label_list(
+            allow_files = True,
+            default = ["@net_sdk//:tagetframework"],
         ),
     },
 )
