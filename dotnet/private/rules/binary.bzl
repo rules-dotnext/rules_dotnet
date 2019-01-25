@@ -6,6 +6,7 @@ load(
     "@io_bazel_rules_dotnet//dotnet/private:providers.bzl",
     "DotnetLibrary",
     "DotnetResource",
+    "DotnetResourceList",
 )
 
 _TEMPLATE_MONO = """
@@ -155,12 +156,12 @@ dotnet_binary = rule(
     _binary_impl,
     attrs = {
         "deps": attr.label_list(providers = [DotnetLibrary]),
-        "resources": attr.label_list(providers = [DotnetResource]),
+        "resources": attr.label_list(providers = [DotnetResourceList]),
         "srcs": attr.label_list(allow_files = [".cs"]),
         "out": attr.string(),
         "defines": attr.string_list(),
         "unsafe": attr.bool(default = False),
-        "data": attr.label_list(),
+        "data": attr.label_list(allow_files = True),
         "keyfile": attr.label(allow_files = True),
         "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data")),
         "_manifest_prep": attr.label(default = Label("//dotnet/tools/manifest_prep")),
@@ -175,7 +176,7 @@ core_binary = rule(
     _binary_impl,
     attrs = {
         "deps": attr.label_list(providers = [DotnetLibrary]),
-        "resources": attr.label_list(providers = [DotnetResource]),
+        "resources": attr.label_list(providers = [DotnetResourceList]),
         "srcs": attr.label_list(allow_files = [".cs"]),
         "out": attr.string(),
         "defines": attr.string_list(),
@@ -195,12 +196,12 @@ net_binary = rule(
     _binary_impl,
     attrs = {
         "deps": attr.label_list(providers = [DotnetLibrary]),
-        "resources": attr.label_list(providers = [DotnetResource]),
+        "resources": attr.label_list(providers = [DotnetResourceList]),
         "srcs": attr.label_list(allow_files = [".cs"]),
         "out": attr.string(),
         "defines": attr.string_list(),
         "unsafe": attr.bool(default = False),
-        "data": attr.label_list(),
+        "data": attr.label_list(allow_files = True),
         "keyfile": attr.label(allow_files = True),
         "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:net_context_data_net472")),
         "native_deps": attr.label(default = Label("@net_sdk//:native_deps")),
