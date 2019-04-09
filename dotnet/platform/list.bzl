@@ -58,6 +58,7 @@ DOTNET_NET_FRAMEWORKS = {
 DOTNET_CORE_FRAMEWORKS = {
     "v2.1.200": (".NETCore,Version=v2.1", "NETCOREAPP2_1", "netcoreapp2.1"),
     "v2.1.502": (".NETCore,Version=v2.1", "NETCOREAPP2_1", "netcoreapp2.1"),
+    "v2.1.503": (".NETCore,Version=v2.1", "NETCOREAPP2_1", "netcoreapp2.1"),
     "v2.2.101": (".NETCore,Version=v2.2", "NETCOREAPP2_2", "netcoreapp2.2"),
 }
 
