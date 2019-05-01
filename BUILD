@@ -37,9 +37,9 @@ exports_files(["AUTHORS"])
 [
     core_context_data(
         name = "core_context_data_" + framework,
-        extra_srcs = ["@core_sdk_{}//:targetframework".format(framework)],
         host = "@core_sdk_{}//:host".format(framework),
         lib = "@core_sdk_{}//:lib".format(framework),
+        libVersion = DOTNET_CORE_FRAMEWORKS[framework][1],
         mcs_bin = "@core_sdk_{}//:mcs_bin".format(framework),
         mono_bin = "@core_sdk_{}//:mono_bin".format(framework),
         shared = "@core_sdk_{}//:shared".format(framework),

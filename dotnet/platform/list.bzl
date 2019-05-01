@@ -52,7 +52,7 @@ DOTNET_NET_FRAMEWORKS = {
 }
 
 # struct:
-# 0. Version string - as required by TargetFrameworkAttribute
+# 0. Version string - as required by TargetFrameworkAttribute and use for the download
 # 1. Preporocesor directive
 # 2. TFM
 DOTNET_CORE_FRAMEWORKS = {
