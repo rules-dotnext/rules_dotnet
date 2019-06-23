@@ -9,26 +9,26 @@ load(
 )
 
 dotnet_binary(
-    name = "hello",
+    name = "hello.exe",
     srcs = [
         "Program.cs",
         "Properties/AssemblyInfo.cs",
     ],
     deps = [
-        "//tests/examples/example_lib:MyClass",
+        "//tests/examples/example_lib:MyClass.dll",
         "@newtonsoft.json//:mono",
     ],
 )
 
 [core_binary(
-    name = "{}_hello-core".format(framework),
+    name = "{}_hello-core.exe".format(framework),
     srcs = [
         "Program.cs",
     ],
     dotnet_context_data = "@io_bazel_rules_dotnet//:core_context_data_{}".format(framework),
     native_deps = "@core_sdk_{}//:native_deps".format(framework),
     deps = [
-        "//tests/examples/example_lib:{}_MyClass-core".format(framework),
+        "//tests/examples/example_lib:{}_MyClass-core.dll".format(framework),
         "@io_bazel_rules_dotnet//dotnet/stdlib.core/{}:system.console.dll".format(framework),
         "@io_bazel_rules_dotnet//dotnet/stdlib.core/{}:system.private.corelib.dll".format(framework),
         "@io_bazel_rules_dotnet//dotnet/stdlib.core/{}:system.runtime.dll".format(framework),
@@ -37,20 +37,20 @@ dotnet_binary(
 ) for framework in DOTNET_CORE_FRAMEWORKS]
 
 [net_binary(
-    name = "hello-net_{}".format(framework),
+    name = "hello-net_{}.exe".format(framework),
     srcs = [
         "Program.cs",
     ],
     dotnet_context_data = "@io_bazel_rules_dotnet//:net_context_data_{}".format(framework),
     native_deps = "@net_sdk_{}//:native_deps".format(framework),
     deps = [
-        "//tests/examples/example_lib:MyClass-net_{}".format(framework),
+        "//tests/examples/example_lib:MyClass-net_{}.dll".format(framework),
         "@newtonsoft.json//:{}_net".format(framework),
     ],
 ) for framework in DOTNET_NET_FRAMEWORKS]
 
 [net_com_library(
-    name = "{}_com-ref-shell32".format(framework),
+    name = "{}_com-ref-shell32.dll".format(framework),
     out = "{}_shell32.dll".format(framework),
     dotnet_context_data = "@io_bazel_rules_dotnet//:net_context_data_{}".format(framework),
     guid = "50A7E9B0-70EF-11D1-B75A-00A0C90564FE",
@@ -59,7 +59,17 @@ dotnet_binary(
     minor_version = 0,
     namespace = "Shell32",
     platform = "win32",
-) for framework in DOTNET_NET_FRAMEWORKS]
+) for framework in [
+    "net45",
+    "net451",
+    "net452",
+    "net46",
+    "net461",
+    "net462",
+    "net47",
+    "net471",
+    "net472",
+]]
 
 # The rule is left as an example. It is commented out, because our CI server doesn't have VS2017 installed
 #net_binary(

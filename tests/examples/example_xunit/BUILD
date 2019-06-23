@@ -1,22 +1,22 @@
 load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "DOTNET_CORE_FRAMEWORKS", "DOTNET_NET_FRAMEWORKS", "core_xunit_test", "dotnet_xunit_test", "net_xunit_test")
 
 [core_xunit_test(
-    name = "{}_example_xunit".format(framework),
+    name = "{}_example_xunit.dll".format(framework),
     size = "small",
     srcs = [
         "MyTest.cs",
     ],
     dotnet_context_data = "@io_bazel_rules_dotnet//:core_context_data_{}".format(framework),
     native_deps = "@core_sdk_{}//:native_deps".format(framework),
-    testlauncher = "@{}_xunit//:xunit.console".format(framework),
+    testlauncher = "@{}_xunit//:xunit.console.exe".format(framework),
     deps = [
-        "@{}_xunit//:xunit.core".format(framework),
-        "@{}_xunit_assert//:assert.xunit".format(framework),
+        "@{}_xunit//:xunit.core.dll".format(framework),
+        "@{}_xunit_assert//:assert.xunit.dll".format(framework),
     ],
 ) for framework in DOTNET_CORE_FRAMEWORKS]
 
 [net_xunit_test(
-    name = "net.example_xunit_{}".format(framework),
+    name = "net.example_xunit_{}.dll".format(framework),
     size = "small",
     srcs = [
         "MyTest.cs",
@@ -49,7 +49,7 @@ load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "DOTNET_CORE_FRAMEWORKS", "DOTNE
 ]]
 
 dotnet_xunit_test(
-    name = "mono.example_xunit",
+    name = "mono.example_xunit.dll",
     size = "small",
     srcs = [
         "MyTest.cs",

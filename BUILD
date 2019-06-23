@@ -1,18 +1,21 @@
 package(default_visibility = ["//visibility:public"])
 
 load("@io_bazel_rules_dotnet//dotnet/private:context.bzl", "core_context_data", "dotnet_context_data", "net_context_data")
-load("//dotnet:defs.bzl", "DOTNET_CORE_FRAMEWORKS", "DOTNET_NET_FRAMEWORKS")
+load("//dotnet:defs.bzl", "DEFAULT_DOTNET_CORE_FRAMEWORK", "DOTNET_CORE_FRAMEWORKS", "DOTNET_NET_FRAMEWORKS")
 
 dotnet_context_data(
     name = "dotnet_context_data",
+    framework = "",
 )
 
 core_context_data(
     name = "core_context_data",
+    framework = DEFAULT_DOTNET_CORE_FRAMEWORK,
 )
 
 net_context_data(
     name = "net_context_data",
+    framework = "net472",
     libVersion = "4.7.2",
 )
 
@@ -22,6 +25,7 @@ exports_files(["AUTHORS"])
     net_context_data(
         name = "net_context_data_" + framework,
         extra_srcs = ["@net_sdk_{}//:targetframework".format(framework)],
+        framework = framework,
         host = "@net_sdk_{}//:mcs_bin".format(framework),
         lib = "@net_sdk_{}//:lib".format(framework),
         libVersion = DOTNET_NET_FRAMEWORKS[framework][3],
@@ -37,6 +41,7 @@ exports_files(["AUTHORS"])
 [
     core_context_data(
         name = "core_context_data_" + framework,
+        framework = framework,
         host = "@core_sdk_{}//:host".format(framework),
         lib = "@core_sdk_{}//:lib".format(framework),
         libVersion = DOTNET_CORE_FRAMEWORKS[framework][1],

@@ -1,7 +1,7 @@
 load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "DOTNET_CORE_FRAMEWORKS", "DOTNET_NET_FRAMEWORKS", "core_library", "dotnet_library", "net_library")
 
 dotnet_library(
-    name = "TransitiveClass",
+    name = "TransitiveClass.dll",
     srcs = [
         "Properties/AssemblyInfo.cs",
         "TransitiveClass.cs",
@@ -10,7 +10,7 @@ dotnet_library(
 )
 
 [core_library(
-    name = "{}_TransitiveClass-core".format(framework),
+    name = "{}_TransitiveClass-core.dll".format(framework),
     srcs = [
         "TransitiveClass.cs",
     ],
@@ -23,7 +23,7 @@ dotnet_library(
 ) for framework in DOTNET_CORE_FRAMEWORKS]
 
 [net_library(
-    name = "TransitiveClass-net_{}".format(framework),
+    name = "TransitiveClass-net_{}.dll".format(framework),
     srcs = [
         "TransitiveClass.cs",
     ],
