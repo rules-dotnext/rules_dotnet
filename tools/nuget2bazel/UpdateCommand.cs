@@ -17,7 +17,7 @@ using NuGet.Versioning;
 
 namespace nuget2bazel
 {
-    public class AddCommand
+    public class UpdateCommand
     {
         public Task Do(ProjectBazelConfig prjConfig, string package, string version, string mainFile, bool skipSha256, bool lowest)
         {
@@ -27,6 +27,7 @@ namespace nuget2bazel
         }
         public async Task DoWithProject(string package, string version, ProjectBazelManipulator project, bool lowest)
         {
+
             var logger = new Logger();
             var providers = new List<Lazy<INuGetResourceProvider>>();
             providers.AddRange(Repository.Provider.GetCoreV3());  // Add v3 API support
@@ -52,15 +53,15 @@ namespace nuget2bazel
 
             var projectContext = new ProjectContext(settings);
 
-            var actions = await packageManager.PreviewInstallPackageAsync(packageManager.PackagesFolderNuGetProject,
-                identity, resolutionContext, projectContext, sourceRepository,
+            var projects = new ProjectBazelManipulator[] { project };
+            var actions = await packageManager.PreviewUpdatePackagesAsync(identity, projects, resolutionContext, projectContext,
+                new SourceRepository[] { sourceRepository },
                 Array.Empty<SourceRepository>(),  // This is a list of secondary source respositories, probably empty
                 CancellationToken.None);
             project.NuGetProjectActions = actions;
 
-            await packageManager.InstallPackageAsync(packageManager.PackagesFolderNuGetProject,
-                identity, resolutionContext, projectContext, sourceRepository,
-                Array.Empty<SourceRepository>(),  // This is a list of secondary source respositories, probably empty
+            var sourceCacheContext = new SourceCacheContext();
+            await packageManager.ExecuteNuGetProjectActionsAsync(project, actions, projectContext, sourceCacheContext,
                 CancellationToken.None);
 
             NuGetPackageManager.ClearDirectInstall(projectContext);

@@ -8,9 +8,10 @@ using NuGet.ProjectManagement;
 
 namespace nuget2bazel
 {
-    public class BazelSolutionManager: ISolutionManager
+    public class BazelSolutionManager : ISolutionManager
     {
-        private readonly ProjectBazel _project;
+        private readonly ProjectBazelManipulator _project;
+#pragma warning disable 67
         public event EventHandler SolutionOpening;
         public event EventHandler SolutionOpened;
         public event EventHandler SolutionClosing;
@@ -24,8 +25,9 @@ namespace nuget2bazel
         public event EventHandler<ActionsExecutedEventArgs> ActionsExecuted;
         public string SolutionDirectory { get; }
         public bool IsSolutionOpen { get; }
+#pragma warning restore 67
 
-        public BazelSolutionManager(ProjectBazel project, string rootPath)
+        public BazelSolutionManager(ProjectBazelManipulator project, string rootPath)
         {
             _project = project;
             SolutionDirectory = rootPath;
@@ -37,9 +39,12 @@ namespace nuget2bazel
         }
 
         public INuGetProjectContext NuGetProjectContext { get; set; }
+
+        public bool IsSolutionAvailable => throw new NotImplementedException();
+
         public Task<IEnumerable<NuGetProject>> GetNuGetProjectsAsync()
         {
-            return Task.FromResult(new NuGetProject[] {_project}.AsEnumerable());
+            return Task.FromResult(new NuGetProject[] { _project }.AsEnumerable());
         }
 
         public Task<string> GetNuGetProjectSafeNameAsync(NuGetProject nuGetProject)
@@ -63,6 +68,21 @@ namespace nuget2bazel
         }
 
         public Task<bool> DoesNuGetSupportsAnyProjectAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<NuGetProject> GetNuGetProjects()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetNuGetProjectSafeName(NuGetProject nuGetProject)
+        {
+            throw new NotImplementedException();
+        }
+
+        public NuGetProject GetNuGetProject(string nuGetProjectSafeName)
         {
             throw new NotImplementedException();
         }

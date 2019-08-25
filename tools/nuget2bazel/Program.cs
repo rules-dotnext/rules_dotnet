@@ -9,17 +9,33 @@ namespace nuget2bazel
     {
         static void Main(string[] args)
         {
-            var parsed = Parser.Default.ParseArguments<AddVerb, DeleteVerb>(args);
-            var result = parsed.MapResult<AddVerb, DeleteVerb, int>(
+            var parsed = Parser.Default.ParseArguments<AddVerb, DeleteVerb, SyncVerb, UpdateVerb>(args);
+            var result = parsed.MapResult<AddVerb, DeleteVerb, SyncVerb, UpdateVerb, int>(
                 (AddVerb opts) =>
                 {
-                    var res = new AddCommand().Do(opts.Package, opts.Version, opts.RootPath, opts.MainFile, opts.SkipSha256);
+                    var prjConfig = new ProjectBazelConfig(opts);
+                    var res = new AddCommand().Do(prjConfig, opts.Package, opts.Version, opts.MainFile, opts.SkipSha256, opts.Lowest);
                     res.Wait();
                     return 0;
                 },
                 (DeleteVerb opts) =>
                 {
-                    var res = new DeleteCommand().Do(opts.Package, opts.RootPath);
+                    var prjConfig = new ProjectBazelConfig(opts);
+                    var res = new DeleteCommand().Do(prjConfig, opts.Package);
+                    res.Wait();
+                    return 0;
+                },
+                (SyncVerb opts) =>
+                {
+                    var prjConfig = new ProjectBazelConfig(opts);
+                    var res = new SyncCommand().Do(prjConfig);
+                    res.Wait();
+                    return 0;
+                },
+                (UpdateVerb opts) =>
+                {
+                    var prjConfig = new ProjectBazelConfig(opts);
+                    var res = new UpdateCommand().Do(prjConfig, opts.Package, opts.Version, opts.MainFile, opts.SkipSha256, opts.Lowest);
                     res.Wait();
                     return 0;
                 },
