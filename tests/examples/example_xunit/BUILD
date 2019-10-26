@@ -8,10 +8,12 @@ load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "DOTNET_CORE_FRAMEWORKS", "DOTNE
     ],
     dotnet_context_data = "@io_bazel_rules_dotnet//:core_context_data_{}".format(framework),
     native_deps = "@core_sdk_{}//:native_deps".format(framework),
-    testlauncher = "@{}_xunit//:xunit.console.exe".format(framework),
+    testlauncher = "@xunit.runner.console//:netcoreapp2.0_core_tool",
     deps = [
-        "@{}_xunit//:xunit.core.dll".format(framework),
-        "@{}_xunit_assert//:assert.xunit.dll".format(framework),
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core/{}:system.runtime.dll".format(framework),
+        "@xunit.assert//:netcoreapp2.0_core",
+        "@xunit.extensibility.core//:netcoreapp2.0_core",
+        "@xunit.extensibility.execution//:netcoreapp2.0_core",
     ],
 ) for framework in DOTNET_CORE_FRAMEWORKS]
 
@@ -23,15 +25,16 @@ load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "DOTNET_CORE_FRAMEWORKS", "DOTNE
     ],
     dotnet_context_data = "@io_bazel_rules_dotnet//:net_context_data_{}".format(framework),
     native_deps = "@net_sdk_{}//:native_deps".format(framework),
+    testlauncher = "@xunit.runner.console//:{}_net_tool".format(framework),
     deps = [
         "@io_bazel_rules_dotnet//dotnet/stdlib.net/{}:system.runtime.dll".format(framework),
-        "@xunit.assert//:{}_net".format(framework),
-        "@xunit.extensibility.core//:{}_net".format(framework),
-        "@xunit.extensibility.execution//:{}_net".format(framework),
+        "@xunit.assert//:netstandard1.1_net",
+        "@xunit.extensibility.core//:netstandard1.1_net",
+        "@xunit.extensibility.execution//:netstandard1.1_net",
     ],
 ) for framework in [
-    "net45",
-    "net451",
+    #"net45",
+    #"net451",
     "net452",
     "net46",
     "net461",
@@ -39,13 +42,13 @@ load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "DOTNET_CORE_FRAMEWORKS", "DOTNE
     "net47",
     "net471",
     "net472",
-    "netstandard1.1",
-    "netstandard1.2",
-    "netstandard1.3",
-    "netstandard1.4",
-    "netstandard1.5",
-    "netstandard1.6",
-    "netstandard2.0",
+    # "netstandard1.1",
+    # "netstandard1.2",
+    # "netstandard1.3",
+    # "netstandard1.4",
+    # "netstandard1.5",
+    # "netstandard1.6",
+    # "netstandard2.0",
 ]]
 
 dotnet_xunit_test(

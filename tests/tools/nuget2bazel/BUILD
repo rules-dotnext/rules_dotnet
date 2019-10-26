@@ -8,7 +8,8 @@ core_xunit_test(
     ],
     deps = [
         "@io_bazel_rules_dotnet//tools/nuget2bazel:nuget2bazel.exe",
-        "@xunit//:xunit.core.dll",
-        "@xunit_assert//:assert.xunit.dll",
+        "@xunit.assert//:netcoreapp2.0_core",
+        "@xunit.extensibility.core//:netcoreapp2.0_core",
+        "@xunit.extensibility.execution//:netcoreapp2.0_core",
     ],
 )

@@ -12,6 +12,10 @@ load(
     "DotnetResource",
     "DotnetResourceList",
 )
+load(
+    "@io_bazel_rules_dotnet//dotnet/private:actions/resolve.bzl",
+    "ResolveVersions",
+)
 
 def _map_dep(deps):
     return deps[DotnetLibrary].result.path
@@ -102,24 +106,26 @@ def emit_assembly_core(
         defines = None,
         unsafe = False,
         data = None,
-        keyfile = None):
+        keyfile = None,
+        subdir = "./"):
     """See dotnet/toolchains.rst#binary for full documentation."""
 
     if name == "" and out == None:
         fail("either name or out must be set")
 
     if not out:
-        result = dotnet.declare_file(dotnet, path = name)
+        result = dotnet.declare_file(dotnet, path = subdir + name)
     else:
-        result = dotnet.declare_file(dotnet, path = out)
+        result = dotnet.declare_file(dotnet, path = subdir + out)
 
     if dotnet.debug:
-        pdb = dotnet.declare_file(dotnet, path = paths.split_extension(name)[0] + ".pdb")
+        pdb = dotnet.declare_file(dotnet, path = paths.split_extension(result.path)[0] + ".pdb")
     else:
         pdb = None
 
     deps_libraries = [d[DotnetLibrary] for d in deps]
-    transitive = depset(direct = deps, transitive = [d[DotnetLibrary].transitive for d in deps])
+
+    transitive, transitive_runfiles = ResolveVersions(deps)
 
     runner_args = _make_runner_arglist(dotnet, transitive.to_list(), resources, result, pdb, executable, defines, unsafe, keyfile)
 
@@ -136,7 +142,7 @@ def emit_assembly_core(
 
     dotnet.actions.write(output = paramfile, content = runner_args)
 
-    deps_files = [d[DotnetLibrary].result for d in deps]
+    deps_files = [d[DotnetLibrary].result for d in transitive.to_list()]
     dotnet.actions.run(
         inputs = attr_srcs + [paramfile] + deps_files + [dotnet.stdlib] + [r[DotnetResource].result for r in resources],
         outputs = [result] + ([pdb] if pdb else []),
@@ -149,8 +155,9 @@ def emit_assembly_core(
     )
 
     extra = depset(direct = [result] + [dotnet.stdlib] + ([pdb] if pdb else []), transitive = [t.files for t in data] if data else [])
-    direct = extra.to_list()
-    runfiles = depset(direct = direct, transitive = [a[DotnetLibrary].runfiles for a in deps])
+    d_direct = extra.to_list()
+    d_transitive = depset(transitive_runfiles)
+    runfiles = depset(direct = d_direct, transitive = [d_transitive])
 
     return dotnet.new_library(
         dotnet = dotnet,

@@ -28,16 +28,16 @@ static void Execute(int argc, char *argv[], const char *manifestDir)
 
 	mono = GetLinkedMonoLauncher(manifestDir);
 
-	// Based on current exe calculate _0.dll to run
+	// Based on current exe calculate file to run
 	p = strrchr(Exe, '/');
 	sprintf(torun, "%s/%s", manifestDir, p + 1);
-	p = strrchr(torun, '.');
+	p = strrchr(torun, '_');
 	if (p == NULL)
 	{
-		printf(". not found in %s\n", torun);
+		printf("launcher_mono: _ not found in %s\n", torun);
 		exit(-1);
 	}
-	strcpy(p, "_0.dll");
+	*p = '\0';
 
 	// Prepare arguments
 	newargv[0] = mono;
@@ -59,7 +59,6 @@ static void Execute(int argc, char *argv[], const char *manifestDir)
 	printf("Call failed with errnor %d\n", errno);
 }
 
-/* One argument is expected: path to the launcher (to locate the manifest file) */
 int main(int argc, char *argv[], char *envp[])
 {
 	const char *manifestDir, *manifestPath;
@@ -73,12 +72,7 @@ int main(int argc, char *argv[], char *envp[])
 		if (*p == '\\')
 			*p = '/';
 
-	manifestPath = GetManifestPath();
-	if (IsVerbose())
-		printf("Manifest found %s\n", manifestPath);
-
-	ReadManifestPath(manifestPath);
-
+	manifestPath = strdup(Exe);
 	manifestDir = strdup(manifestPath);
 	p = strrchr(manifestDir, '/');
 	if (p == NULL)
@@ -87,9 +81,9 @@ int main(int argc, char *argv[], char *envp[])
 		return -1;
 	}
 	*(p + 1) = '\0';
-	LinkFiles(manifestDir);
-	LinkFilesTree(manifestDir);
-	LinkHostFxr(manifestDir);
+	// LinkFiles(manifestDir);
+	// LinkFilesTree(manifestDir);
+	// LinkHostFxr(manifestDir);
 
 	Execute(argc, argv, manifestDir);
 

@@ -12,6 +12,10 @@ load(
     "DotnetResource",
     "DotnetResourceList",
 )
+load(
+    "@io_bazel_rules_dotnet//dotnet/private:actions/resolve.bzl",
+    "ResolveVersions",
+)
 
 def _map_dep(deps):
     return deps[DotnetLibrary].result.path
@@ -102,24 +106,26 @@ def emit_assembly_net(
         defines = None,
         unsafe = False,
         data = None,
-        keyfile = None):
+        keyfile = None,
+        subdir = "./"):
     """See dotnet/toolchains.rst#binary for full documentation."""
 
     if name == "" and out == None:
         fail("either name or out must be set")
 
     if not out:
-        result = dotnet.declare_file(dotnet, path = name)
+        result = dotnet.declare_file(dotnet, path = subdir + name)
     else:
-        result = dotnet.declare_file(dotnet, path = out)
-
+        result = dotnet.declare_file(dotnet, path = subdir + out)
 
     if dotnet.debug:
-        pdb = dotnet.declare_file(dotnet, path = paths.split_extension(name)[0] + ".pdb")
+        pdb = dotnet.declare_file(dotnet, path = paths.split_extension(result.path)[0] + ".pdb")
     else:
         pdb = None
 
-    runner_args = _make_runner_arglist(dotnet, deps, resources, result, pdb, executable, defines, unsafe, keyfile)
+    transitive, transitive_runfiles = ResolveVersions(deps)
+
+    runner_args = _make_runner_arglist(dotnet, transitive.to_list(), resources, result, pdb, executable, defines, unsafe, keyfile)
 
     attr_srcs = [f for t in srcs for f in as_iterable(t.files)]
     runner_args.add_all(attr_srcs)
@@ -142,7 +148,7 @@ def emit_assembly_net(
 
     dotnet.actions.write(output = paramfile, content = runner_args)
 
-    deps_files = [d[DotnetLibrary].result for d in deps]
+    deps_files = [d[DotnetLibrary].result for d in transitive.to_list()]
     dotnet.actions.run(
         inputs = attr_srcs + attr_extra_srcs + [paramfile] + deps_files + [dotnet.stdlib] + [k.result for r in resources for k in r[DotnetResourceList].result],
         outputs = [result] + ([pdb] if pdb else []),
@@ -155,8 +161,8 @@ def emit_assembly_net(
     )
 
     extra = [] if data == None else [d.files for d in data]
-    runfiles = depset(direct = [result] + [dotnet.stdlib] + ([pdb] if pdb else []), transitive = [d[DotnetLibrary].runfiles for d in deps] + extra)
-    transitive = depset(direct = deps, transitive = [a[DotnetLibrary].transitive for a in deps])
+    d_runfiles = [result] + [dotnet.stdlib] + ([pdb] if pdb else []) + extra
+    runfiles = depset(direct = d_runfiles, transitive = [transitive_runfiles])
 
     return dotnet.new_library(
         dotnet = dotnet,

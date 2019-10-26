@@ -9,14 +9,15 @@ load(
     "DotnetResourceList",
 )
 load(
-    "@io_bazel_rules_dotnet//dotnet/private:skylib/lib/paths.bzl",
-    "paths",
+    "@io_bazel_rules_dotnet//dotnet/private:rules/runfiles.bzl",
+    "CopyRunfiles",
 )
 
 def _binary_impl(ctx):
     """_binary_impl emits actions for compiling executable assembly."""
     dotnet = dotnet_context(ctx)
     name = ctx.label.name
+    subdir = name + "/"
 
     if dotnet.assembly == None:
         empty = dotnet.declare_file(dotnet, path = "empty.sh")
@@ -26,7 +27,7 @@ def _binary_impl(ctx):
 
     executable = dotnet.assembly(
         dotnet,
-        name = paths.split_extension(name)[0] + "_0.dll",
+        name = name,
         srcs = ctx.attr.srcs,
         deps = ctx.attr.deps,
         resources = ctx.attr.resources,
@@ -36,9 +37,10 @@ def _binary_impl(ctx):
         data = ctx.attr.data,
         executable = True,
         keyfile = ctx.attr.keyfile,
+        subdir = subdir,
     )
 
-    launcher = dotnet.declare_file(dotnet, path = name)
+    launcher = dotnet.declare_file(dotnet, path = subdir + executable.result.basename + "_0.exe")
     ctx.actions.run(
         outputs = [launcher],
         inputs = ctx.attr._launcher.files.to_list(),
@@ -51,7 +53,11 @@ def _binary_impl(ctx):
         runner = [dotnet.runner]
     else:
         runner = []
-    runfiles = ctx.runfiles(files = [launcher] + runner + ctx.attr.native_deps.files.to_list(), transitive_files = executable.runfiles)
+
+    #runfiles = ctx.runfiles(files = [launcher] + runner + ctx.attr.native_deps.files.to_list(), transitive_files = executable.runfiles)
+
+    runfiles = ctx.runfiles(files = runner + ctx.attr.native_deps.files.to_list(), transitive_files = executable.runfiles)
+    runfiles = CopyRunfiles(dotnet, runfiles, ctx.attr._copy, ctx.attr._symlink, executable, subdir)
 
     return [
         executable,
@@ -77,6 +83,7 @@ dotnet_binary = rule(
         "native_deps": attr.label(default = Label("@dotnet_sdk//:native_deps")),
         "_launcher": attr.label(default = Label("//dotnet/tools/launcher_mono:launcher_mono.exe")),
         "_copy": attr.label(default = Label("//dotnet/tools/copy")),
+        "_symlink": attr.label(default = Label("//dotnet/tools/symlink")),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
     executable = True,
@@ -97,6 +104,7 @@ core_binary = rule(
         "native_deps": attr.label(default = Label("@core_sdk//:native_deps")),
         "_launcher": attr.label(default = Label("//dotnet/tools/launcher_core:launcher_core.exe")),
         "_copy": attr.label(default = Label("//dotnet/tools/copy")),
+        "_symlink": attr.label(default = Label("//dotnet/tools/symlink")),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_core"],
     executable = True,
@@ -117,6 +125,7 @@ net_binary = rule(
         "native_deps": attr.label(default = Label("@net_sdk//:native_deps")),
         "_launcher": attr.label(default = Label("//dotnet/tools/launcher_net:launcher_net.exe")),
         "_copy": attr.label(default = Label("//dotnet/tools/copy")),
+        "_symlink": attr.label(default = Label("//dotnet/tools/symlink")),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_net"],
     executable = True,
