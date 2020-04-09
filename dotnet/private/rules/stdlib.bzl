@@ -23,7 +23,10 @@ def _stdlib_impl(ctx):
         library = dotnet.new_library(dotnet = dotnet)
         return [library]
 
-    result = dotnet.stdlib_byname(name = name, shared = dotnet.shared, lib = dotnet.lib, libVersion = dotnet.libVersion)
+    if ctx.attr.stdlib_path:
+        result = ctx.attr.stdlib_path.files.to_list()[0]
+    else:
+        result = dotnet.stdlib_byname(name = name, shared = dotnet.shared, lib = dotnet.lib, libVersion = dotnet.libVersion, attr_ref = ctx.attr.ref)
 
     (transitive_refs, transitive_runfiles, transitive_deps) = collect_transitive_info(ctx.attr.deps)
 
@@ -38,6 +41,7 @@ def _stdlib_impl(ctx):
         dotnet = dotnet,
         name = name,
         deps = ctx.attr.deps,
+        ref = ctx.attr.ref,
         transitive = transitive_deps,
         runfiles = depset(direct = direct_runfiles, transitive = [transitive_runfiles]),
         result = result,
@@ -56,8 +60,10 @@ dotnet_stdlib = rule(
     _stdlib_impl,
     attrs = {
         "dll": attr.string(),
+        "ref": attr.label(allow_files = True),
         "deps": attr.label_list(providers = [DotnetLibrary]),
         "data": attr.label_list(allow_files = True),
+        "stdlib_path": attr.label(allow_files = True),
         "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data")),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
@@ -68,8 +74,10 @@ core_stdlib = rule(
     _stdlib_impl,
     attrs = {
         "dll": attr.string(),
+        "ref": attr.label(allow_files = True),
         "deps": attr.label_list(providers = [DotnetLibrary]),
         "data": attr.label_list(allow_files = True),
+        "stdlib_path": attr.label(allow_files = True),
         "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:core_context_data")),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_core"],
@@ -80,8 +88,10 @@ net_stdlib = rule(
     _stdlib_impl,
     attrs = {
         "dll": attr.string(),
+        "ref": attr.label(allow_files = True),
         "deps": attr.label_list(providers = [DotnetLibrary]),
         "data": attr.label_list(allow_files = True),
+        "stdlib_path": attr.label(allow_files = True),
         "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:net_context_data")),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_net"],
