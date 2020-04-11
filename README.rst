@@ -46,6 +46,8 @@ C# Rules for Bazel_
 Documentation
 -------------
 
+* `Examples <tests/examples/README.rst>`_
+
 * `Runtime considerations <docs/runtime.rst>`_
 
 * `Multiple framework versions <docs/multiversion.rst>`_

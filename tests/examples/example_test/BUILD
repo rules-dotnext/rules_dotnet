@@ -8,13 +8,14 @@ dotnet_nunit_test(
     ],
     deps = [
         "//tests/examples/example_lib:MyClass.dll",
+        "@io_bazel_rules_dotnet//dotnet/stdlib:system.dll",
         "@nunitv2//:netstandard1.0_net",
     ],
 )
 
 [net_nunit_test(
     name = "net.example_test_{}.dll".format(framework),
-    size = "small",
+    size = "medium",
     srcs = [
         "MyTest.cs",
     ],
@@ -28,7 +29,7 @@ dotnet_nunit_test(
 
 [net_nunit3_test(
     name = "net.example_test3_{}.dll".format(framework),
-    size = "small",
+    size = "medium",
     srcs = [
         "MyTest.cs",
     ],

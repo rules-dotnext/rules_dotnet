@@ -1,6 +1,7 @@
 load(
     "@io_bazel_rules_dotnet//dotnet:defs.bzl",
     "DOTNET_CORE_FRAMEWORKS",
+    "DOTNET_NET_FRAMEWORKS",
     "core_resx",
     "core_xunit_test",
     "dotnet_resx",
@@ -19,7 +20,7 @@ load(
 
 [core_xunit_test(
     name = "{}_example_resx.dll".format(framework),
-    size = "small",
+    size = "medium",
     srcs = glob(["*.cs"]),
     dotnet_context_data = "@io_bazel_rules_dotnet//:core_context_data_{}".format(framework),
     native_deps = "@core_sdk_{}//:native_deps".format(framework),
@@ -38,28 +39,11 @@ load(
     src = "Resources.resx",
     dotnet_context_data = "@io_bazel_rules_dotnet//:net_context_data_{}".format(framework),
     identifier = "example_resx.Resources.resources",
-) for framework in [
-    "net45",
-    "net451",
-    "net452",
-    "net46",
-    "net461",
-    "net462",
-    "net47",
-    "net471",
-    "net472",
-    "netstandard1.1",
-    "netstandard1.2",
-    "netstandard1.3",
-    "netstandard1.4",
-    "netstandard1.5",
-    "netstandard1.6",
-    "netstandard2.0",
-]]
+) for framework in DOTNET_NET_FRAMEWORKS]
 
 [net_xunit_test(
     name = "net.example_resx_{}.dll".format(framework),
-    size = "small",
+    size = "medium",
     srcs = glob(["*.cs"]),
     dotnet_context_data = "@io_bazel_rules_dotnet//:net_context_data_{}".format(framework),
     native_deps = "@net_sdk_{}//:native_deps".format(framework),
@@ -82,13 +66,6 @@ load(
     "net47",
     #"net471",
     #"net472",
-    # "netstandard1.1",
-    # "netstandard1.2",
-    # "netstandard1.3",
-    # "netstandard1.4",
-    # "netstandard1.5",
-    # "netstandard1.6",
-    # "netstandard2.0",
 ]]
 
 dotnet_resx(
@@ -103,7 +80,6 @@ dotnet_xunit_test(
     srcs = glob(["*.cs"]),
     resources = [":mono.resx"],
     deps = [
-        "@io_bazel_rules_dotnet//dotnet/stdlib:System.dll",
         "@io_bazel_rules_dotnet//dotnet/stdlib:system.runtime.dll",
         "@xunit.assert//:mono",
         "@xunit.extensibility.core//:mono",
