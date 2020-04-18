@@ -48,7 +48,14 @@ load(
     _net_resource_multi = "net_resource_multi",
 )
 load(
+    "@io_bazel_rules_dotnet//dotnet/private:rules/stdlib.bzl",
+    _core_stdlib = "core_stdlib",
+    _dotnet_stdlib = "dotnet_stdlib",
+    _net_stdlib = "net_stdlib",
+)
+load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/test.bzl",
+    _core_nunit3_test = "core_nunit3_test",
     _core_xunit_test = "core_xunit_test",
     _dotnet_nunit_test = "dotnet_nunit_test",
     _dotnet_xunit_test = "dotnet_xunit_test",
@@ -118,7 +125,11 @@ net_resx_multi = _net_resx_multi
 core_resource = _core_resource
 net_resource = _net_resource
 net_resource_multi = _net_resource_multi
+core_stdlib = _core_stdlib
+dotnet_stdlib = _dotnet_stdlib
+net_stdlib = _net_stdlib
 core_xunit_test = _core_xunit_test
+core_nunit3_test = _core_nunit3_test
 dotnet_nunit_test = _dotnet_nunit_test
 dotnet_xunit_test = _dotnet_xunit_test
 net_nunit3_test = _net_nunit3_test

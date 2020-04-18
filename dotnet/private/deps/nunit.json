@@ -2,6 +2,6 @@
   "externals": {},
   "dependencies": {
     "NUnit": "3.12.0",
-    "NUnit.ConsoleRunner": "3.10.0"
+    "NUnit.ConsoleRunner": "3.11.1"
   }
 }
