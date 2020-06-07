@@ -7,6 +7,7 @@ load(
     "DotnetResourceList",
 )
 load("@io_bazel_rules_dotnet//dotnet/private:rules/common.bzl", "collect_transitive_info")
+load("@io_bazel_rules_dotnet//dotnet/private:rules/versions.bzl", "version2string")
 
 def _map_resource(d):
     return d.result.path + "," + d.identifier
@@ -27,7 +28,8 @@ def emit_assembly_common(
         subdir = "./",
         target_framework = "",
         nowarn = None,
-        langversion = "latest"):
+        langversion = "latest",
+        version = (0, 0, 0, 0, "")):
     """See dotnet/toolchains.rst#binary for full documentation. Emits actions for assembly build.
 
     The function is used by all frameworks.
@@ -140,10 +142,25 @@ def emit_assembly_common(
         args.add(f)
         direct_inputs.append(f)
 
-    # References - also needs to include transitive dependencies
-    (transitive_refs, transitive_runfiles, transitive_deps) = collect_transitive_info(deps)
+    # Generate the source file for assembly version
+    if version != (0, 0, 0, 0, ""):
+        f = dotnet._ctx.actions.declare_file(result.basename + "._tv_.cs", sibling = result)
+        content = """
+        [assembly:System.Reflection.AssemblyVersion("{}")]
+        """.format(version2string(version))
+        dotnet._ctx.actions.write(f, content)
+        args.add(f)
+        direct_inputs.append(f)
 
-    args.add_all(transitive_refs, format_each = "/r:%s")
+    # References - also needs to include transitive dependencies
+    transitive = collect_transitive_info(deps)
+
+    refs = []
+    for d in transitive:
+        if d.ref != None:
+            refs.append(d.ref)
+
+    args.add_all(refs, format_each = "/r:%s")
 
     args.set_param_file_format("multiline")
 
@@ -165,7 +182,7 @@ def emit_assembly_common(
         action_args = ["/noconfig", "@" + paramfile.path]
         direct_inputs.append(runner)
 
-    inputs = depset(direct = direct_inputs, transitive = [transitive_refs])
+    inputs = depset(direct = direct_inputs, transitive = [depset(direct = refs)])
     dotnet.actions.run(
         inputs = inputs,
         outputs = [result] + ([pdb] if pdb else []),
@@ -182,18 +199,22 @@ def emit_assembly_common(
     direct_runfiles.append(result)
     if pdb:
         direct_runfiles.append(pdb)
-
     data_l = [f for t in data for f in as_iterable(t.files)]
     direct_runfiles += data_l
 
+    runfiles = depset(direct = direct_runfiles)
+
     # Final result
-    return dotnet.new_library(
+    new_library = dotnet.new_library(
         dotnet = dotnet,
         name = name,
         deps = deps,
-        transitive = transitive_deps,
-        runfiles = depset(direct = direct_runfiles, transitive = [transitive_runfiles]),
+        transitive = transitive,
+        runfiles = runfiles,
         result = result,
         pdb = pdb,
-        transitive_refs = depset(direct = [result], transitive = [transitive_refs]),
+        version = version,
+        ref = result,  # Generating reference assemblies is not supported yet
     )
+
+    return new_library

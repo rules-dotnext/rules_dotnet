@@ -10,7 +10,7 @@ os:
 
 before_install:
   - |
-    if [[ "${TRAVIS_OS_NAME}" == "osx" ]]; then
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       OS=darwin
       brew cask install homebrew/cask-versions/adoptopenjdk8
       brew install bazel coreutils
@@ -31,7 +31,9 @@ script:
     bazel version
 
   - |
-    export PATH=$PATH:/Library/Frameworks/Mono.framework/Versions/6.8.0/bin/
+    ls /Library/Frameworks/Mono.framework/Versions
+    echo $PATH
+    export PATH=$PATH:/Library/Frameworks/Mono.framework/Versions/Current/bin/
     mono --version
 
   - |
@@ -49,6 +51,15 @@ script:
   - |
     export PATH=$PATH:/Library/Frameworks/Mono.framework/Versions/6.8.0/bin/
     bazel --host_jvm_args=-Xmx500m --host_jvm_args=-Xms500m test --test_summary=detailed --spawn_strategy=standalone --test_output=all //... 
-    
+
+  - |    
+    cd docs/examples/mono && bazel --host_jvm_args=-Xmx500m --host_jvm_args=-Xms500m test --test_summary=detailed --spawn_strategy=standalone --test_output=all //... 
+
+  - |    
+    cd ../grpc && bazel --host_jvm_args=-Xmx500m --host_jvm_args=-Xms500m test --test_summary=detailed --spawn_strategy=standalone --test_output=all //... 
+
+  - |    
+    cd ../ef && bazel --host_jvm_args=-Xmx500m --host_jvm_args=-Xms500m test --test_summary=detailed --spawn_strategy=standalone --test_output=all //... 
+
 notifications:
   email: false

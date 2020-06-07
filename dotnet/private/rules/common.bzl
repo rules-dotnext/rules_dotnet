@@ -1,50 +1,49 @@
-load(
-    "@io_bazel_rules_dotnet//dotnet/private:providers.bzl",
-    "DotnetLibrary",
-)
+load("@io_bazel_rules_dotnet//dotnet/private:providers.bzl", "DotnetLibrary")
+load("@io_bazel_rules_dotnet//dotnet/private:rules/versions.bzl", "compare_versions")
 
-def collect_transitive_info(deps, data = None):
+def collect_transitive_info(deps):
     """Collects transitive information.
 
     Args:
       deps: Dependencies that the DotnetLibrary depends on.
-      data: Data dependencies
 
     Returns:
-      A depsets of the references, runfiles and deps. References and deps also include direct dependencies provided by deps.
-      However, runtfiles do not include direct runfiles.
+      list of DotnetDepInfo.
     """
 
-    direct_refs = []
-    direct_deps = []
-    transitive_refs = []
-    transitive_runfiles = []
-    direct_runfiles = []
-    transitive_deps = []
+    result = []
+
+    # key: basename of result, value: DotnetLibrary
+    lookup = {}
+
+    basename = ""
+    found = None
 
     for dep in deps:
         assembly = dep[DotnetLibrary]
 
-        if assembly.ref:
-            direct_refs += assembly.ref.files.to_list()
-        elif assembly.result:
-            direct_refs.append(assembly.result)
+        # Empty result is set for librarysets
+        if assembly.result != None:
+            basename = assembly.result.basename
+            found = lookup.get(basename)
+        else:
+            basename = assembly.name + "__libraryset__"
+            found = None
 
-        if assembly.transitive_refs:
-            transitive_refs.append(assembly.transitive_refs)
+        if found == None or compare_versions(assembly.version, found.version) > 0:
+            result.append(assembly)
+            lookup[basename] = assembly
+            if assembly.transitive != None:
+                for t in assembly.transitive:
+                    if t.result != None:
+                        tbasename = t.result.basename
+                        tfound = lookup.get(tbasename)
+                    else:
+                        tbasename = t.name + "__libraryset__"
+                        tfound = None
 
-        transitive_runfiles.append(assembly.runfiles)
+                    if tfound == None or compare_versions(t.version, tfound.version) > 0:
+                        result.append(t)
+                        lookup[tbasename] = t
 
-        direct_deps.append(assembly)
-        if assembly.transitive:
-            transitive_deps.append(assembly.transitive)
-
-    if data:
-        for i in data:
-            transitive_runfiles.append(i.files)
-
-    return (
-        depset(direct = direct_refs, transitive = transitive_refs),
-        depset(direct = direct_runfiles, transitive = transitive_runfiles),
-        depset(direct = direct_deps, transitive = transitive_deps),
-    )
+    return result

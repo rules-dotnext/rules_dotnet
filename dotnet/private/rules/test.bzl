@@ -15,6 +15,7 @@ load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/data_with_dirs.bzl",
     "CopyDataWithDirs",
 )
+load("@io_bazel_rules_dotnet//dotnet/private:rules/versions.bzl", "parse_version")
 
 def _unit_test(ctx):
     dotnet = dotnet_context(ctx)
@@ -49,6 +50,7 @@ def _unit_test(ctx):
         subdir = subdir,
         nowarn = ctx.attr.nowarn,
         langversion = ctx.attr.langversion,
+        version = (0, 0, 0, 0, "") if ctx.attr.version == "" else parse_version(ctx.attr.version),
     )
 
     launcher = dotnet.declare_file(dotnet, path = subdir + executable.result.basename + "_0.exe")
@@ -71,7 +73,9 @@ def _unit_test(ctx):
         transitive_runfiles.append(ctx.attr._xslt.files)
 
     transitive_runfiles.append(executable.runfiles)
+    transitive_runfiles += [t.runfiles for t in executable.transitive]
     transitive_runfiles.append(ctx.attr.testlauncher[DotnetLibrary].runfiles)
+    transitive_runfiles += [t.runfiles for t in ctx.attr.testlauncher[DotnetLibrary].transitive]
 
     runfiles = ctx.runfiles(files = direct_runfiles, transitive_files = depset(transitive = transitive_runfiles))
     runfiles = CopyRunfiles(dotnet, runfiles, ctx.attr._copy, ctx.attr._symlink, executable, subdir)
@@ -111,6 +115,7 @@ dotnet_nunit_test = rule(
         "nowarn": attr.string_list(),
         "langversion": attr.string(default = "latest"),
         "data_with_dirs": attr.label_keyed_string_dict(allow_files = True),
+        "version": attr.string(),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
     executable = True,
@@ -140,6 +145,7 @@ net_nunit_test = rule(
         "nowarn": attr.string_list(),
         "langversion": attr.string(default = "latest"),
         "data_with_dirs": attr.label_keyed_string_dict(allow_files = True),
+        "version": attr.string(),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_net"],
     executable = True,
@@ -169,6 +175,7 @@ net_nunit3_test = rule(
         "nowarn": attr.string_list(),
         "langversion": attr.string(default = "latest"),
         "data_with_dirs": attr.label_keyed_string_dict(allow_files = True),
+        "version": attr.string(),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_net"],
     executable = True,
@@ -197,6 +204,7 @@ core_xunit_test = rule(
         "nowarn": attr.string_list(),
         "langversion": attr.string(default = "latest"),
         "data_with_dirs": attr.label_keyed_string_dict(allow_files = True),
+        "version": attr.string(),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_core"],
     executable = True,
@@ -232,6 +240,7 @@ core_nunit3_test = rule(
                 "@JunitXml.TestLogger//:extension": ".",
             },
         ),
+        "version": attr.string(),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_core"],
     executable = True,
@@ -261,6 +270,7 @@ net_xunit_test = rule(
         "nowarn": attr.string_list(),
         "langversion": attr.string(default = "latest"),
         "data_with_dirs": attr.label_keyed_string_dict(allow_files = True),
+        "version": attr.string(),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_net"],
     executable = True,
@@ -290,6 +300,7 @@ dotnet_xunit_test = rule(
         "nowarn": attr.string_list(),
         "langversion": attr.string(default = "latest"),
         "data_with_dirs": attr.label_keyed_string_dict(allow_files = True),
+        "version": attr.string(),
     },
     toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
     executable = True,
