@@ -24,12 +24,7 @@ def _get_dotnet_runner(context_data, ext):
     return None
 
 def _get_dotnet_mcs(context_data):
-    for f in context_data._mcs_bin.files.to_list():
-        basename = paths.basename(f.path)
-        if basename != "csc.exe":
-            continue
-        return f
-    fail("Could not find csc.exe in net_sdk (mcs_bin)")
+    return context_data._csc
 
 def _get_dotnet_resgen(context_data):
     return _get_dotnet_tool(context_data, "resgen.exe")
@@ -65,9 +60,9 @@ def _get_dotnet_stdlib_byname(shared, lib, libVersion, name, attr_ref = None):
 def _net_toolchain_impl(ctx):
     return [platform_common.ToolchainInfo(
         name = ctx.label.name,
-        default_dotnetimpl = ctx.attr.dotnetimpl,
-        default_dotnetos = ctx.attr.dotnetos,
-        default_dotnetarch = ctx.attr.dotnetarch,
+        dotnetimpl = ctx.attr.dotnetimpl,
+        dotnetos = ctx.attr.dotnetos,
+        dotnetarch = ctx.attr.dotnetarch,
         get_dotnet_runner = _get_dotnet_runner,
         get_dotnet_mcs = _get_dotnet_mcs,
         get_dotnet_resgen = _get_dotnet_resgen,
@@ -94,20 +89,13 @@ _net_toolchain = rule(
     },
 )
 
-def net_toolchain(name, host, constraints = [], **kwargs):
+def net_toolchain(name, arch, os, constraints, **kwargs):
     """See dotnet/toolchains.rst#net-toolchain for full documentation."""
-
-    elems = host.split("_")
-    impl, os, arch = elems[0], elems[1], elems[2]
-    host_constraints = constraints + [
-        "@io_bazel_rules_dotnet//dotnet/toolchain:" + os,
-        "@io_bazel_rules_dotnet//dotnet/toolchain:" + arch,
-    ]
 
     impl_name = name + "-impl"
     _net_toolchain(
         name = impl_name,
-        dotnetimpl = impl,
+        dotnetimpl = "net",
         dotnetos = os,
         dotnetarch = arch,
         tags = ["manual"],
@@ -116,7 +104,7 @@ def net_toolchain(name, host, constraints = [], **kwargs):
     )
     native.toolchain(
         name = name,
-        toolchain_type = "@io_bazel_rules_dotnet//dotnet:toolchain_net",
-        exec_compatible_with = host_constraints,
+        toolchain_type = "@io_bazel_rules_dotnet//dotnet:toolchain_type_net",
+        exec_compatible_with = constraints,
         toolchain = ":" + impl_name,
     )

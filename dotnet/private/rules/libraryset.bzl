@@ -11,13 +11,7 @@ load("@io_bazel_rules_dotnet//dotnet/private:common.bzl", "as_iterable")
 
 def _libraryset_impl(ctx):
     """_libraryset_impl implements the set of libraries."""
-    dotnet = dotnet_context(ctx)
     name = ctx.label.name
-
-    # Handle case of empty toolchain on linux and darwin
-    if dotnet.assembly == None:
-        library = dotnet.new_library(dotnet = dotnet, runfiles = depset())
-        return [library]
 
     transitive = collect_transitive_info(ctx.attr.deps)
 
@@ -29,12 +23,16 @@ def _libraryset_impl(ctx):
 
     runfiles = depset(direct = direct_runfiles)
 
-    library = dotnet.new_library(
-        dotnet = dotnet,
+    library = DotnetLibrary(
         name = name,
+        label = ctx.label,
         deps = ctx.attr.deps,
         transitive = transitive,
         runfiles = runfiles,
+        result = None,
+        pdb = None,
+        version = None,
+        ref = None,
     )
 
     return [
@@ -49,9 +47,8 @@ dotnet_libraryset = rule(
     attrs = {
         "deps": attr.label_list(providers = [DotnetLibrary]),
         "data": attr.label_list(allow_files = True),
-        "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data")),
     },
-    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
+    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_type_mono"],
     executable = False,
 )
 
@@ -60,9 +57,8 @@ core_libraryset = rule(
     attrs = {
         "deps": attr.label_list(providers = [DotnetLibrary]),
         "data": attr.label_list(allow_files = True),
-        "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:core_context_data")),
     },
-    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_core"],
+    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_type_core"],
     executable = False,
 )
 
@@ -71,8 +67,7 @@ net_libraryset = rule(
     attrs = {
         "deps": attr.label_list(providers = [DotnetLibrary]),
         "data": attr.label_list(allow_files = True),
-        "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:net_context_data")),
     },
-    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_net"],
+    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_type_net"],
     executable = False,
 )

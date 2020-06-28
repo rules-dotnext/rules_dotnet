@@ -1,8 +1,8 @@
-DOTNETIMPL = {
-    "mono": None,
-    "core": None,
-    "net": None,
-}
+DOTNETIMPL = [
+    "mono",
+    "core",
+    "net",
+]
 
 DOTNETOS = {
     "darwin": "@bazel_tools//platforms:osx",
@@ -70,45 +70,18 @@ DOTNET_NET_FRAMEWORKS = {
 # 0. Version string - as required by TargetFrameworkAttribute and use for the download
 # 1. Preporocesor directive
 # 2. TFM
+# 3. Runtime folder version
 DOTNET_CORE_FRAMEWORKS = {
-    "v2.1.200": (".NETCore,Version=v2.1", "NETCOREAPP2_1", "netcoreapp2.1"),
-    "v2.1.502": (".NETCore,Version=v2.1", "NETCOREAPP2_1", "netcoreapp2.1"),
-    "v2.1.503": (".NETCore,Version=v2.1", "NETCOREAPP2_1", "netcoreapp2.1"),
-    "v2.2.101": (".NETCore,Version=v2.2", "NETCOREAPP2_2", "netcoreapp2.2"),
-    "v2.2.402": (".NETCore,Version=v2.2", "NETCOREAPP2_2", "netcoreapp2.2"),
-    "v3.0.100": (".NETCore,Version=v3.0", "NETCOREAPP3_0", "netcoreapp3.0"),
-    "v3.1.100": (".NETCore,Version=v3.1", "NETCOREAPP3_1", "netcoreapp3.1"),
+    "v2.1.200": (".NETCore,Version=v2.1", "NETCOREAPP2_1", "netcoreapp2.1", "2.0.7"),
+    "v2.1.502": (".NETCore,Version=v2.1", "NETCOREAPP2_1", "netcoreapp2.1", "2.1.6"),
+    "v2.1.503": (".NETCore,Version=v2.1", "NETCOREAPP2_1", "netcoreapp2.1", "2.1.7"),
+    "v2.2.101": (".NETCore,Version=v2.2", "NETCOREAPP2_2", "netcoreapp2.2", "2.2.0"),
+    "v2.2.402": (".NETCore,Version=v2.2", "NETCOREAPP2_2", "netcoreapp2.2", "2.2.7"),
+    "v3.0.100": (".NETCore,Version=v3.0", "NETCOREAPP3_0", "netcoreapp3.0", "3.0.0"),
+    "v3.1.100": (".NETCore,Version=v3.1", "NETCOREAPP3_1", "netcoreapp3.1", "3.1.0"),
 }
 DOTNET_CORE_NAMES = ["netcoreapp2.0", "netcoreapp2.1", "netcoreapp2.2", "netcoreapp3.0", "netcoreapp3.1"] + DOTNET_NETSTANDARD.keys()
 DOTNET_NET_NAMES = DOTNET_NET_FRAMEWORKS.keys() + DOTNET_NETSTANDARD.keys()
 
 DEFAULT_DOTNET_CORE_FRAMEWORK = "v3.1.100"
-
-def declare_config_settings():
-    for impl in DOTNETIMPL:
-        native.config_setting(
-            name = impl,
-            #constraint_values = ["//dotnet/toolchain:" + impl],
-            values = {
-                "compilation_mode": impl,
-            },
-        )
-    for os in DOTNETOS:
-        native.config_setting(
-            name = os,
-            constraint_values = ["//dotnet/toolchain:" + os],
-        )
-    for arch in DOTNETARCH:
-        native.config_setting(
-            name = arch,
-            constraint_values = ["//dotnet/toolchain:" + arch],
-        )
-    for impl, os, arch in DOTNETIMPL_OS_ARCH:
-        native.config_setting(
-            name = impl + "_" + os + "_" + arch,
-            constraint_values = [
-                "//dotnet/toolchain:" + os,
-                "//dotnet/toolchain:" + arch,
-                "//dotnet/toolchain:" + impl,
-            ],
-        )
+DEFAULT_DOTNET_NET_FRAMEWORK = "net48"

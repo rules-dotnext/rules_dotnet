@@ -13,6 +13,7 @@ load(
 )
 load("@io_bazel_rules_dotnet//dotnet/platform:list.bzl", "DOTNET_CORE_FRAMEWORKS", "DOTNET_NETSTANDARD", "DOTNET_NET_FRAMEWORKS")
 load("@io_bazel_rules_dotnet//dotnet/private:rules/versions.bzl", "parse_version")
+load("@io_bazel_rules_dotnet//dotnet/private:rules/common.bzl", "collect_transitive_info")
 
 def _binary_impl(ctx):
     """_binary_impl emits actions for compiling executable assembly."""
@@ -54,15 +55,15 @@ def _binary_impl(ctx):
         mnemonic = "CopyLauncher",
     )
 
+    # Calculate final runtiles including runtime-required files
+    run_transitive = collect_transitive_info(ctx.attr.deps + ([ctx.attr.dotnet_context_data._runtime] if ctx.attr.dotnet_context_data._runtime != None else []))
+    direct_runfiles = []
     if dotnet.runner != None:
-        runner = [dotnet.runner]
-    else:
-        runner = []
+        direct_runfiles += dotnet.runner.files.to_list()
 
-    #runfiles = ctx.runfiles(files = [launcher] + runner + ctx.attr.native_deps.files.to_list(), transitive_files = executable.runfiles)
-
-    runfiles = ctx.runfiles(files = runner + ctx.attr.native_deps.files.to_list(), transitive_files = depset(transitive = [t.runfiles for t in executable.transitive]))
-    runfiles = CopyRunfiles(dotnet, runfiles, ctx.attr._copy, ctx.attr._symlink, executable, subdir)
+    #runfiles = ctx.runfiles(files = runner + ctx.attr.native_dep.files.to_list(), transitive_files = depset(transitive = [t.runfiles for t in executable.transitive]))
+    runfiles = ctx.runfiles(files = direct_runfiles, transitive_files = depset(transitive = [t.runfiles for t in run_transitive] + [executable.runfiles]))
+    runfiles = CopyRunfiles(dotnet._ctx, runfiles, ctx.attr._copy, ctx.attr._symlink, executable, subdir)
 
     return [
         executable,
@@ -86,7 +87,6 @@ dotnet_binary = rule(
         "data": attr.label_list(allow_files = True),
         "keyfile": attr.label(allow_files = True),
         "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:dotnet_context_data")),
-        "native_deps": attr.label(default = Label("@dotnet_sdk//:native_deps")),
         "_launcher": attr.label(default = Label("//dotnet/tools/launcher_mono:launcher_mono.exe")),
         "_copy": attr.label(default = Label("//dotnet/tools/copy")),
         "_symlink": attr.label(default = Label("//dotnet/tools/symlink")),
@@ -94,7 +94,7 @@ dotnet_binary = rule(
         "nowarn": attr.string_list(),
         "langversion": attr.string(default = "latest"),
     },
-    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain"],
+    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_type_mono"],
     executable = True,
 )
 
@@ -111,7 +111,6 @@ core_binary = rule(
         "data": attr.label_list(allow_files = True),
         "keyfile": attr.label(allow_files = True),
         "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:core_context_data")),
-        "native_deps": attr.label(default = Label("@core_sdk//:native_deps")),
         "_launcher": attr.label(default = Label("//dotnet/tools/launcher_core:launcher_core.exe")),
         "_copy": attr.label(default = Label("//dotnet/tools/copy")),
         "_symlink": attr.label(default = Label("//dotnet/tools/symlink")),
@@ -119,7 +118,7 @@ core_binary = rule(
         "nowarn": attr.string_list(),
         "langversion": attr.string(default = "latest"),
     },
-    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_core"],
+    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_type_core"],
     executable = True,
 )
 
@@ -136,7 +135,6 @@ net_binary = rule(
         "data": attr.label_list(allow_files = True),
         "keyfile": attr.label(allow_files = True),
         "dotnet_context_data": attr.label(default = Label("@io_bazel_rules_dotnet//:net_context_data")),
-        "native_deps": attr.label(default = Label("@net_sdk//:native_deps")),
         "_launcher": attr.label(default = Label("//dotnet/tools/launcher_net:launcher_net.exe")),
         "_copy": attr.label(default = Label("//dotnet/tools/copy")),
         "_symlink": attr.label(default = Label("//dotnet/tools/symlink")),
@@ -144,6 +142,6 @@ net_binary = rule(
         "nowarn": attr.string_list(),
         "langversion": attr.string(default = "latest"),
     },
-    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_net"],
+    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_type_net"],
     executable = True,
 )

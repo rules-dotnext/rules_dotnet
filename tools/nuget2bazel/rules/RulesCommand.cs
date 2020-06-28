@@ -27,6 +27,9 @@ namespace nuget2bazel.rules
         {
             var configDir = Path.Combine(Path.GetTempPath(), "nuget2bazel");
 
+            var runtimeCoreGenerator = new RuntimeCoreGenerator(configDir, path);
+            await runtimeCoreGenerator.Do();
+
             var netStdlibGenerator = new StdlibNetGenerator(configDir, path);
             await netStdlibGenerator.Do();
 

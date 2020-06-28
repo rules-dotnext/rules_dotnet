@@ -50,6 +50,7 @@ load(
 load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/stdlib.bzl",
     _core_stdlib = "core_stdlib",
+    _core_stdlib_internal = "core_stdlib_internal",
     _dotnet_stdlib = "dotnet_stdlib",
     _net_stdlib = "net_stdlib",
 )
@@ -72,6 +73,7 @@ load(
 load(
     "@io_bazel_rules_dotnet//dotnet/private:rules/import.bzl",
     _core_import_binary = "core_import_binary",
+    _core_import_binary_internal = "core_import_binary_internal",
     _core_import_library = "core_import_library",
     _dotnet_import_binary = "dotnet_import_binary",
     _dotnet_import_library = "dotnet_import_library",
@@ -128,6 +130,7 @@ core_resource = _core_resource
 net_resource = _net_resource
 net_resource_multi = _net_resource_multi
 core_stdlib = _core_stdlib
+core_stdlib_internal = _core_stdlib_internal
 dotnet_stdlib = _dotnet_stdlib
 net_stdlib = _net_stdlib
 core_xunit_test = _core_xunit_test
@@ -141,6 +144,7 @@ dotnet_nuget = _dotnet_nuget
 dotnet_nuget_new = _dotnet_nuget_new
 nuget_package = _nuget_package
 core_import_binary = _core_import_binary
+core_import_binary_internal = _core_import_binary_internal
 core_import_library = _core_import_library
 dotnet_import_binary = _dotnet_import_binary
 dotnet_import_library = _dotnet_import_library

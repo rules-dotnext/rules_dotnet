@@ -61,13 +61,16 @@ jobs:
         mono --version
       displayName: 'Show mono version'
       condition: and(succeeded(), ne(variables['systemName'], 'windows'))
-
     - script: |
         "c:\program files\mono\bin\mono.exe" --version
       displayName: 'Show mono version'
       condition: and(succeeded(), eq(variables['systemName'], 'windows'))
 
-    - script: |
+    - script: |    
+        bazel $(bazel_startup) query "deps(@dotnet_sdk//:csc)"
+      displayName: 'Query'
+
+    - script: |    
         bazel $(bazel_startup) build -s --spawn_strategy=standalone //... 
       displayName: 'Build all'
     - script: |
@@ -76,7 +79,6 @@ jobs:
     - script: |
         bazel $(bazel_startup) run -s  --spawn_strategy=standalone //tests/examples/example_binary:v2.1.200_hello-core.exe
       displayName: 'Run sample core hello'
-
     - script: |
         bazel $(bazel_startup) test -s --test_summary=detailed --spawn_strategy=standalone --test_output=all //... 
       continueOnError: true
