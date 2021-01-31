@@ -1,24 +1,24 @@
-load("@io_bazel_rules_dotnet//dotnet/private:providers.bzl", "DotnetLibrary")
+load("@io_bazel_rules_dotnet//dotnet/private:providers.bzl", "DotnetLibraryInfo")
 load("@io_bazel_rules_dotnet//dotnet/private:rules/versions.bzl", "compare_versions")
 
 def collect_transitive_info(deps):
     """Collects transitive information.
 
     Args:
-      deps: Dependencies that the DotnetLibrary depends on.
+      deps: Dependencies that the DotnetLibraryInfo depends on.
 
     Returns:
-      list of DotnetLibrary.
+      list of DotnetLibraryInfo.
     """
 
-    # key: basename of result, value: DotnetLibrary
+    # key: basename of result, value: DotnetLibraryInfo
     lookup = {}
 
     basename = ""
     found = None
 
     for dep in deps:
-        assembly = dep[DotnetLibrary]
+        assembly = dep[DotnetLibraryInfo]
 
         # Empty result is set for librarysets
         if assembly.result != None:
