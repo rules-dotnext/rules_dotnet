@@ -17,7 +17,7 @@ Important changes:
 
 This release contains contributions from Pierre Lule, tomaszstrejczek and tomdegoede.
 
-Release 0.0.6 (2020-12-24)
+Release 0.0.6 (2021-01-31)
 --------------------------
 
 Incompatible changes:
