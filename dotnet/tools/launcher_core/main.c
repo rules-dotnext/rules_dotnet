@@ -67,13 +67,15 @@ static void Execute(int argc, char *argv[], const char *manifestDir)
 	if (IsVerbose())
 	{
 		for (i = 0; i < argc + 2; ++i)
-		{
 			printf("argv[%d] = %s (access: %d)\n", i, newargv[i], newargv[i]!=NULL?access(newargv[i], F_OK):0);
-		}
 	}
 
 #ifdef _MSC_VER
-	exit(_spawnvp(_P_WAIT, newargv[0], newargv));
+	/*i = _spawnvp(_P_WAIT, newargv[0], newargv);*/
+	i = _spawnvp(_P_WAIT, newargv[0], newargv);
+	if (IsVerbose())
+		printf("Return code from _spawnvp: %d, errno: %d\n", i, errno);
+	exit(i);
 #else
 	_execvp(newargv[0], newargv);
 #endif
@@ -112,10 +114,6 @@ int main(int argc, char *argv[], char *envp[])
 		return -1;
 	}
 	p[1] = '\0';
-
-	// LinkFiles(manifestDir);
-	// LinkFilesTree(manifestDir);
-	// LinkHostFxr(manifestDir);
 
 	// Execute should never return - it should transform this process into
 	// dotnet, which will handle exiting at some point/
