@@ -4,7 +4,7 @@ load("@io_bazel_rules_dotnet//dotnet/private:rules/versions.bzl", "parse_version
 load("@io_bazel_rules_dotnet//dotnet/private:rules/common.bzl", "wrap_binary")
 
 def _unit_test(ctx):
-    dotnet = dotnet_context(ctx)
+    dotnet = dotnet_context(ctx, "csharp")
     name = ctx.label.name
     subdir = name + "/"
 
@@ -27,7 +27,7 @@ def _unit_test(ctx):
     )
     return wrap_binary(executable, dotnet, ctx.attr.testlauncher[DotnetLibraryInfo])
 
-core_xunit_test = rule(
+csharp_xunit_test = rule(
     _unit_test,
     attrs = {
         "deps": attr.label_list(providers = [DotnetLibraryInfo], doc = "The direct dependencies of this library. These may be dotnet_library rules or compatible rules with the [DotnetLibraryInfo](api.md#dotnetlibraryinfo) provider."),
@@ -48,7 +48,7 @@ core_xunit_test = rule(
         "data_with_dirs": attr.label_keyed_string_dict(allow_files = True, doc = "Dictionary of {label:folder}. Files specified by <label> will be put in subdirectory <folder>."),
         "version": attr.string(doc = "Version to be set for the assembly. The version is set by compiling in [AssemblyVersion](https://docs.microsoft.com/en-us/troubleshoot/visualstudio/general/assembly-version-assembly-file-version) attribute."),
     },
-    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_type_core"],
+    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_type_csharp_core"],
     executable = True,
     test = True,
     doc = """This builds a set of tests that can be run with ``bazel test``.
@@ -64,7 +64,7 @@ core_xunit_test = rule(
     """,
 )
 
-core_nunit3_test = rule(
+csharp_nunit3_test = rule(
     _unit_test,
     attrs = {
         "deps": attr.label_list(providers = [DotnetLibraryInfo], doc = "The direct dependencies of this library. These may be dotnet_library rules or compatible rules with the [DotnetLibraryInfo](api.md#dotnetlibraryinfo) provider."),
@@ -94,7 +94,7 @@ core_nunit3_test = rule(
         ),
         "version": attr.string(doc = "Version to be set for the assembly. The version is set by compiling in [AssemblyVersion](https://docs.microsoft.com/en-us/troubleshoot/visualstudio/general/assembly-version-assembly-file-version) attribute."),
     },
-    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_type_core"],
+    toolchains = ["@io_bazel_rules_dotnet//dotnet:toolchain_type_csharp_core"],
     executable = True,
     test = True,
     doc = """This builds a set of tests that can be run with ``bazel test``.

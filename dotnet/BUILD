@@ -17,7 +17,12 @@ toolchain_type(
 )
 
 toolchain_type(
-    name = "toolchain_type_core",
+    name = "toolchain_type_csharp_core",
+    visibility = ["//visibility:public"],
+)
+
+toolchain_type(
+    name = "toolchain_type_fsharp_core",
     visibility = ["//visibility:public"],
 )
 
