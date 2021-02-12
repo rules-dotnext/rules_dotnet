@@ -1,3 +1,5 @@
+"DotnetContext declarations"
+
 load(
     "@io_bazel_rules_dotnet//dotnet/private:providers.bzl",
     "DotnetLibraryInfo",
@@ -24,7 +26,7 @@ DotnetContextInfo = provider(
         "label": "Rule's label.",
         "toolchain": "Toolchain selected for the rule.",
         "actions": "Copy of ctx.actions (legacy).",
-        "assembly": "Toolchain's assembly function. See [emit_assembly_core](api.md#emit_assembly_core) for the function signature.",
+        "assembly": "Toolchain's assembly function. See [emit_assembly_core_csharp](api.md#emit_assembly_core_csharp) and [emit_assembly_core_fsharp](api.md#emit_assembly_core_fsharp) for the function signature.",
         "resx": "Toolchain's resx function. See [emit_resx_core](api.md#emit_resx_core) for the function signature.",
         "stdlib_byname": "Helper function for locating stdlib by name.",
         "exe_extension": "The suffix to use for all executables in this build mode. Mostly used when generating the output filenames of binary rules.",
@@ -143,7 +145,6 @@ def dotnet_context(ctx, lang):
         toolchain = ctx.toolchains["@io_bazel_rules_dotnet//dotnet:toolchain_type_fsharp_core"]
     else:
         fail("Only C# and F# are supported")
-
 
     ext = ""
     if toolchain.os == "windows":

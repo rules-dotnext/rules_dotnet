@@ -1,3 +1,5 @@
+"Assembly generation rules"
+
 load(
     "@io_bazel_rules_dotnet//dotnet/private:common.bzl",
     "as_iterable",
@@ -30,9 +32,9 @@ def emit_assembly_core_csharp(
         nowarn = None,
         langversion = "latest",
         version = (0, 0, 0, 0, "")):
-    """See dotnet/toolchains.rst#binary for full documentation. Emits actions for assembly build.
+    """Emits actions for assembly build.
 
-    The function is used by all frameworks.
+    The function is used to build C# assemblies..
 
     Args:
       dotnet: DotnetContextInfo provider
@@ -231,9 +233,9 @@ def emit_assembly_core_fsharp(
         nowarn = None,
         langversion = "latest",
         version = (0, 0, 0, 0, "")):
-    """See dotnet/toolchains.rst#binary for full documentation. Emits actions for assembly build.
+    """Emits actions for assembly build.
 
-    The function is used by all frameworks.
+    The function is used got build F# assemblies.
 
     Args:
       dotnet: DotnetContextInfo provider
@@ -244,7 +246,6 @@ def emit_assembly_core_fsharp(
       resources: list of DotnetResourceListInfo provider
       executable: bool. True for executable assembly, False otherwise
       defines: list of string. Defines to pass to a compiler
-      unsafe: /unsafe flag (False - default - /unsafe-, otherwise /unsafe+)
       data: list of targets (as passed from rules). Additional depdendencies of the target
       keyfile: File to be used for signing if provided
       subdir: specific subdirectory to be used for target location. Default ./
@@ -422,4 +423,3 @@ def emit_assembly_core_fsharp(
     )
 
     return new_library
-
