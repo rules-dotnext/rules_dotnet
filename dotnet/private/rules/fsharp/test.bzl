@@ -6,6 +6,9 @@ load("@io_bazel_rules_dotnet//dotnet/private:rules/versions.bzl", "parse_version
 load("@io_bazel_rules_dotnet//dotnet/private:rules/common.bzl", "wrap_binary")
 
 def _unit_test(ctx):
+    if not ctx.label.name.endswith(".exe") and not ctx.label.name.endswith(".dll"):
+        fail("All fsharp_xunit_test/fsharp_nunit3_test targets must have their extension declared in their name (.dll or .exe)")
+
     dotnet = dotnet_context(ctx, "fsharp")
     name = ctx.label.name
     subdir = name + "/"

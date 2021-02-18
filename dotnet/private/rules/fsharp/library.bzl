@@ -11,6 +11,9 @@ load("@io_bazel_rules_dotnet//dotnet/private:rules/versions.bzl", "parse_version
 
 def _library_impl(ctx):
     """_library_impl emits actions for compiling dotnet executable assembly."""
+    if not ctx.label.name.endswith(".exe") and not ctx.label.name.endswith(".dll"):
+        fail("All fsharp_library targets must have their extension declared in their name (.dll or .exe)")
+
     dotnet = dotnet_context(ctx, "fsharp")
     name = ctx.label.name
 
