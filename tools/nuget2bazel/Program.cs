@@ -7,16 +7,16 @@ using nuget2bazel.rules;
 
 namespace nuget2bazel
 {
-    class Program
+    internal class Program
     {
-        static async Task Main(string[] args)
+        private static async Task Main(string[] args)
         {
             var parsed = Parser.Default.ParseArguments<AddVerb, DeleteVerb, SyncVerb, UpdateVerb, RulesVerb>(args);
             var result = await parsed.MapResult<AddVerb, DeleteVerb, SyncVerb, UpdateVerb, RulesVerb, Task<int>>(
                 async (AddVerb opts) =>
                 {
                     var prjConfig = new ProjectBazelConfig(opts);
-                    await new AddCommand().Do(prjConfig, opts.Package, opts.Version, opts.MainFile, opts.SkipSha256, opts.Lowest, opts.Variable);
+                    await new AddCommand().Do(prjConfig, opts.Package, opts.Version, opts.MainFile, opts.SkipSha256, opts.Lowest, opts.CustomTargetName);
                     return 0;
                 },
                 async (DeleteVerb opts) =>
@@ -34,7 +34,7 @@ namespace nuget2bazel
                 async (UpdateVerb opts) =>
                 {
                     var prjConfig = new ProjectBazelConfig(opts);
-                    await new UpdateCommand().Do(prjConfig, opts.Package, opts.Version, opts.MainFile, opts.SkipSha256, opts.Lowest, opts.Variable);
+                    await new UpdateCommand().Do(prjConfig, opts.Package, opts.Version, opts.MainFile, opts.SkipSha256, opts.Lowest, opts.CustomTargetName);
                     return 0;
                 },
                 async (RulesVerb opts) =>
