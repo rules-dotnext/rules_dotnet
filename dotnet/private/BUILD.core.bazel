@@ -46,7 +46,7 @@ filegroup(
         "@bazel_tools//src/conditions:windows": ["core/dotnet.exe"],
         "//conditions:default": ["core/dotnet"],
     }),
-    data = glob(["core/host/**/*"]),
+    data = glob(["core/host/**/*", "core/shared/Microsoft.NETCore.App/**/*"]),
 )
 
 #filegroup(
