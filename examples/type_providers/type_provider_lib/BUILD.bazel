@@ -1,0 +1,22 @@
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "fsharp_library")
+
+exports_files(
+    ["foo.json"],
+    visibility = ["//:__subpackages__"],
+)
+
+fsharp_library(
+    name = "lib.dll",
+    srcs = [
+        "Lib.fs",
+    ],
+    design_time_resources = [
+        "foo.json",
+    ],
+    visibility = ["//:__subpackages__"],
+    deps = [
+        "@FSharp.Data//:FSharp.Data.DesignTime.dll",
+        "@FSharp.Data//:FSharp.Data.dll",
+        "@core_sdk_stdlib//:libraryset",
+    ],
+)
