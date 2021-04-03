@@ -1,6 +1,6 @@
 "Provides nugets used by rules themselves"
 
-load("@io_bazel_rules_dotnet//dotnet/private:rules/nuget.bzl", "nuget_package")
+load("@io_bazel_rules_dotnet//dotnet/private:rules/nuget.bzl", "nuget_package")  # @unused
 
 def dotnet_repositories_nuget():
     """Registers repositories used by rules_dotnet itself."""
@@ -32,6 +32,9 @@ def dotnet_repositories_nuget():
             ],
             "netcoreapp3.1": [
                 "@microsoft.netcore.platforms//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@microsoft.netcore.platforms//:net5.0_core",
             ],
         },
         core_files = {
@@ -504,6 +507,123 @@ def dotnet_repositories_nuget():
                 "build/netstandard2.0/ref/System.Xml.XPath.XDocument.dll",
             ],
             "netcoreapp3.1": [
+                "build/netstandard2.0/NETStandard.Library.targets",
+                "build/netstandard2.0/ref/Microsoft.Win32.Primitives.dll",
+                "build/netstandard2.0/ref/mscorlib.dll",
+                "build/netstandard2.0/ref/netstandard.dll",
+                "build/netstandard2.0/ref/netstandard.xml",
+                "build/netstandard2.0/ref/System.AppContext.dll",
+                "build/netstandard2.0/ref/System.Collections.Concurrent.dll",
+                "build/netstandard2.0/ref/System.Collections.dll",
+                "build/netstandard2.0/ref/System.Collections.NonGeneric.dll",
+                "build/netstandard2.0/ref/System.Collections.Specialized.dll",
+                "build/netstandard2.0/ref/System.ComponentModel.Composition.dll",
+                "build/netstandard2.0/ref/System.ComponentModel.dll",
+                "build/netstandard2.0/ref/System.ComponentModel.EventBasedAsync.dll",
+                "build/netstandard2.0/ref/System.ComponentModel.Primitives.dll",
+                "build/netstandard2.0/ref/System.ComponentModel.TypeConverter.dll",
+                "build/netstandard2.0/ref/System.Console.dll",
+                "build/netstandard2.0/ref/System.Core.dll",
+                "build/netstandard2.0/ref/System.Data.Common.dll",
+                "build/netstandard2.0/ref/System.Data.dll",
+                "build/netstandard2.0/ref/System.Diagnostics.Contracts.dll",
+                "build/netstandard2.0/ref/System.Diagnostics.Debug.dll",
+                "build/netstandard2.0/ref/System.Diagnostics.FileVersionInfo.dll",
+                "build/netstandard2.0/ref/System.Diagnostics.Process.dll",
+                "build/netstandard2.0/ref/System.Diagnostics.StackTrace.dll",
+                "build/netstandard2.0/ref/System.Diagnostics.TextWriterTraceListener.dll",
+                "build/netstandard2.0/ref/System.Diagnostics.Tools.dll",
+                "build/netstandard2.0/ref/System.Diagnostics.TraceSource.dll",
+                "build/netstandard2.0/ref/System.Diagnostics.Tracing.dll",
+                "build/netstandard2.0/ref/System.dll",
+                "build/netstandard2.0/ref/System.Drawing.dll",
+                "build/netstandard2.0/ref/System.Drawing.Primitives.dll",
+                "build/netstandard2.0/ref/System.Dynamic.Runtime.dll",
+                "build/netstandard2.0/ref/System.Globalization.Calendars.dll",
+                "build/netstandard2.0/ref/System.Globalization.dll",
+                "build/netstandard2.0/ref/System.Globalization.Extensions.dll",
+                "build/netstandard2.0/ref/System.IO.Compression.dll",
+                "build/netstandard2.0/ref/System.IO.Compression.FileSystem.dll",
+                "build/netstandard2.0/ref/System.IO.Compression.ZipFile.dll",
+                "build/netstandard2.0/ref/System.IO.dll",
+                "build/netstandard2.0/ref/System.IO.FileSystem.dll",
+                "build/netstandard2.0/ref/System.IO.FileSystem.DriveInfo.dll",
+                "build/netstandard2.0/ref/System.IO.FileSystem.Primitives.dll",
+                "build/netstandard2.0/ref/System.IO.FileSystem.Watcher.dll",
+                "build/netstandard2.0/ref/System.IO.IsolatedStorage.dll",
+                "build/netstandard2.0/ref/System.IO.MemoryMappedFiles.dll",
+                "build/netstandard2.0/ref/System.IO.Pipes.dll",
+                "build/netstandard2.0/ref/System.IO.UnmanagedMemoryStream.dll",
+                "build/netstandard2.0/ref/System.Linq.dll",
+                "build/netstandard2.0/ref/System.Linq.Expressions.dll",
+                "build/netstandard2.0/ref/System.Linq.Parallel.dll",
+                "build/netstandard2.0/ref/System.Linq.Queryable.dll",
+                "build/netstandard2.0/ref/System.Net.dll",
+                "build/netstandard2.0/ref/System.Net.Http.dll",
+                "build/netstandard2.0/ref/System.Net.NameResolution.dll",
+                "build/netstandard2.0/ref/System.Net.NetworkInformation.dll",
+                "build/netstandard2.0/ref/System.Net.Ping.dll",
+                "build/netstandard2.0/ref/System.Net.Primitives.dll",
+                "build/netstandard2.0/ref/System.Net.Requests.dll",
+                "build/netstandard2.0/ref/System.Net.Security.dll",
+                "build/netstandard2.0/ref/System.Net.Sockets.dll",
+                "build/netstandard2.0/ref/System.Net.WebHeaderCollection.dll",
+                "build/netstandard2.0/ref/System.Net.WebSockets.Client.dll",
+                "build/netstandard2.0/ref/System.Net.WebSockets.dll",
+                "build/netstandard2.0/ref/System.Numerics.dll",
+                "build/netstandard2.0/ref/System.ObjectModel.dll",
+                "build/netstandard2.0/ref/System.Reflection.dll",
+                "build/netstandard2.0/ref/System.Reflection.Extensions.dll",
+                "build/netstandard2.0/ref/System.Reflection.Primitives.dll",
+                "build/netstandard2.0/ref/System.Resources.Reader.dll",
+                "build/netstandard2.0/ref/System.Resources.ResourceManager.dll",
+                "build/netstandard2.0/ref/System.Resources.Writer.dll",
+                "build/netstandard2.0/ref/System.Runtime.CompilerServices.VisualC.dll",
+                "build/netstandard2.0/ref/System.Runtime.dll",
+                "build/netstandard2.0/ref/System.Runtime.Extensions.dll",
+                "build/netstandard2.0/ref/System.Runtime.Handles.dll",
+                "build/netstandard2.0/ref/System.Runtime.InteropServices.dll",
+                "build/netstandard2.0/ref/System.Runtime.InteropServices.RuntimeInformation.dll",
+                "build/netstandard2.0/ref/System.Runtime.Numerics.dll",
+                "build/netstandard2.0/ref/System.Runtime.Serialization.dll",
+                "build/netstandard2.0/ref/System.Runtime.Serialization.Formatters.dll",
+                "build/netstandard2.0/ref/System.Runtime.Serialization.Json.dll",
+                "build/netstandard2.0/ref/System.Runtime.Serialization.Primitives.dll",
+                "build/netstandard2.0/ref/System.Runtime.Serialization.Xml.dll",
+                "build/netstandard2.0/ref/System.Security.Claims.dll",
+                "build/netstandard2.0/ref/System.Security.Cryptography.Algorithms.dll",
+                "build/netstandard2.0/ref/System.Security.Cryptography.Csp.dll",
+                "build/netstandard2.0/ref/System.Security.Cryptography.Encoding.dll",
+                "build/netstandard2.0/ref/System.Security.Cryptography.Primitives.dll",
+                "build/netstandard2.0/ref/System.Security.Cryptography.X509Certificates.dll",
+                "build/netstandard2.0/ref/System.Security.Principal.dll",
+                "build/netstandard2.0/ref/System.Security.SecureString.dll",
+                "build/netstandard2.0/ref/System.ServiceModel.Web.dll",
+                "build/netstandard2.0/ref/System.Text.Encoding.dll",
+                "build/netstandard2.0/ref/System.Text.Encoding.Extensions.dll",
+                "build/netstandard2.0/ref/System.Text.RegularExpressions.dll",
+                "build/netstandard2.0/ref/System.Threading.dll",
+                "build/netstandard2.0/ref/System.Threading.Overlapped.dll",
+                "build/netstandard2.0/ref/System.Threading.Tasks.dll",
+                "build/netstandard2.0/ref/System.Threading.Tasks.Parallel.dll",
+                "build/netstandard2.0/ref/System.Threading.Thread.dll",
+                "build/netstandard2.0/ref/System.Threading.ThreadPool.dll",
+                "build/netstandard2.0/ref/System.Threading.Timer.dll",
+                "build/netstandard2.0/ref/System.Transactions.dll",
+                "build/netstandard2.0/ref/System.ValueTuple.dll",
+                "build/netstandard2.0/ref/System.Web.dll",
+                "build/netstandard2.0/ref/System.Windows.dll",
+                "build/netstandard2.0/ref/System.Xml.dll",
+                "build/netstandard2.0/ref/System.Xml.Linq.dll",
+                "build/netstandard2.0/ref/System.Xml.ReaderWriter.dll",
+                "build/netstandard2.0/ref/System.Xml.Serialization.dll",
+                "build/netstandard2.0/ref/System.Xml.XDocument.dll",
+                "build/netstandard2.0/ref/System.Xml.XmlDocument.dll",
+                "build/netstandard2.0/ref/System.Xml.XmlSerializer.dll",
+                "build/netstandard2.0/ref/System.Xml.XPath.dll",
+                "build/netstandard2.0/ref/System.Xml.XPath.XDocument.dll",
+            ],
+            "net5.0": [
                 "build/netstandard2.0/NETStandard.Library.targets",
                 "build/netstandard2.0/ref/Microsoft.Win32.Primitives.dll",
                 "build/netstandard2.0/ref/mscorlib.dll",
@@ -633,6 +753,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard2.0/nunit.framework.dll",
             "netcoreapp3.0": "lib/netstandard2.0/nunit.framework.dll",
             "netcoreapp3.1": "lib/netstandard2.0/nunit.framework.dll",
+            "net5.0": "lib/netstandard2.0/nunit.framework.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
@@ -649,6 +770,9 @@ def dotnet_repositories_nuget():
             ],
             "netcoreapp3.1": [
                 "@netstandard.library//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@netstandard.library//:net5.0_core",
             ],
         },
         core_files = {
@@ -677,6 +801,12 @@ def dotnet_repositories_nuget():
                 "build/NUnit.props",
             ],
             "netcoreapp3.1": [
+                "lib/netstandard2.0/nunit.framework.dll",
+                "lib/netstandard2.0/nunit.framework.pdb",
+                "lib/netstandard2.0/nunit.framework.xml",
+                "build/NUnit.props",
+            ],
+            "net5.0": [
                 "lib/netstandard2.0/nunit.framework.dll",
                 "lib/netstandard2.0/nunit.framework.pdb",
                 "lib/netstandard2.0/nunit.framework.xml",
@@ -695,6 +825,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "tools/nunit3-console.exe",
             "netcoreapp3.0": "tools/nunit3-console.exe",
             "netcoreapp3.1": "tools/nunit3-console.exe",
+            "net5.0": "tools/nunit3-console.exe",
         },
         core_files = {
             "netcoreapp2.0": [
@@ -754,6 +885,20 @@ def dotnet_repositories_nuget():
                 "tools/nunit3-console.exe.config",
             ],
             "netcoreapp3.1": [
+                "tools/Mono.Cecil.dll",
+                "tools/nunit-agent-x86.exe",
+                "tools/nunit-agent-x86.exe.config",
+                "tools/nunit-agent.exe",
+                "tools/nunit-agent.exe.config",
+                "tools/nunit.console.nuget.addins",
+                "tools/nunit.engine.api.dll",
+                "tools/nunit.engine.api.xml",
+                "tools/nunit.engine.core.dll",
+                "tools/nunit.engine.dll",
+                "tools/nunit3-console.exe",
+                "tools/nunit3-console.exe.config",
+            ],
+            "net5.0": [
                 "tools/Mono.Cecil.dll",
                 "tools/nunit-agent-x86.exe",
                 "tools/nunit-agent-x86.exe.config",
@@ -780,6 +925,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.dll",
             "netcoreapp3.0": "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.dll",
             "netcoreapp3.1": "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.dll",
+            "net5.0": "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.dll",
         },
         core_files = {
             "netcoreapp2.0": [
@@ -799,6 +945,10 @@ def dotnet_repositories_nuget():
                 "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.xml",
             ],
             "netcoreapp3.1": [
+                "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.dll",
+                "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.xml",
+            ],
+            "net5.0": [
                 "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.dll",
                 "lib/netstandard2.0/Microsoft.Extensions.FileSystemGlobbing.xml",
             ],
@@ -815,6 +965,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard1.0/Newtonsoft.Json.dll",
             "netcoreapp3.0": "lib/netstandard1.0/Newtonsoft.Json.dll",
             "netcoreapp3.1": "lib/netstandard1.0/Newtonsoft.Json.dll",
+            "net5.0": "lib/netstandard1.0/Newtonsoft.Json.dll",
         },
         core_files = {
             "netcoreapp2.0": [
@@ -838,6 +989,11 @@ def dotnet_repositories_nuget():
                 "tools/install.ps1",
             ],
             "netcoreapp3.1": [
+                "lib/netstandard1.0/Newtonsoft.Json.dll",
+                "lib/netstandard1.0/Newtonsoft.Json.xml",
+                "tools/install.ps1",
+            ],
+            "net5.0": [
                 "lib/netstandard1.0/Newtonsoft.Json.dll",
                 "lib/netstandard1.0/Newtonsoft.Json.xml",
                 "tools/install.ps1",
@@ -855,6 +1011,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
             "netcoreapp3.0": "lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
             "netcoreapp3.1": "lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
+            "net5.0": "lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
         },
         core_ref = {
             "netcoreapp2.0": "ref/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
@@ -862,6 +1019,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "ref/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
             "netcoreapp3.0": "ref/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
             "netcoreapp3.1": "ref/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
+            "net5.0": "ref/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
         },
         core_files = {
             "netcoreapp2.0": [
@@ -885,6 +1043,11 @@ def dotnet_repositories_nuget():
                 "runtimes/unix/lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
             ],
             "netcoreapp3.1": [
+                "lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
+                "runtimes/aot/lib/netcore50/System.Runtime.InteropServices.RuntimeInformation.dll",
+                "runtimes/unix/lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
+            ],
+            "net5.0": [
                 "lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
                 "runtimes/aot/lib/netcore50/System.Runtime.InteropServices.RuntimeInformation.dll",
                 "runtimes/unix/lib/netstandard1.1/System.Runtime.InteropServices.RuntimeInformation.dll",
@@ -902,6 +1065,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard2.0/Microsoft.Extensions.DependencyModel.dll",
             "netcoreapp3.0": "lib/netstandard2.0/Microsoft.Extensions.DependencyModel.dll",
             "netcoreapp3.1": "lib/netstandard2.0/Microsoft.Extensions.DependencyModel.dll",
+            "net5.0": "lib/netstandard2.0/Microsoft.Extensions.DependencyModel.dll",
         },
         core_files = {
             "netcoreapp2.0": [
@@ -921,6 +1085,10 @@ def dotnet_repositories_nuget():
                 "lib/netstandard2.0/Microsoft.Extensions.DependencyModel.xml",
             ],
             "netcoreapp3.1": [
+                "lib/netstandard2.0/Microsoft.Extensions.DependencyModel.dll",
+                "lib/netstandard2.0/Microsoft.Extensions.DependencyModel.xml",
+            ],
+            "net5.0": [
                 "lib/netstandard2.0/Microsoft.Extensions.DependencyModel.dll",
                 "lib/netstandard2.0/Microsoft.Extensions.DependencyModel.xml",
             ],
@@ -937,6 +1105,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "tools/netcoreapp2.0/xunit.console.dll",
             "netcoreapp3.0": "tools/netcoreapp2.0/xunit.console.dll",
             "netcoreapp3.1": "tools/netcoreapp2.0/xunit.console.dll",
+            "net5.0": "tools/netcoreapp2.0/xunit.console.dll",
         },
         core_files = {
             "netcoreapp2.0": [
@@ -984,6 +1153,17 @@ def dotnet_repositories_nuget():
                 "build/xunit.runner.console.props",
             ],
             "netcoreapp3.1": [
+                "tools/netcoreapp2.0/xunit.abstractions.dll",
+                "tools/netcoreapp2.0/xunit.console.deps.json",
+                "tools/netcoreapp2.0/xunit.console.dll",
+                "tools/netcoreapp2.0/xunit.console.dll.config",
+                "tools/netcoreapp2.0/xunit.console.runtimeconfig.json",
+                "tools/netcoreapp2.0/xunit.runner.reporters.netcoreapp10.dll",
+                "tools/netcoreapp2.0/xunit.runner.utility.netcoreapp10.dll",
+                "tools/netcoreapp2.0/xunit.runner.utility.netcoreapp10.xml",
+                "build/xunit.runner.console.props",
+            ],
+            "net5.0": [
                 "tools/netcoreapp2.0/xunit.abstractions.dll",
                 "tools/netcoreapp2.0/xunit.console.deps.json",
                 "tools/netcoreapp2.0/xunit.console.dll",
@@ -1007,6 +1187,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard1.1/xunit.assert.dll",
             "netcoreapp3.0": "lib/netstandard1.1/xunit.assert.dll",
             "netcoreapp3.1": "lib/netstandard1.1/xunit.assert.dll",
+            "net5.0": "lib/netstandard1.1/xunit.assert.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
@@ -1024,6 +1205,9 @@ def dotnet_repositories_nuget():
             "netcoreapp3.1": [
                 "@netstandard.library//:netcoreapp3.1_core",
             ],
+            "net5.0": [
+                "@netstandard.library//:net5.0_core",
+            ],
         },
         core_files = {
             "netcoreapp2.0": [
@@ -1043,6 +1227,10 @@ def dotnet_repositories_nuget():
                 "lib/netstandard1.1/xunit.assert.xml",
             ],
             "netcoreapp3.1": [
+                "lib/netstandard1.1/xunit.assert.dll",
+                "lib/netstandard1.1/xunit.assert.xml",
+            ],
+            "net5.0": [
                 "lib/netstandard1.1/xunit.assert.dll",
                 "lib/netstandard1.1/xunit.assert.xml",
             ],
@@ -1059,6 +1247,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard2.0/xunit.abstractions.dll",
             "netcoreapp3.0": "lib/netstandard2.0/xunit.abstractions.dll",
             "netcoreapp3.1": "lib/netstandard2.0/xunit.abstractions.dll",
+            "net5.0": "lib/netstandard2.0/xunit.abstractions.dll",
         },
         core_files = {
             "netcoreapp2.0": [
@@ -1078,6 +1267,10 @@ def dotnet_repositories_nuget():
                 "lib/netstandard2.0/xunit.abstractions.xml",
             ],
             "netcoreapp3.1": [
+                "lib/netstandard2.0/xunit.abstractions.dll",
+                "lib/netstandard2.0/xunit.abstractions.xml",
+            ],
+            "net5.0": [
                 "lib/netstandard2.0/xunit.abstractions.dll",
                 "lib/netstandard2.0/xunit.abstractions.xml",
             ],
@@ -1109,6 +1302,10 @@ def dotnet_repositories_nuget():
                 "tools/install.ps1",
                 "tools/uninstall.ps1",
             ],
+            "net5.0": [
+                "tools/install.ps1",
+                "tools/uninstall.ps1",
+            ],
         },
     )
     nuget_package(
@@ -1122,6 +1319,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard1.1/xunit.core.dll",
             "netcoreapp3.0": "lib/netstandard1.1/xunit.core.dll",
             "netcoreapp3.1": "lib/netstandard1.1/xunit.core.dll",
+            "net5.0": "lib/netstandard1.1/xunit.core.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
@@ -1144,6 +1342,10 @@ def dotnet_repositories_nuget():
                 "@netstandard.library//:netcoreapp3.1_core",
                 "@xunit.abstractions//:netcoreapp3.1_core",
             ],
+            "net5.0": [
+                "@netstandard.library//:net5.0_core",
+                "@xunit.abstractions//:net5.0_core",
+            ],
         },
         core_files = {
             "netcoreapp2.0": [
@@ -1166,6 +1368,10 @@ def dotnet_repositories_nuget():
                 "lib/netstandard1.1/xunit.core.dll",
                 "lib/netstandard1.1/xunit.core.xml",
             ],
+            "net5.0": [
+                "lib/netstandard1.1/xunit.core.dll",
+                "lib/netstandard1.1/xunit.core.xml",
+            ],
         },
     )
     nuget_package(
@@ -1179,6 +1385,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard1.1/xunit.execution.dotnet.dll",
             "netcoreapp3.0": "lib/netstandard1.1/xunit.execution.dotnet.dll",
             "netcoreapp3.1": "lib/netstandard1.1/xunit.execution.dotnet.dll",
+            "net5.0": "lib/netstandard1.1/xunit.execution.dotnet.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
@@ -1201,6 +1408,10 @@ def dotnet_repositories_nuget():
                 "@netstandard.library//:netcoreapp3.1_core",
                 "@xunit.extensibility.core//:netcoreapp3.1_core",
             ],
+            "net5.0": [
+                "@netstandard.library//:net5.0_core",
+                "@xunit.extensibility.core//:net5.0_core",
+            ],
         },
         core_files = {
             "netcoreapp2.0": [
@@ -1220,6 +1431,10 @@ def dotnet_repositories_nuget():
                 "lib/netstandard1.1/xunit.execution.dotnet.xml",
             ],
             "netcoreapp3.1": [
+                "lib/netstandard1.1/xunit.execution.dotnet.dll",
+                "lib/netstandard1.1/xunit.execution.dotnet.xml",
+            ],
+            "net5.0": [
                 "lib/netstandard1.1/xunit.execution.dotnet.dll",
                 "lib/netstandard1.1/xunit.execution.dotnet.xml",
             ],
@@ -1251,6 +1466,10 @@ def dotnet_repositories_nuget():
                 "@xunit.extensibility.core//:netcoreapp3.1_core",
                 "@xunit.extensibility.execution//:netcoreapp3.1_core",
             ],
+            "net5.0": [
+                "@xunit.extensibility.core//:net5.0_core",
+                "@xunit.extensibility.execution//:net5.0_core",
+            ],
         },
         core_files = {
             "netcoreapp2.0": [
@@ -1270,6 +1489,10 @@ def dotnet_repositories_nuget():
                 "build/xunit.core.targets",
             ],
             "netcoreapp3.1": [
+                "build/xunit.core.props",
+                "build/xunit.core.targets",
+            ],
+            "net5.0": [
                 "build/xunit.core.props",
                 "build/xunit.core.targets",
             ],
@@ -1306,828 +1529,886 @@ def dotnet_repositories_nuget():
                 "@xunit.assert//:netcoreapp3.1_core",
                 "@xunit.analyzers//:netcoreapp3.1_core",
             ],
+            "net5.0": [
+                "@xunit.core//:net5.0_core",
+                "@xunit.assert//:net5.0_core",
+                "@xunit.analyzers//:net5.0_core",
+            ],
+        },
+    )
+    nuget_package(
+        name = "microsoft.web.xdt",
+        package = "microsoft.web.xdt",
+        version = "3.0.0",
+        sha256 = "161152cd56e0b6d602b6ba9470854537654a184cf52790c8f08cd107817371a1",
+        core_lib = {
+            "netcoreapp2.0": "lib/netstandard2.0/Microsoft.Web.XmlTransform.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/Microsoft.Web.XmlTransform.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/Microsoft.Web.XmlTransform.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/Microsoft.Web.XmlTransform.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/Microsoft.Web.XmlTransform.dll",
+            "net5.0": "lib/netstandard2.0/Microsoft.Web.XmlTransform.dll",
+        },
+        core_files = {
+            "netcoreapp2.0": [
+                "lib/netstandard2.0/Microsoft.Web.XmlTransform.dll",
+                "lib/netstandard2.0/Microsoft.Web.XmlTransform.pdb",
+            ],
+            "netcoreapp2.1": [
+                "lib/netstandard2.0/Microsoft.Web.XmlTransform.dll",
+                "lib/netstandard2.0/Microsoft.Web.XmlTransform.pdb",
+            ],
+            "netcoreapp2.2": [
+                "lib/netstandard2.0/Microsoft.Web.XmlTransform.dll",
+                "lib/netstandard2.0/Microsoft.Web.XmlTransform.pdb",
+            ],
+            "netcoreapp3.0": [
+                "lib/netstandard2.0/Microsoft.Web.XmlTransform.dll",
+                "lib/netstandard2.0/Microsoft.Web.XmlTransform.pdb",
+            ],
+            "netcoreapp3.1": [
+                "lib/netstandard2.0/Microsoft.Web.XmlTransform.dll",
+                "lib/netstandard2.0/Microsoft.Web.XmlTransform.pdb",
+            ],
+            "net5.0": [
+                "lib/netstandard2.0/Microsoft.Web.XmlTransform.dll",
+                "lib/netstandard2.0/Microsoft.Web.XmlTransform.pdb",
+            ],
         },
     )
     nuget_package(
         name = "nuget.frameworks",
         package = "nuget.frameworks",
-        version = "4.9.2",
-        sha256 = "e461391653e748cfcb72f8dbf81ae0c7dba87ce3a66d8668a4be0245986ff6de",
+        version = "5.9.0",
+        sha256 = "91011f1498904d5c349ea1d63b4b1714d56ae8b4ad850c56d90ed2b72b583325",
         core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.Frameworks.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.Frameworks.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.Frameworks.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.Frameworks.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.Frameworks.dll",
-        },
-        core_deps = {
-            "netcoreapp2.0": [
-                "@netstandard.library//:netcoreapp2.0_core",
-            ],
-            "netcoreapp2.1": [
-                "@netstandard.library//:netcoreapp2.1_core",
-            ],
-            "netcoreapp2.2": [
-                "@netstandard.library//:netcoreapp2.2_core",
-            ],
-            "netcoreapp3.0": [
-                "@netstandard.library//:netcoreapp3.0_core",
-            ],
-            "netcoreapp3.1": [
-                "@netstandard.library//:netcoreapp3.1_core",
-            ],
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.Frameworks.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.Frameworks.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.Frameworks.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.Frameworks.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.Frameworks.dll",
+            "net5.0": "lib/netstandard2.0/NuGet.Frameworks.dll",
         },
         core_files = {
             "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.Frameworks.dll",
-                "lib/netstandard1.6/NuGet.Frameworks.xml",
+                "lib/netstandard2.0/NuGet.Frameworks.dll",
+                "lib/netstandard2.0/NuGet.Frameworks.xml",
             ],
             "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.Frameworks.dll",
-                "lib/netstandard1.6/NuGet.Frameworks.xml",
+                "lib/netstandard2.0/NuGet.Frameworks.dll",
+                "lib/netstandard2.0/NuGet.Frameworks.xml",
             ],
             "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.Frameworks.dll",
-                "lib/netstandard1.6/NuGet.Frameworks.xml",
+                "lib/netstandard2.0/NuGet.Frameworks.dll",
+                "lib/netstandard2.0/NuGet.Frameworks.xml",
             ],
             "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.Frameworks.dll",
-                "lib/netstandard1.6/NuGet.Frameworks.xml",
+                "lib/netstandard2.0/NuGet.Frameworks.dll",
+                "lib/netstandard2.0/NuGet.Frameworks.xml",
             ],
             "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.Frameworks.dll",
-                "lib/netstandard1.6/NuGet.Frameworks.xml",
+                "lib/netstandard2.0/NuGet.Frameworks.dll",
+                "lib/netstandard2.0/NuGet.Frameworks.xml",
+            ],
+            "net5.0": [
+                "lib/netstandard2.0/NuGet.Frameworks.dll",
+                "lib/netstandard2.0/NuGet.Frameworks.xml",
             ],
         },
     )
     nuget_package(
         name = "nuget.common",
         package = "nuget.common",
-        version = "4.9.2",
-        sha256 = "001e8aaae2c07f4914735895b5106ebedc372b2b70dd9fa583f4ee59e943bae8",
+        version = "5.9.0",
+        sha256 = "8917c99e4d39d1037269297caa68f103eea73fc7ee23783210896bfd329a13c8",
         core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.Common.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.Common.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.Common.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.Common.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.Common.dll",
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.Common.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.Common.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.Common.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.Common.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.Common.dll",
+            "net5.0": "lib/netstandard2.0/NuGet.Common.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
                 "@nuget.frameworks//:netcoreapp2.0_core",
-                "@netstandard.library//:netcoreapp2.0_core",
             ],
             "netcoreapp2.1": [
                 "@nuget.frameworks//:netcoreapp2.1_core",
-                "@netstandard.library//:netcoreapp2.1_core",
             ],
             "netcoreapp2.2": [
                 "@nuget.frameworks//:netcoreapp2.2_core",
-                "@netstandard.library//:netcoreapp2.2_core",
             ],
             "netcoreapp3.0": [
                 "@nuget.frameworks//:netcoreapp3.0_core",
-                "@netstandard.library//:netcoreapp3.0_core",
             ],
             "netcoreapp3.1": [
                 "@nuget.frameworks//:netcoreapp3.1_core",
-                "@netstandard.library//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@nuget.frameworks//:net5.0_core",
             ],
         },
         core_files = {
             "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.Common.dll",
-                "lib/netstandard1.6/NuGet.Common.xml",
+                "lib/netstandard2.0/NuGet.Common.dll",
+                "lib/netstandard2.0/NuGet.Common.xml",
             ],
             "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.Common.dll",
-                "lib/netstandard1.6/NuGet.Common.xml",
+                "lib/netstandard2.0/NuGet.Common.dll",
+                "lib/netstandard2.0/NuGet.Common.xml",
             ],
             "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.Common.dll",
-                "lib/netstandard1.6/NuGet.Common.xml",
+                "lib/netstandard2.0/NuGet.Common.dll",
+                "lib/netstandard2.0/NuGet.Common.xml",
             ],
             "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.Common.dll",
-                "lib/netstandard1.6/NuGet.Common.xml",
+                "lib/netstandard2.0/NuGet.Common.dll",
+                "lib/netstandard2.0/NuGet.Common.xml",
             ],
             "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.Common.dll",
-                "lib/netstandard1.6/NuGet.Common.xml",
+                "lib/netstandard2.0/NuGet.Common.dll",
+                "lib/netstandard2.0/NuGet.Common.xml",
+            ],
+            "net5.0": [
+                "lib/netstandard2.0/NuGet.Common.dll",
+                "lib/netstandard2.0/NuGet.Common.xml",
             ],
         },
     )
     nuget_package(
         name = "nuget.configuration",
         package = "nuget.configuration",
-        version = "4.9.2",
-        sha256 = "103fd9eab88ececa0190b041c3ae6eaf470929280a35c7f444ffd6ad6b0328b6",
+        version = "5.9.0",
+        sha256 = "a9e7acf8752ee5c9cb7c670c1c4e48a371b3e130fac6a3b02df8c18da993989b",
         core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.Configuration.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.Configuration.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.Configuration.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.Configuration.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.Configuration.dll",
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.Configuration.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.Configuration.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.Configuration.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.Configuration.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.Configuration.dll",
+            "net5.0": "lib/netstandard2.0/NuGet.Configuration.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
                 "@nuget.common//:netcoreapp2.0_core",
-                "@netstandard.library//:netcoreapp2.0_core",
             ],
             "netcoreapp2.1": [
                 "@nuget.common//:netcoreapp2.1_core",
-                "@netstandard.library//:netcoreapp2.1_core",
             ],
             "netcoreapp2.2": [
                 "@nuget.common//:netcoreapp2.2_core",
-                "@netstandard.library//:netcoreapp2.2_core",
             ],
             "netcoreapp3.0": [
                 "@nuget.common//:netcoreapp3.0_core",
-                "@netstandard.library//:netcoreapp3.0_core",
             ],
             "netcoreapp3.1": [
                 "@nuget.common//:netcoreapp3.1_core",
-                "@netstandard.library//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@nuget.common//:net5.0_core",
             ],
         },
         core_files = {
             "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.Configuration.dll",
-                "lib/netstandard1.6/NuGet.Configuration.xml",
+                "lib/netstandard2.0/NuGet.Configuration.dll",
+                "lib/netstandard2.0/NuGet.Configuration.xml",
             ],
             "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.Configuration.dll",
-                "lib/netstandard1.6/NuGet.Configuration.xml",
+                "lib/netstandard2.0/NuGet.Configuration.dll",
+                "lib/netstandard2.0/NuGet.Configuration.xml",
             ],
             "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.Configuration.dll",
-                "lib/netstandard1.6/NuGet.Configuration.xml",
+                "lib/netstandard2.0/NuGet.Configuration.dll",
+                "lib/netstandard2.0/NuGet.Configuration.xml",
             ],
             "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.Configuration.dll",
-                "lib/netstandard1.6/NuGet.Configuration.xml",
+                "lib/netstandard2.0/NuGet.Configuration.dll",
+                "lib/netstandard2.0/NuGet.Configuration.xml",
             ],
             "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.Configuration.dll",
-                "lib/netstandard1.6/NuGet.Configuration.xml",
+                "lib/netstandard2.0/NuGet.Configuration.dll",
+                "lib/netstandard2.0/NuGet.Configuration.xml",
+            ],
+            "net5.0": [
+                "lib/netstandard2.0/NuGet.Configuration.dll",
+                "lib/netstandard2.0/NuGet.Configuration.xml",
             ],
         },
     )
     nuget_package(
         name = "nuget.versioning",
         package = "nuget.versioning",
-        version = "4.9.2",
-        sha256 = "10bae2c865a86ba5a955e32b886f7626f1a0af1959ff9d9d9ff010d5049c7cc8",
+        version = "5.9.0",
+        sha256 = "95fcd7b2a5553c843c58a85162a59ca685d64c70338209f71885a6d16d427ee5",
         core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.Versioning.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.Versioning.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.Versioning.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.Versioning.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.Versioning.dll",
-        },
-        core_deps = {
-            "netcoreapp2.0": [
-                "@netstandard.library//:netcoreapp2.0_core",
-            ],
-            "netcoreapp2.1": [
-                "@netstandard.library//:netcoreapp2.1_core",
-            ],
-            "netcoreapp2.2": [
-                "@netstandard.library//:netcoreapp2.2_core",
-            ],
-            "netcoreapp3.0": [
-                "@netstandard.library//:netcoreapp3.0_core",
-            ],
-            "netcoreapp3.1": [
-                "@netstandard.library//:netcoreapp3.1_core",
-            ],
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.Versioning.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.Versioning.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.Versioning.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.Versioning.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.Versioning.dll",
+            "net5.0": "lib/netstandard2.0/NuGet.Versioning.dll",
         },
         core_files = {
             "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.Versioning.dll",
-                "lib/netstandard1.6/NuGet.Versioning.xml",
+                "lib/netstandard2.0/NuGet.Versioning.dll",
+                "lib/netstandard2.0/NuGet.Versioning.xml",
             ],
             "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.Versioning.dll",
-                "lib/netstandard1.6/NuGet.Versioning.xml",
+                "lib/netstandard2.0/NuGet.Versioning.dll",
+                "lib/netstandard2.0/NuGet.Versioning.xml",
             ],
             "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.Versioning.dll",
-                "lib/netstandard1.6/NuGet.Versioning.xml",
+                "lib/netstandard2.0/NuGet.Versioning.dll",
+                "lib/netstandard2.0/NuGet.Versioning.xml",
             ],
             "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.Versioning.dll",
-                "lib/netstandard1.6/NuGet.Versioning.xml",
+                "lib/netstandard2.0/NuGet.Versioning.dll",
+                "lib/netstandard2.0/NuGet.Versioning.xml",
             ],
             "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.Versioning.dll",
-                "lib/netstandard1.6/NuGet.Versioning.xml",
+                "lib/netstandard2.0/NuGet.Versioning.dll",
+                "lib/netstandard2.0/NuGet.Versioning.xml",
+            ],
+            "net5.0": [
+                "lib/netstandard2.0/NuGet.Versioning.dll",
+                "lib/netstandard2.0/NuGet.Versioning.xml",
             ],
         },
     )
     nuget_package(
         name = "nuget.librarymodel",
         package = "nuget.librarymodel",
-        version = "4.9.2",
-        sha256 = "da08ab3101ab4adc527947abb9739ad665b37084b73a2165a184cf71be0a64e0",
+        version = "5.9.0",
+        sha256 = "de41e8a675d3e3a96cb0019c05d0bc59240186d620824acfbcb981465ba9ded4",
         core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.LibraryModel.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.LibraryModel.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.LibraryModel.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.LibraryModel.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.LibraryModel.dll",
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.LibraryModel.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.LibraryModel.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.LibraryModel.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.LibraryModel.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.LibraryModel.dll",
+            "net5.0": "lib/netstandard2.0/NuGet.LibraryModel.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
                 "@nuget.common//:netcoreapp2.0_core",
                 "@nuget.versioning//:netcoreapp2.0_core",
-                "@netstandard.library//:netcoreapp2.0_core",
             ],
             "netcoreapp2.1": [
                 "@nuget.common//:netcoreapp2.1_core",
                 "@nuget.versioning//:netcoreapp2.1_core",
-                "@netstandard.library//:netcoreapp2.1_core",
             ],
             "netcoreapp2.2": [
                 "@nuget.common//:netcoreapp2.2_core",
                 "@nuget.versioning//:netcoreapp2.2_core",
-                "@netstandard.library//:netcoreapp2.2_core",
             ],
             "netcoreapp3.0": [
                 "@nuget.common//:netcoreapp3.0_core",
                 "@nuget.versioning//:netcoreapp3.0_core",
-                "@netstandard.library//:netcoreapp3.0_core",
             ],
             "netcoreapp3.1": [
                 "@nuget.common//:netcoreapp3.1_core",
                 "@nuget.versioning//:netcoreapp3.1_core",
-                "@netstandard.library//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@nuget.common//:net5.0_core",
+                "@nuget.versioning//:net5.0_core",
             ],
         },
         core_files = {
             "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.LibraryModel.dll",
-                "lib/netstandard1.6/NuGet.LibraryModel.xml",
+                "lib/netstandard2.0/NuGet.LibraryModel.dll",
+                "lib/netstandard2.0/NuGet.LibraryModel.xml",
             ],
             "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.LibraryModel.dll",
-                "lib/netstandard1.6/NuGet.LibraryModel.xml",
+                "lib/netstandard2.0/NuGet.LibraryModel.dll",
+                "lib/netstandard2.0/NuGet.LibraryModel.xml",
             ],
             "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.LibraryModel.dll",
-                "lib/netstandard1.6/NuGet.LibraryModel.xml",
+                "lib/netstandard2.0/NuGet.LibraryModel.dll",
+                "lib/netstandard2.0/NuGet.LibraryModel.xml",
             ],
             "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.LibraryModel.dll",
-                "lib/netstandard1.6/NuGet.LibraryModel.xml",
+                "lib/netstandard2.0/NuGet.LibraryModel.dll",
+                "lib/netstandard2.0/NuGet.LibraryModel.xml",
             ],
             "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.LibraryModel.dll",
-                "lib/netstandard1.6/NuGet.LibraryModel.xml",
+                "lib/netstandard2.0/NuGet.LibraryModel.dll",
+                "lib/netstandard2.0/NuGet.LibraryModel.xml",
             ],
-        },
-    )
-    nuget_package(
-        name = "nuget.packaging.core",
-        package = "nuget.packaging.core",
-        version = "4.9.2",
-        sha256 = "7e40e1692af1cf7f7d18ea52b4f396831e0e02256a95b2831233cbe3b2f8b4f3",
-        core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.Packaging.Core.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.Packaging.Core.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.Packaging.Core.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.Packaging.Core.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.Packaging.Core.dll",
-        },
-        core_deps = {
-            "netcoreapp2.0": [
-                "@nuget.common//:netcoreapp2.0_core",
-                "@nuget.versioning//:netcoreapp2.0_core",
-                "@netstandard.library//:netcoreapp2.0_core",
-            ],
-            "netcoreapp2.1": [
-                "@nuget.common//:netcoreapp2.1_core",
-                "@nuget.versioning//:netcoreapp2.1_core",
-                "@netstandard.library//:netcoreapp2.1_core",
-            ],
-            "netcoreapp2.2": [
-                "@nuget.common//:netcoreapp2.2_core",
-                "@nuget.versioning//:netcoreapp2.2_core",
-                "@netstandard.library//:netcoreapp2.2_core",
-            ],
-            "netcoreapp3.0": [
-                "@nuget.common//:netcoreapp3.0_core",
-                "@nuget.versioning//:netcoreapp3.0_core",
-                "@netstandard.library//:netcoreapp3.0_core",
-            ],
-            "netcoreapp3.1": [
-                "@nuget.common//:netcoreapp3.1_core",
-                "@nuget.versioning//:netcoreapp3.1_core",
-                "@netstandard.library//:netcoreapp3.1_core",
-            ],
-        },
-        core_files = {
-            "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.Packaging.Core.dll",
-                "lib/netstandard1.6/NuGet.Packaging.Core.xml",
-            ],
-            "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.Packaging.Core.dll",
-                "lib/netstandard1.6/NuGet.Packaging.Core.xml",
-            ],
-            "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.Packaging.Core.dll",
-                "lib/netstandard1.6/NuGet.Packaging.Core.xml",
-            ],
-            "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.Packaging.Core.dll",
-                "lib/netstandard1.6/NuGet.Packaging.Core.xml",
-            ],
-            "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.Packaging.Core.dll",
-                "lib/netstandard1.6/NuGet.Packaging.Core.xml",
+            "net5.0": [
+                "lib/netstandard2.0/NuGet.LibraryModel.dll",
+                "lib/netstandard2.0/NuGet.LibraryModel.xml",
             ],
         },
     )
     nuget_package(
         name = "nuget.packaging",
         package = "nuget.packaging",
-        version = "4.9.2",
-        sha256 = "a096e81f1a769fc0e6173cd2673e0be47974d42e6365ca513b0639e6be047ed1",
+        version = "5.9.0",
+        sha256 = "fd92e804a62247a12c5ccdfa40398f408529e46e96755505248b823d04b21a54",
         core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.Packaging.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.Packaging.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.Packaging.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.Packaging.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.Packaging.dll",
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.Packaging.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.Packaging.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.Packaging.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.Packaging.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.Packaging.dll",
+            "net5.0": "lib/net5.0/NuGet.Packaging.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
                 "@nuget.configuration//:netcoreapp2.0_core",
-                "@nuget.packaging.core//:netcoreapp2.0_core",
-                "@netstandard.library//:netcoreapp2.0_core",
+                "@nuget.versioning//:netcoreapp2.0_core",
                 "@newtonsoft.json//:netcoreapp2.0_core",
             ],
             "netcoreapp2.1": [
                 "@nuget.configuration//:netcoreapp2.1_core",
-                "@nuget.packaging.core//:netcoreapp2.1_core",
-                "@netstandard.library//:netcoreapp2.1_core",
+                "@nuget.versioning//:netcoreapp2.1_core",
                 "@newtonsoft.json//:netcoreapp2.1_core",
             ],
             "netcoreapp2.2": [
                 "@nuget.configuration//:netcoreapp2.2_core",
-                "@nuget.packaging.core//:netcoreapp2.2_core",
-                "@netstandard.library//:netcoreapp2.2_core",
+                "@nuget.versioning//:netcoreapp2.2_core",
                 "@newtonsoft.json//:netcoreapp2.2_core",
             ],
             "netcoreapp3.0": [
                 "@nuget.configuration//:netcoreapp3.0_core",
-                "@nuget.packaging.core//:netcoreapp3.0_core",
-                "@netstandard.library//:netcoreapp3.0_core",
+                "@nuget.versioning//:netcoreapp3.0_core",
                 "@newtonsoft.json//:netcoreapp3.0_core",
             ],
             "netcoreapp3.1": [
                 "@nuget.configuration//:netcoreapp3.1_core",
-                "@nuget.packaging.core//:netcoreapp3.1_core",
-                "@netstandard.library//:netcoreapp3.1_core",
+                "@nuget.versioning//:netcoreapp3.1_core",
                 "@newtonsoft.json//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@nuget.configuration//:net5.0_core",
+                "@nuget.versioning//:net5.0_core",
+                "@newtonsoft.json//:net5.0_core",
             ],
         },
         core_files = {
             "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.Packaging.dll",
-                "lib/netstandard1.6/NuGet.Packaging.xml",
+                "lib/netstandard2.0/NuGet.Packaging.dll",
+                "lib/netstandard2.0/NuGet.Packaging.xml",
             ],
             "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.Packaging.dll",
-                "lib/netstandard1.6/NuGet.Packaging.xml",
+                "lib/netstandard2.0/NuGet.Packaging.dll",
+                "lib/netstandard2.0/NuGet.Packaging.xml",
             ],
             "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.Packaging.dll",
-                "lib/netstandard1.6/NuGet.Packaging.xml",
+                "lib/netstandard2.0/NuGet.Packaging.dll",
+                "lib/netstandard2.0/NuGet.Packaging.xml",
             ],
             "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.Packaging.dll",
-                "lib/netstandard1.6/NuGet.Packaging.xml",
+                "lib/netstandard2.0/NuGet.Packaging.dll",
+                "lib/netstandard2.0/NuGet.Packaging.xml",
             ],
             "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.Packaging.dll",
-                "lib/netstandard1.6/NuGet.Packaging.xml",
+                "lib/netstandard2.0/NuGet.Packaging.dll",
+                "lib/netstandard2.0/NuGet.Packaging.xml",
+            ],
+            "net5.0": [
+                "lib/net5.0/NuGet.Packaging.dll",
+                "lib/net5.0/NuGet.Packaging.xml",
             ],
         },
     )
     nuget_package(
         name = "nuget.protocol",
         package = "nuget.protocol",
-        version = "4.9.2",
-        sha256 = "f413d9ad117c08e0805bd78d48473113062e0424cf389f8d23b835bb081937fe",
+        version = "5.9.0",
+        sha256 = "96b0cd4562e61f93481f106f4148a329dcb6f4a946f5c06bbb0bcbdb7b786edb",
         core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.Protocol.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.Protocol.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.Protocol.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.Protocol.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.Protocol.dll",
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.Protocol.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.Protocol.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.Protocol.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.Protocol.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.Protocol.dll",
+            "net5.0": "lib/net5.0/NuGet.Protocol.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
-                "@nuget.configuration//:netcoreapp2.0_core",
                 "@nuget.packaging//:netcoreapp2.0_core",
-                "@netstandard.library//:netcoreapp2.0_core",
             ],
             "netcoreapp2.1": [
-                "@nuget.configuration//:netcoreapp2.1_core",
                 "@nuget.packaging//:netcoreapp2.1_core",
-                "@netstandard.library//:netcoreapp2.1_core",
             ],
             "netcoreapp2.2": [
-                "@nuget.configuration//:netcoreapp2.2_core",
                 "@nuget.packaging//:netcoreapp2.2_core",
-                "@netstandard.library//:netcoreapp2.2_core",
             ],
             "netcoreapp3.0": [
-                "@nuget.configuration//:netcoreapp3.0_core",
                 "@nuget.packaging//:netcoreapp3.0_core",
-                "@netstandard.library//:netcoreapp3.0_core",
             ],
             "netcoreapp3.1": [
-                "@nuget.configuration//:netcoreapp3.1_core",
                 "@nuget.packaging//:netcoreapp3.1_core",
-                "@netstandard.library//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@nuget.packaging//:net5.0_core",
             ],
         },
         core_files = {
             "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.Protocol.dll",
-                "lib/netstandard1.6/NuGet.Protocol.xml",
+                "lib/netstandard2.0/NuGet.Protocol.dll",
+                "lib/netstandard2.0/NuGet.Protocol.xml",
             ],
             "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.Protocol.dll",
-                "lib/netstandard1.6/NuGet.Protocol.xml",
+                "lib/netstandard2.0/NuGet.Protocol.dll",
+                "lib/netstandard2.0/NuGet.Protocol.xml",
             ],
             "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.Protocol.dll",
-                "lib/netstandard1.6/NuGet.Protocol.xml",
+                "lib/netstandard2.0/NuGet.Protocol.dll",
+                "lib/netstandard2.0/NuGet.Protocol.xml",
             ],
             "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.Protocol.dll",
-                "lib/netstandard1.6/NuGet.Protocol.xml",
+                "lib/netstandard2.0/NuGet.Protocol.dll",
+                "lib/netstandard2.0/NuGet.Protocol.xml",
             ],
             "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.Protocol.dll",
-                "lib/netstandard1.6/NuGet.Protocol.xml",
+                "lib/netstandard2.0/NuGet.Protocol.dll",
+                "lib/netstandard2.0/NuGet.Protocol.xml",
+            ],
+            "net5.0": [
+                "lib/net5.0/NuGet.Protocol.dll",
+                "lib/net5.0/NuGet.Protocol.xml",
             ],
         },
     )
     nuget_package(
         name = "nuget.credentials",
         package = "nuget.credentials",
-        version = "4.9.2",
-        sha256 = "58a309f7bdd96871d15eb19952099b4d6bda7f3f9f8644969a55f7fe4b92ae33",
+        version = "5.9.0",
+        sha256 = "90100597c829227c2ab900b1b09f16381e75f95bac88179be7ec2a0dd2979cbe",
         core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.Credentials.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.Credentials.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.Credentials.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.Credentials.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.Credentials.dll",
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.Credentials.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.Credentials.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.Credentials.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.Credentials.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.Credentials.dll",
+            "net5.0": "lib/net5.0/NuGet.Credentials.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
                 "@nuget.protocol//:netcoreapp2.0_core",
-                "@netstandard.library//:netcoreapp2.0_core",
             ],
             "netcoreapp2.1": [
                 "@nuget.protocol//:netcoreapp2.1_core",
-                "@netstandard.library//:netcoreapp2.1_core",
             ],
             "netcoreapp2.2": [
                 "@nuget.protocol//:netcoreapp2.2_core",
-                "@netstandard.library//:netcoreapp2.2_core",
             ],
             "netcoreapp3.0": [
                 "@nuget.protocol//:netcoreapp3.0_core",
-                "@netstandard.library//:netcoreapp3.0_core",
             ],
             "netcoreapp3.1": [
                 "@nuget.protocol//:netcoreapp3.1_core",
-                "@netstandard.library//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@nuget.protocol//:net5.0_core",
             ],
         },
         core_files = {
             "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.Credentials.dll",
+                "lib/netstandard2.0/NuGet.Credentials.dll",
             ],
             "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.Credentials.dll",
+                "lib/netstandard2.0/NuGet.Credentials.dll",
             ],
             "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.Credentials.dll",
+                "lib/netstandard2.0/NuGet.Credentials.dll",
             ],
             "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.Credentials.dll",
+                "lib/netstandard2.0/NuGet.Credentials.dll",
             ],
             "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.Credentials.dll",
+                "lib/netstandard2.0/NuGet.Credentials.dll",
+            ],
+            "net5.0": [
+                "lib/net5.0/NuGet.Credentials.dll",
             ],
         },
     )
     nuget_package(
         name = "nuget.dependencyresolver.core",
         package = "nuget.dependencyresolver.core",
-        version = "4.9.2",
-        sha256 = "42b917c6d65394cdc57175b8cea9035b3ecd8d8efc321ba0c6911ee5ebc42b7b",
+        version = "5.9.0",
+        sha256 = "dfa61e27ef91dbad5eb635cd48d82d50f1fd79a9fdd415e1e8716383e86639b8",
         core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.DependencyResolver.Core.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.DependencyResolver.Core.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.DependencyResolver.Core.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.DependencyResolver.Core.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.DependencyResolver.Core.dll",
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.DependencyResolver.Core.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.DependencyResolver.Core.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.DependencyResolver.Core.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.DependencyResolver.Core.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.DependencyResolver.Core.dll",
+            "net5.0": "lib/net5.0/NuGet.DependencyResolver.Core.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
                 "@nuget.librarymodel//:netcoreapp2.0_core",
                 "@nuget.protocol//:netcoreapp2.0_core",
-                "@netstandard.library//:netcoreapp2.0_core",
             ],
             "netcoreapp2.1": [
                 "@nuget.librarymodel//:netcoreapp2.1_core",
                 "@nuget.protocol//:netcoreapp2.1_core",
-                "@netstandard.library//:netcoreapp2.1_core",
             ],
             "netcoreapp2.2": [
                 "@nuget.librarymodel//:netcoreapp2.2_core",
                 "@nuget.protocol//:netcoreapp2.2_core",
-                "@netstandard.library//:netcoreapp2.2_core",
             ],
             "netcoreapp3.0": [
                 "@nuget.librarymodel//:netcoreapp3.0_core",
                 "@nuget.protocol//:netcoreapp3.0_core",
-                "@netstandard.library//:netcoreapp3.0_core",
             ],
             "netcoreapp3.1": [
                 "@nuget.librarymodel//:netcoreapp3.1_core",
                 "@nuget.protocol//:netcoreapp3.1_core",
-                "@netstandard.library//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@nuget.librarymodel//:net5.0_core",
+                "@nuget.protocol//:net5.0_core",
             ],
         },
         core_files = {
             "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.DependencyResolver.Core.dll",
-                "lib/netstandard1.6/NuGet.DependencyResolver.Core.xml",
+                "lib/netstandard2.0/NuGet.DependencyResolver.Core.dll",
+                "lib/netstandard2.0/NuGet.DependencyResolver.Core.xml",
             ],
             "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.DependencyResolver.Core.dll",
-                "lib/netstandard1.6/NuGet.DependencyResolver.Core.xml",
+                "lib/netstandard2.0/NuGet.DependencyResolver.Core.dll",
+                "lib/netstandard2.0/NuGet.DependencyResolver.Core.xml",
             ],
             "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.DependencyResolver.Core.dll",
-                "lib/netstandard1.6/NuGet.DependencyResolver.Core.xml",
+                "lib/netstandard2.0/NuGet.DependencyResolver.Core.dll",
+                "lib/netstandard2.0/NuGet.DependencyResolver.Core.xml",
             ],
             "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.DependencyResolver.Core.dll",
-                "lib/netstandard1.6/NuGet.DependencyResolver.Core.xml",
+                "lib/netstandard2.0/NuGet.DependencyResolver.Core.dll",
+                "lib/netstandard2.0/NuGet.DependencyResolver.Core.xml",
             ],
             "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.DependencyResolver.Core.dll",
-                "lib/netstandard1.6/NuGet.DependencyResolver.Core.xml",
+                "lib/netstandard2.0/NuGet.DependencyResolver.Core.dll",
+                "lib/netstandard2.0/NuGet.DependencyResolver.Core.xml",
+            ],
+            "net5.0": [
+                "lib/net5.0/NuGet.DependencyResolver.Core.dll",
+                "lib/net5.0/NuGet.DependencyResolver.Core.xml",
             ],
         },
     )
     nuget_package(
         name = "nuget.projectmodel",
         package = "nuget.projectmodel",
-        version = "4.9.2",
-        sha256 = "b13a9db9d88b0b8d568c367dd837437793e8f57afb61beda4aa485457ddc23b4",
+        version = "5.9.0",
+        sha256 = "a3f3c9b2df66fcfccd3e02fb5b05987391acb360b3a5783a1758aff23b740d1b",
         core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.ProjectModel.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.ProjectModel.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.ProjectModel.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.ProjectModel.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.ProjectModel.dll",
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.ProjectModel.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.ProjectModel.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.ProjectModel.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.ProjectModel.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.ProjectModel.dll",
+            "net5.0": "lib/net5.0/NuGet.ProjectModel.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
                 "@nuget.dependencyresolver.core//:netcoreapp2.0_core",
-                "@netstandard.library//:netcoreapp2.0_core",
             ],
             "netcoreapp2.1": [
                 "@nuget.dependencyresolver.core//:netcoreapp2.1_core",
-                "@netstandard.library//:netcoreapp2.1_core",
             ],
             "netcoreapp2.2": [
                 "@nuget.dependencyresolver.core//:netcoreapp2.2_core",
-                "@netstandard.library//:netcoreapp2.2_core",
             ],
             "netcoreapp3.0": [
                 "@nuget.dependencyresolver.core//:netcoreapp3.0_core",
-                "@netstandard.library//:netcoreapp3.0_core",
             ],
             "netcoreapp3.1": [
                 "@nuget.dependencyresolver.core//:netcoreapp3.1_core",
-                "@netstandard.library//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@nuget.dependencyresolver.core//:net5.0_core",
             ],
         },
         core_files = {
             "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.ProjectModel.dll",
-                "lib/netstandard1.6/NuGet.ProjectModel.xml",
+                "lib/netstandard2.0/NuGet.ProjectModel.dll",
+                "lib/netstandard2.0/NuGet.ProjectModel.xml",
             ],
             "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.ProjectModel.dll",
-                "lib/netstandard1.6/NuGet.ProjectModel.xml",
+                "lib/netstandard2.0/NuGet.ProjectModel.dll",
+                "lib/netstandard2.0/NuGet.ProjectModel.xml",
             ],
             "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.ProjectModel.dll",
-                "lib/netstandard1.6/NuGet.ProjectModel.xml",
+                "lib/netstandard2.0/NuGet.ProjectModel.dll",
+                "lib/netstandard2.0/NuGet.ProjectModel.xml",
             ],
             "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.ProjectModel.dll",
-                "lib/netstandard1.6/NuGet.ProjectModel.xml",
+                "lib/netstandard2.0/NuGet.ProjectModel.dll",
+                "lib/netstandard2.0/NuGet.ProjectModel.xml",
             ],
             "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.ProjectModel.dll",
-                "lib/netstandard1.6/NuGet.ProjectModel.xml",
+                "lib/netstandard2.0/NuGet.ProjectModel.dll",
+                "lib/netstandard2.0/NuGet.ProjectModel.xml",
+            ],
+            "net5.0": [
+                "lib/net5.0/NuGet.ProjectModel.dll",
+                "lib/net5.0/NuGet.ProjectModel.xml",
             ],
         },
     )
     nuget_package(
         name = "nuget.commands",
         package = "nuget.commands",
-        version = "4.9.2",
-        sha256 = "50566e04602b90f0032fea33f3972a3dbbddc5fe799357e5a18e6a2f8583b26d",
+        version = "5.9.0",
+        sha256 = "9309a638d6a59129ef1489f9f7573c6b9aa01bd4f42faef69be3330703ffaed4",
         core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.Commands.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.Commands.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.Commands.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.Commands.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.Commands.dll",
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.Commands.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.Commands.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.Commands.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.Commands.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.Commands.dll",
+            "net5.0": "lib/net5.0/NuGet.Commands.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
                 "@nuget.credentials//:netcoreapp2.0_core",
                 "@nuget.projectmodel//:netcoreapp2.0_core",
-                "@netstandard.library//:netcoreapp2.0_core",
             ],
             "netcoreapp2.1": [
                 "@nuget.credentials//:netcoreapp2.1_core",
                 "@nuget.projectmodel//:netcoreapp2.1_core",
-                "@netstandard.library//:netcoreapp2.1_core",
             ],
             "netcoreapp2.2": [
                 "@nuget.credentials//:netcoreapp2.2_core",
                 "@nuget.projectmodel//:netcoreapp2.2_core",
-                "@netstandard.library//:netcoreapp2.2_core",
             ],
             "netcoreapp3.0": [
                 "@nuget.credentials//:netcoreapp3.0_core",
                 "@nuget.projectmodel//:netcoreapp3.0_core",
-                "@netstandard.library//:netcoreapp3.0_core",
             ],
             "netcoreapp3.1": [
                 "@nuget.credentials//:netcoreapp3.1_core",
                 "@nuget.projectmodel//:netcoreapp3.1_core",
-                "@netstandard.library//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@nuget.credentials//:net5.0_core",
+                "@nuget.projectmodel//:net5.0_core",
             ],
         },
         core_files = {
             "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.Commands.dll",
-                "lib/netstandard1.6/NuGet.Commands.xml",
+                "lib/netstandard2.0/NuGet.Commands.dll",
+                "lib/netstandard2.0/NuGet.Commands.xml",
             ],
             "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.Commands.dll",
-                "lib/netstandard1.6/NuGet.Commands.xml",
+                "lib/netstandard2.0/NuGet.Commands.dll",
+                "lib/netstandard2.0/NuGet.Commands.xml",
             ],
             "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.Commands.dll",
-                "lib/netstandard1.6/NuGet.Commands.xml",
+                "lib/netstandard2.0/NuGet.Commands.dll",
+                "lib/netstandard2.0/NuGet.Commands.xml",
             ],
             "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.Commands.dll",
-                "lib/netstandard1.6/NuGet.Commands.xml",
+                "lib/netstandard2.0/NuGet.Commands.dll",
+                "lib/netstandard2.0/NuGet.Commands.xml",
             ],
             "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.Commands.dll",
-                "lib/netstandard1.6/NuGet.Commands.xml",
+                "lib/netstandard2.0/NuGet.Commands.dll",
+                "lib/netstandard2.0/NuGet.Commands.xml",
+            ],
+            "net5.0": [
+                "lib/net5.0/NuGet.Commands.dll",
+                "lib/net5.0/NuGet.Commands.xml",
             ],
         },
     )
     nuget_package(
         name = "nuget.resolver",
         package = "nuget.resolver",
-        version = "4.9.2",
-        sha256 = "2ab469a5aaac1d5150fcdda976dec8f555fcb8baf61f191bc871b9390f9a30c2",
+        version = "5.9.0",
+        sha256 = "cf05f848b1ef29e0217df2d7609b11f7b1d85f1d7f74e282912cb7c9a32a0cd9",
         core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.Resolver.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.Resolver.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.Resolver.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.Resolver.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.Resolver.dll",
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.Resolver.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.Resolver.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.Resolver.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.Resolver.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.Resolver.dll",
+            "net5.0": "lib/net5.0/NuGet.Resolver.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
                 "@nuget.protocol//:netcoreapp2.0_core",
-                "@netstandard.library//:netcoreapp2.0_core",
             ],
             "netcoreapp2.1": [
                 "@nuget.protocol//:netcoreapp2.1_core",
-                "@netstandard.library//:netcoreapp2.1_core",
             ],
             "netcoreapp2.2": [
                 "@nuget.protocol//:netcoreapp2.2_core",
-                "@netstandard.library//:netcoreapp2.2_core",
             ],
             "netcoreapp3.0": [
                 "@nuget.protocol//:netcoreapp3.0_core",
-                "@netstandard.library//:netcoreapp3.0_core",
             ],
             "netcoreapp3.1": [
                 "@nuget.protocol//:netcoreapp3.1_core",
-                "@netstandard.library//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@nuget.protocol//:net5.0_core",
             ],
         },
         core_files = {
             "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.Resolver.dll",
-                "lib/netstandard1.6/NuGet.Resolver.xml",
+                "lib/netstandard2.0/NuGet.Resolver.dll",
+                "lib/netstandard2.0/NuGet.Resolver.xml",
             ],
             "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.Resolver.dll",
-                "lib/netstandard1.6/NuGet.Resolver.xml",
+                "lib/netstandard2.0/NuGet.Resolver.dll",
+                "lib/netstandard2.0/NuGet.Resolver.xml",
             ],
             "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.Resolver.dll",
-                "lib/netstandard1.6/NuGet.Resolver.xml",
+                "lib/netstandard2.0/NuGet.Resolver.dll",
+                "lib/netstandard2.0/NuGet.Resolver.xml",
             ],
             "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.Resolver.dll",
-                "lib/netstandard1.6/NuGet.Resolver.xml",
+                "lib/netstandard2.0/NuGet.Resolver.dll",
+                "lib/netstandard2.0/NuGet.Resolver.xml",
             ],
             "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.Resolver.dll",
-                "lib/netstandard1.6/NuGet.Resolver.xml",
+                "lib/netstandard2.0/NuGet.Resolver.dll",
+                "lib/netstandard2.0/NuGet.Resolver.xml",
+            ],
+            "net5.0": [
+                "lib/net5.0/NuGet.Resolver.dll",
+                "lib/net5.0/NuGet.Resolver.xml",
             ],
         },
     )
     nuget_package(
-        name = "nuget.packagemanagement.netstandard",
-        package = "nuget.packagemanagement.netstandard",
-        version = "4.9.2",
-        sha256 = "c51c50b2da22e2f8649bbf8a151a04fdd119e631141bf8b88e4ebb4335f5ff7e",
+        name = "nuget.packagemanagement",
+        package = "nuget.packagemanagement",
+        version = "5.9.0",
+        sha256 = "c0e6877d72992e158669e0d51b527cccd055d239fad422e54cd5dbab984e5ade",
         core_lib = {
-            "netcoreapp2.0": "lib/netstandard1.6/NuGet.PackageManagement.dll",
-            "netcoreapp2.1": "lib/netstandard1.6/NuGet.PackageManagement.dll",
-            "netcoreapp2.2": "lib/netstandard1.6/NuGet.PackageManagement.dll",
-            "netcoreapp3.0": "lib/netstandard1.6/NuGet.PackageManagement.dll",
-            "netcoreapp3.1": "lib/netstandard1.6/NuGet.PackageManagement.dll",
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.PackageManagement.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.PackageManagement.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.PackageManagement.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.PackageManagement.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.PackageManagement.dll",
+            "net5.0": "lib/netstandard2.0/NuGet.PackageManagement.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
                 "@nuget.commands//:netcoreapp2.0_core",
                 "@nuget.resolver//:netcoreapp2.0_core",
-                "@netstandard.library//:netcoreapp2.0_core",
+                "@microsoft.web.xdt//:netcoreapp2.0_core",
             ],
             "netcoreapp2.1": [
                 "@nuget.commands//:netcoreapp2.1_core",
                 "@nuget.resolver//:netcoreapp2.1_core",
-                "@netstandard.library//:netcoreapp2.1_core",
+                "@microsoft.web.xdt//:netcoreapp2.1_core",
             ],
             "netcoreapp2.2": [
                 "@nuget.commands//:netcoreapp2.2_core",
                 "@nuget.resolver//:netcoreapp2.2_core",
-                "@netstandard.library//:netcoreapp2.2_core",
+                "@microsoft.web.xdt//:netcoreapp2.2_core",
             ],
             "netcoreapp3.0": [
                 "@nuget.commands//:netcoreapp3.0_core",
                 "@nuget.resolver//:netcoreapp3.0_core",
-                "@netstandard.library//:netcoreapp3.0_core",
+                "@microsoft.web.xdt//:netcoreapp3.0_core",
             ],
             "netcoreapp3.1": [
                 "@nuget.commands//:netcoreapp3.1_core",
                 "@nuget.resolver//:netcoreapp3.1_core",
-                "@netstandard.library//:netcoreapp3.1_core",
+                "@microsoft.web.xdt//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@nuget.commands//:net5.0_core",
+                "@nuget.resolver//:net5.0_core",
+                "@microsoft.web.xdt//:net5.0_core",
             ],
         },
         core_files = {
             "netcoreapp2.0": [
-                "lib/netstandard1.6/NuGet.PackageManagement.dll",
-                "lib/netstandard1.6/NuGet.PackageManagement.xml",
+                "lib/netstandard2.0/NuGet.PackageManagement.dll",
+                "lib/netstandard2.0/NuGet.PackageManagement.xml",
             ],
             "netcoreapp2.1": [
-                "lib/netstandard1.6/NuGet.PackageManagement.dll",
-                "lib/netstandard1.6/NuGet.PackageManagement.xml",
+                "lib/netstandard2.0/NuGet.PackageManagement.dll",
+                "lib/netstandard2.0/NuGet.PackageManagement.xml",
             ],
             "netcoreapp2.2": [
-                "lib/netstandard1.6/NuGet.PackageManagement.dll",
-                "lib/netstandard1.6/NuGet.PackageManagement.xml",
+                "lib/netstandard2.0/NuGet.PackageManagement.dll",
+                "lib/netstandard2.0/NuGet.PackageManagement.xml",
             ],
             "netcoreapp3.0": [
-                "lib/netstandard1.6/NuGet.PackageManagement.dll",
-                "lib/netstandard1.6/NuGet.PackageManagement.xml",
+                "lib/netstandard2.0/NuGet.PackageManagement.dll",
+                "lib/netstandard2.0/NuGet.PackageManagement.xml",
             ],
             "netcoreapp3.1": [
-                "lib/netstandard1.6/NuGet.PackageManagement.dll",
-                "lib/netstandard1.6/NuGet.PackageManagement.xml",
+                "lib/netstandard2.0/NuGet.PackageManagement.dll",
+                "lib/netstandard2.0/NuGet.PackageManagement.xml",
+            ],
+            "net5.0": [
+                "lib/netstandard2.0/NuGet.PackageManagement.dll",
+                "lib/netstandard2.0/NuGet.PackageManagement.xml",
+            ],
+        },
+    )
+    nuget_package(
+        name = "nuget.packaging.core",
+        package = "nuget.packaging.core",
+        version = "5.9.0",
+        sha256 = "06cee96d7fea529f220cb63ad42da51eed8d8fb8c6e16a98252b005129ae2495",
+        core_lib = {
+            "netcoreapp2.0": "lib/netstandard2.0/NuGet.Packaging.Core.dll",
+            "netcoreapp2.1": "lib/netstandard2.0/NuGet.Packaging.Core.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/NuGet.Packaging.Core.dll",
+            "netcoreapp3.0": "lib/netstandard2.0/NuGet.Packaging.Core.dll",
+            "netcoreapp3.1": "lib/netstandard2.0/NuGet.Packaging.Core.dll",
+            "net5.0": "lib/net5.0/NuGet.Packaging.Core.dll",
+        },
+        core_deps = {
+            "netcoreapp2.0": [
+                "@nuget.packaging//:netcoreapp2.0_core",
+            ],
+            "netcoreapp2.1": [
+                "@nuget.packaging//:netcoreapp2.1_core",
+            ],
+            "netcoreapp2.2": [
+                "@nuget.packaging//:netcoreapp2.2_core",
+            ],
+            "netcoreapp3.0": [
+                "@nuget.packaging//:netcoreapp3.0_core",
+            ],
+            "netcoreapp3.1": [
+                "@nuget.packaging//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@nuget.packaging//:net5.0_core",
+            ],
+        },
+        core_files = {
+            "netcoreapp2.0": [
+                "lib/netstandard2.0/NuGet.Packaging.Core.dll",
+                "lib/netstandard2.0/NuGet.Packaging.Core.xml",
+            ],
+            "netcoreapp2.1": [
+                "lib/netstandard2.0/NuGet.Packaging.Core.dll",
+                "lib/netstandard2.0/NuGet.Packaging.Core.xml",
+            ],
+            "netcoreapp2.2": [
+                "lib/netstandard2.0/NuGet.Packaging.Core.dll",
+                "lib/netstandard2.0/NuGet.Packaging.Core.xml",
+            ],
+            "netcoreapp3.0": [
+                "lib/netstandard2.0/NuGet.Packaging.Core.dll",
+                "lib/netstandard2.0/NuGet.Packaging.Core.xml",
+            ],
+            "netcoreapp3.1": [
+                "lib/netstandard2.0/NuGet.Packaging.Core.dll",
+                "lib/netstandard2.0/NuGet.Packaging.Core.xml",
+            ],
+            "net5.0": [
+                "lib/net5.0/NuGet.Packaging.Core.dll",
+                "lib/net5.0/NuGet.Packaging.Core.xml",
             ],
         },
     )
@@ -2142,6 +2423,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard2.0/CommandLine.dll",
             "netcoreapp3.0": "lib/netstandard2.0/CommandLine.dll",
             "netcoreapp3.1": "lib/netstandard2.0/CommandLine.dll",
+            "net5.0": "lib/netstandard2.0/CommandLine.dll",
         },
         core_files = {
             "netcoreapp2.0": [
@@ -2161,6 +2443,10 @@ def dotnet_repositories_nuget():
                 "lib/netstandard2.0/CommandLine.xml",
             ],
             "netcoreapp3.1": [
+                "lib/netstandard2.0/CommandLine.dll",
+                "lib/netstandard2.0/CommandLine.xml",
+            ],
+            "net5.0": [
                 "lib/netstandard2.0/CommandLine.dll",
                 "lib/netstandard2.0/CommandLine.xml",
             ],
@@ -2189,6 +2475,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
             "netcoreapp3.0": "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
             "netcoreapp3.1": "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
+            "net5.0": "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
         },
         core_ref = {
             "netcoreapp2.0": "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
@@ -2196,6 +2483,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
             "netcoreapp3.0": "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
             "netcoreapp3.1": "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
+            "net5.0": "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
         },
         core_files = {
             "netcoreapp2.0": [
@@ -2215,6 +2503,10 @@ def dotnet_repositories_nuget():
                 "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.xml",
             ],
             "netcoreapp3.1": [
+                "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
+                "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.xml",
+            ],
+            "net5.0": [
                 "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
                 "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.xml",
             ],
@@ -2251,6 +2543,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard2.0/System.Collections.Immutable.dll",
             "netcoreapp3.0": "lib/netstandard2.0/System.Collections.Immutable.dll",
             "netcoreapp3.1": "lib/netstandard2.0/System.Collections.Immutable.dll",
+            "net5.0": "lib/netstandard2.0/System.Collections.Immutable.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
@@ -2278,6 +2571,10 @@ def dotnet_repositories_nuget():
                 "lib/netstandard2.0/System.Collections.Immutable.dll",
                 "lib/netstandard2.0/System.Collections.Immutable.xml",
             ],
+            "net5.0": [
+                "lib/netstandard2.0/System.Collections.Immutable.dll",
+                "lib/netstandard2.0/System.Collections.Immutable.xml",
+            ],
         },
     )
     nuget_package(
@@ -2291,6 +2588,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard2.0/System.Reflection.Metadata.dll",
             "netcoreapp3.0": "lib/netstandard2.0/System.Reflection.Metadata.dll",
             "netcoreapp3.1": "lib/netstandard2.0/System.Reflection.Metadata.dll",
+            "net5.0": "lib/netstandard2.0/System.Reflection.Metadata.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
@@ -2327,6 +2625,10 @@ def dotnet_repositories_nuget():
                 "lib/netstandard2.0/System.Reflection.Metadata.dll",
                 "lib/netstandard2.0/System.Reflection.Metadata.xml",
             ],
+            "net5.0": [
+                "lib/netstandard2.0/System.Reflection.Metadata.dll",
+                "lib/netstandard2.0/System.Reflection.Metadata.xml",
+            ],
         },
     )
     nuget_package(
@@ -2340,6 +2642,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard2.0/System.Reflection.MetadataLoadContext.dll",
             "netcoreapp3.0": "lib/netcoreapp3.0/System.Reflection.MetadataLoadContext.dll",
             "netcoreapp3.1": "lib/netcoreapp3.0/System.Reflection.MetadataLoadContext.dll",
+            "net5.0": "lib/netcoreapp3.0/System.Reflection.MetadataLoadContext.dll",
         },
         core_ref = {
             "netcoreapp2.0": "ref/netstandard2.0/System.Reflection.MetadataLoadContext.dll",
@@ -2347,6 +2650,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "ref/netstandard2.0/System.Reflection.MetadataLoadContext.dll",
             "netcoreapp3.0": "ref/netstandard2.0/System.Reflection.MetadataLoadContext.dll",
             "netcoreapp3.1": "ref/netstandard2.0/System.Reflection.MetadataLoadContext.dll",
+            "net5.0": "ref/netstandard2.0/System.Reflection.MetadataLoadContext.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
@@ -2388,6 +2692,10 @@ def dotnet_repositories_nuget():
                 "lib/netcoreapp3.0/System.Reflection.MetadataLoadContext.dll",
                 "lib/netcoreapp3.0/System.Reflection.MetadataLoadContext.xml",
             ],
+            "net5.0": [
+                "lib/netcoreapp3.0/System.Reflection.MetadataLoadContext.dll",
+                "lib/netcoreapp3.0/System.Reflection.MetadataLoadContext.xml",
+            ],
         },
     )
     nuget_package(
@@ -2401,6 +2709,7 @@ def dotnet_repositories_nuget():
             "netcoreapp2.2": "lib/netstandard2.0/ICSharpCode.SharpZipLib.dll",
             "netcoreapp3.0": "lib/netstandard2.0/ICSharpCode.SharpZipLib.dll",
             "netcoreapp3.1": "lib/netstandard2.0/ICSharpCode.SharpZipLib.dll",
+            "net5.0": "lib/netstandard2.0/ICSharpCode.SharpZipLib.dll",
         },
         core_files = {
             "netcoreapp2.0": [
@@ -2428,6 +2737,13 @@ def dotnet_repositories_nuget():
                 "lib/netstandard2.0/ICSharpCode.SharpZipLib.pdb",
                 "lib/netstandard2.0/ICSharpCode.SharpZipLib.xml",
             ],
+            "net5.0": [
+                "lib/netstandard2.0/ICSharpCode.SharpZipLib.dll",
+                "lib/netstandard2.0/ICSharpCode.SharpZipLib.pdb",
+                "lib/netstandard2.0/ICSharpCode.SharpZipLib.xml",
+            ],
         },
     )
+
     ### End of generated by the tool
+    return
