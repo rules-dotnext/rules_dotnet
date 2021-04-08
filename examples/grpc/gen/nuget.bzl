@@ -26,14 +26,18 @@ def project_dotnet_repositories_nuget():
         core_lib = {
             "netcoreapp2.0": "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
             "netcoreapp2.1": "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
+            "netcoreapp2.2": "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
             "netcoreapp3.0": "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
             "netcoreapp3.1": "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
+            "net5.0": "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
         },
         core_ref = {
             "netcoreapp2.0": "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
             "netcoreapp2.1": "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
+            "netcoreapp2.2": "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
             "netcoreapp3.0": "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
             "netcoreapp3.1": "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
+            "net5.0": "ref/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll",
         },
         core_files = {
             "netcoreapp2.0": [
@@ -44,11 +48,19 @@ def project_dotnet_repositories_nuget():
                 "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
                 "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.xml",
             ],
+            "netcoreapp2.2": [
+                "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
+                "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.xml",
+            ],
             "netcoreapp3.0": [
                 "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
                 "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.xml",
             ],
             "netcoreapp3.1": [
+                "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
+                "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.xml",
+            ],
+            "net5.0": [
                 "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.dll",
                 "lib/netcoreapp2.0/System.Runtime.CompilerServices.Unsafe.xml",
             ],
@@ -82,8 +94,10 @@ def project_dotnet_repositories_nuget():
         core_lib = {
             "netcoreapp2.0": "lib/netstandard2.0/Grpc.Core.Api.dll",
             "netcoreapp2.1": "lib/netstandard2.0/Grpc.Core.Api.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/Grpc.Core.Api.dll",
             "netcoreapp3.0": "lib/netstandard2.0/Grpc.Core.Api.dll",
             "netcoreapp3.1": "lib/netstandard2.0/Grpc.Core.Api.dll",
+            "net5.0": "lib/netstandard2.0/Grpc.Core.Api.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
@@ -92,11 +106,17 @@ def project_dotnet_repositories_nuget():
             "netcoreapp2.1": [
                 "@system.memory//:netcoreapp2.1_core",
             ],
+            "netcoreapp2.2": [
+                "@system.memory//:netcoreapp2.2_core",
+            ],
             "netcoreapp3.0": [
                 "@system.memory//:netcoreapp3.0_core",
             ],
             "netcoreapp3.1": [
                 "@system.memory//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@system.memory//:net5.0_core",
             ],
         },
         core_files = {
@@ -110,12 +130,22 @@ def project_dotnet_repositories_nuget():
                 "lib/netstandard2.0/Grpc.Core.Api.pdb",
                 "lib/netstandard2.0/Grpc.Core.Api.xml",
             ],
+            "netcoreapp2.2": [
+                "lib/netstandard2.0/Grpc.Core.Api.dll",
+                "lib/netstandard2.0/Grpc.Core.Api.pdb",
+                "lib/netstandard2.0/Grpc.Core.Api.xml",
+            ],
             "netcoreapp3.0": [
                 "lib/netstandard2.0/Grpc.Core.Api.dll",
                 "lib/netstandard2.0/Grpc.Core.Api.pdb",
                 "lib/netstandard2.0/Grpc.Core.Api.xml",
             ],
             "netcoreapp3.1": [
+                "lib/netstandard2.0/Grpc.Core.Api.dll",
+                "lib/netstandard2.0/Grpc.Core.Api.pdb",
+                "lib/netstandard2.0/Grpc.Core.Api.xml",
+            ],
+            "net5.0": [
                 "lib/netstandard2.0/Grpc.Core.Api.dll",
                 "lib/netstandard2.0/Grpc.Core.Api.pdb",
                 "lib/netstandard2.0/Grpc.Core.Api.xml",
@@ -130,8 +160,10 @@ def project_dotnet_repositories_nuget():
         core_lib = {
             "netcoreapp2.0": "lib/netstandard2.0/Grpc.Core.dll",
             "netcoreapp2.1": "lib/netstandard2.0/Grpc.Core.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/Grpc.Core.dll",
             "netcoreapp3.0": "lib/netstandard2.0/Grpc.Core.dll",
             "netcoreapp3.1": "lib/netstandard2.0/Grpc.Core.dll",
+            "net5.0": "lib/netstandard2.0/Grpc.Core.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
@@ -142,6 +174,10 @@ def project_dotnet_repositories_nuget():
                 "@grpc.core.api//:netcoreapp2.1_core",
                 "@system.memory//:netcoreapp2.1_core",
             ],
+            "netcoreapp2.2": [
+                "@grpc.core.api//:netcoreapp2.2_core",
+                "@system.memory//:netcoreapp2.2_core",
+            ],
             "netcoreapp3.0": [
                 "@grpc.core.api//:netcoreapp3.0_core",
                 "@system.memory//:netcoreapp3.0_core",
@@ -150,27 +186,65 @@ def project_dotnet_repositories_nuget():
                 "@grpc.core.api//:netcoreapp3.1_core",
                 "@system.memory//:netcoreapp3.1_core",
             ],
+            "net5.0": [
+                "@grpc.core.api//:net5.0_core",
+                "@system.memory//:net5.0_core",
+            ],
         },
         core_files = {
             "netcoreapp2.0": [
                 "lib/netstandard2.0/Grpc.Core.dll",
                 "lib/netstandard2.0/Grpc.Core.pdb",
                 "lib/netstandard2.0/Grpc.Core.xml",
+                "runtimes/linux/native/libgrpc_csharp_ext.x64.so",
+                "runtimes/linux/native/libgrpc_csharp_ext.x86.so",
+                "runtimes/osx/native/libgrpc_csharp_ext.x64.dylib",
+                "runtimes/osx/native/libgrpc_csharp_ext.x86.dylib",
             ],
             "netcoreapp2.1": [
                 "lib/netstandard2.0/Grpc.Core.dll",
                 "lib/netstandard2.0/Grpc.Core.pdb",
                 "lib/netstandard2.0/Grpc.Core.xml",
+                "runtimes/linux/native/libgrpc_csharp_ext.x64.so",
+                "runtimes/linux/native/libgrpc_csharp_ext.x86.so",
+                "runtimes/osx/native/libgrpc_csharp_ext.x64.dylib",
+                "runtimes/osx/native/libgrpc_csharp_ext.x86.dylib",
+            ],
+            "netcoreapp2.2": [
+                "lib/netstandard2.0/Grpc.Core.dll",
+                "lib/netstandard2.0/Grpc.Core.pdb",
+                "lib/netstandard2.0/Grpc.Core.xml",
+                "runtimes/linux/native/libgrpc_csharp_ext.x64.so",
+                "runtimes/linux/native/libgrpc_csharp_ext.x86.so",
+                "runtimes/osx/native/libgrpc_csharp_ext.x64.dylib",
+                "runtimes/osx/native/libgrpc_csharp_ext.x86.dylib",
             ],
             "netcoreapp3.0": [
                 "lib/netstandard2.0/Grpc.Core.dll",
                 "lib/netstandard2.0/Grpc.Core.pdb",
                 "lib/netstandard2.0/Grpc.Core.xml",
+                "runtimes/linux/native/libgrpc_csharp_ext.x64.so",
+                "runtimes/linux/native/libgrpc_csharp_ext.x86.so",
+                "runtimes/osx/native/libgrpc_csharp_ext.x64.dylib",
+                "runtimes/osx/native/libgrpc_csharp_ext.x86.dylib",
             ],
             "netcoreapp3.1": [
                 "lib/netstandard2.0/Grpc.Core.dll",
                 "lib/netstandard2.0/Grpc.Core.pdb",
                 "lib/netstandard2.0/Grpc.Core.xml",
+                "runtimes/linux/native/libgrpc_csharp_ext.x64.so",
+                "runtimes/linux/native/libgrpc_csharp_ext.x86.so",
+                "runtimes/osx/native/libgrpc_csharp_ext.x64.dylib",
+                "runtimes/osx/native/libgrpc_csharp_ext.x86.dylib",
+            ],
+            "net5.0": [
+                "lib/netstandard2.0/Grpc.Core.dll",
+                "lib/netstandard2.0/Grpc.Core.pdb",
+                "lib/netstandard2.0/Grpc.Core.xml",
+                "runtimes/linux/native/libgrpc_csharp_ext.x64.so",
+                "runtimes/linux/native/libgrpc_csharp_ext.x86.so",
+                "runtimes/osx/native/libgrpc_csharp_ext.x64.dylib",
+                "runtimes/osx/native/libgrpc_csharp_ext.x86.dylib",
             ],
         },
     )
@@ -202,8 +276,10 @@ def project_dotnet_repositories_nuget():
         core_lib = {
             "netcoreapp2.0": "lib/netstandard2.0/System.Threading.Channels.dll",
             "netcoreapp2.1": "lib/netstandard2.0/System.Threading.Channels.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/System.Threading.Channels.dll",
             "netcoreapp3.0": "lib/netcoreapp3.0/System.Threading.Channels.dll",
             "netcoreapp3.1": "lib/netcoreapp3.0/System.Threading.Channels.dll",
+            "net5.0": "lib/netcoreapp3.0/System.Threading.Channels.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
@@ -219,11 +295,19 @@ def project_dotnet_repositories_nuget():
                 "lib/netstandard2.0/System.Threading.Channels.dll",
                 "lib/netstandard2.0/System.Threading.Channels.xml",
             ],
+            "netcoreapp2.2": [
+                "lib/netstandard2.0/System.Threading.Channels.dll",
+                "lib/netstandard2.0/System.Threading.Channels.xml",
+            ],
             "netcoreapp3.0": [
                 "lib/netcoreapp3.0/System.Threading.Channels.dll",
                 "lib/netcoreapp3.0/System.Threading.Channels.xml",
             ],
             "netcoreapp3.1": [
+                "lib/netcoreapp3.0/System.Threading.Channels.dll",
+                "lib/netcoreapp3.0/System.Threading.Channels.xml",
+            ],
+            "net5.0": [
                 "lib/netcoreapp3.0/System.Threading.Channels.dll",
                 "lib/netcoreapp3.0/System.Threading.Channels.xml",
             ],
@@ -237,8 +321,10 @@ def project_dotnet_repositories_nuget():
         core_lib = {
             "netcoreapp2.0": "lib/netstandard2.0/Grpc.HealthCheck.dll",
             "netcoreapp2.1": "lib/netstandard2.0/Grpc.HealthCheck.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/Grpc.HealthCheck.dll",
             "netcoreapp3.0": "lib/netstandard2.0/Grpc.HealthCheck.dll",
             "netcoreapp3.1": "lib/netstandard2.0/Grpc.HealthCheck.dll",
+            "net5.0": "lib/netstandard2.0/Grpc.HealthCheck.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
@@ -251,6 +337,11 @@ def project_dotnet_repositories_nuget():
                 "@google.protobuf//:netcoreapp2.1_core",
                 "@system.threading.channels//:netcoreapp2.1_core",
             ],
+            "netcoreapp2.2": [
+                "@grpc.core.api//:netcoreapp2.2_core",
+                "@google.protobuf//:netcoreapp2.2_core",
+                "@system.threading.channels//:netcoreapp2.2_core",
+            ],
             "netcoreapp3.0": [
                 "@grpc.core.api//:netcoreapp3.0_core",
                 "@google.protobuf//:netcoreapp3.0_core",
@@ -260,6 +351,11 @@ def project_dotnet_repositories_nuget():
                 "@grpc.core.api//:netcoreapp3.1_core",
                 "@google.protobuf//:netcoreapp3.1_core",
                 "@system.threading.channels//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@grpc.core.api//:net5.0_core",
+                "@google.protobuf//:net5.0_core",
+                "@system.threading.channels//:net5.0_core",
             ],
         },
         core_files = {
@@ -273,12 +369,22 @@ def project_dotnet_repositories_nuget():
                 "lib/netstandard2.0/Grpc.HealthCheck.pdb",
                 "lib/netstandard2.0/Grpc.HealthCheck.xml",
             ],
+            "netcoreapp2.2": [
+                "lib/netstandard2.0/Grpc.HealthCheck.dll",
+                "lib/netstandard2.0/Grpc.HealthCheck.pdb",
+                "lib/netstandard2.0/Grpc.HealthCheck.xml",
+            ],
             "netcoreapp3.0": [
                 "lib/netstandard2.0/Grpc.HealthCheck.dll",
                 "lib/netstandard2.0/Grpc.HealthCheck.pdb",
                 "lib/netstandard2.0/Grpc.HealthCheck.xml",
             ],
             "netcoreapp3.1": [
+                "lib/netstandard2.0/Grpc.HealthCheck.dll",
+                "lib/netstandard2.0/Grpc.HealthCheck.pdb",
+                "lib/netstandard2.0/Grpc.HealthCheck.xml",
+            ],
+            "net5.0": [
                 "lib/netstandard2.0/Grpc.HealthCheck.dll",
                 "lib/netstandard2.0/Grpc.HealthCheck.pdb",
                 "lib/netstandard2.0/Grpc.HealthCheck.xml",
@@ -293,8 +399,10 @@ def project_dotnet_repositories_nuget():
         core_lib = {
             "netcoreapp2.0": "lib/netstandard2.0/Google.Protobuf.dll",
             "netcoreapp2.1": "lib/netstandard2.0/Google.Protobuf.dll",
+            "netcoreapp2.2": "lib/netstandard2.0/Google.Protobuf.dll",
             "netcoreapp3.0": "lib/netstandard2.0/Google.Protobuf.dll",
             "netcoreapp3.1": "lib/netstandard2.0/Google.Protobuf.dll",
+            "net5.0": "lib/netstandard2.0/Google.Protobuf.dll",
         },
         core_deps = {
             "netcoreapp2.0": [
@@ -303,11 +411,17 @@ def project_dotnet_repositories_nuget():
             "netcoreapp2.1": [
                 "@system.memory//:netcoreapp2.1_core",
             ],
+            "netcoreapp2.2": [
+                "@system.memory//:netcoreapp2.2_core",
+            ],
             "netcoreapp3.0": [
                 "@system.memory//:netcoreapp3.0_core",
             ],
             "netcoreapp3.1": [
                 "@system.memory//:netcoreapp3.1_core",
+            ],
+            "net5.0": [
+                "@system.memory//:net5.0_core",
             ],
         },
         core_files = {
@@ -321,12 +435,22 @@ def project_dotnet_repositories_nuget():
                 "lib/netstandard2.0/Google.Protobuf.pdb",
                 "lib/netstandard2.0/Google.Protobuf.xml",
             ],
+            "netcoreapp2.2": [
+                "lib/netstandard2.0/Google.Protobuf.dll",
+                "lib/netstandard2.0/Google.Protobuf.pdb",
+                "lib/netstandard2.0/Google.Protobuf.xml",
+            ],
             "netcoreapp3.0": [
                 "lib/netstandard2.0/Google.Protobuf.dll",
                 "lib/netstandard2.0/Google.Protobuf.pdb",
                 "lib/netstandard2.0/Google.Protobuf.xml",
             ],
             "netcoreapp3.1": [
+                "lib/netstandard2.0/Google.Protobuf.dll",
+                "lib/netstandard2.0/Google.Protobuf.pdb",
+                "lib/netstandard2.0/Google.Protobuf.xml",
+            ],
+            "net5.0": [
                 "lib/netstandard2.0/Google.Protobuf.dll",
                 "lib/netstandard2.0/Google.Protobuf.pdb",
                 "lib/netstandard2.0/Google.Protobuf.xml",

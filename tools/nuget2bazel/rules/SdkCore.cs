@@ -19,7 +19,7 @@ namespace nuget2bazel.rules
         public override async Task<List<RefInfo>> GetRefInfos(string configDir)
         {
             var package = await PackageDownloader.DownloadPackageIfNedeed(configDir, "Microsoft.NETCore.App", InternalVersionFolder);
-            var sdkDir = await ZipDownloader.DownloadIfNedeed(configDir, WindowsUrl);
+            var sdkDir = await ZipDownloader.DownloadIfNedeed(configDir, GetDownloadUrl());
 
             var brokenDependencies = new string[] { "netstandard" };
 
@@ -61,14 +61,13 @@ namespace nuget2bazel.rules
                 {
                 }
             }
-
             return result;
         }
         public static string GetStdlibPath(string sdk, string name, string version, string sdkVersion)
         {
             var p = Path.Combine(sdk, "shared", "Microsoft.NETCore.App", version, name);
             if (File.Exists(p))
-                return $"@core_sdk_{sdkVersion}//:core/shared/Microsoft.NETCore.App/{version}/{name}";
+                return $":core/shared/Microsoft.NETCore.App/{version}/{name}";
 
             return null;
         }
@@ -93,7 +92,7 @@ namespace nuget2bazel.rules
 
         protected async Task<List<RefInfo>> GetRefInfosImpl(string configDir, string pack)
         {
-            var sdk = await ZipDownloader.DownloadIfNedeed(configDir, WindowsUrl);
+            var sdk = await ZipDownloader.DownloadIfNedeed(configDir, GetDownloadUrl());
 
             var brokenDependencies = new[] { "system.printing", "presentationframework" };
 
@@ -125,7 +124,7 @@ namespace nuget2bazel.rules
                         .Where(y => !brokenDependencies.Contains(y.Name.ToLower()) && known.Contains(y.Name.ToLower()))
                         .Select(x => $"\":{x.Name.ToLower()}.dll\"");
                     var name = Path.GetFileName(d);
-                    var refname = $"@core_sdk_{Version}//:core/{relative}/{name}";
+                    var refname = $":core/{relative}/{name}";
                     var stdlibname = GetStdlibPath(sdk, name, pack, InternalVersionFolder, Version);
 
                     var refInfo = new RefInfo();
@@ -150,14 +149,14 @@ namespace nuget2bazel.rules
         {
             var p = Path.Combine(sdk, "shared", pack.Replace(".Ref", ""), version, name);
             if (File.Exists(p))
-                return $"@core_sdk_{sdkVersion}//:core/shared/{pack.Replace(".Ref", "")}/{version}/{name}";
+                return $":core/shared/{pack.Replace(".Ref", "")}/{version}/{name}";
 
             p = Path.Combine(sdk, "shared");
             foreach (var d in Directory.GetDirectories(p))
             {
                 p = Path.Combine(d, version, name);
                 if (File.Exists(p))
-                    return $"@core_sdk_{sdkVersion}//:core/shared/{Path.GetFileName(d)}/{version}/{name}";
+                    return $":core/shared/{Path.GetFileName(d)}/{version}/{name}";
             }
 
             return null;

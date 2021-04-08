@@ -26,29 +26,22 @@ namespace nuget2bazel.rules
             foreach (var tfm in SdkInfos.Sdks.Where(x => x.Packs != null))
             {
                 var refs = await tfm.GetRefInfos(_configDir);
-                await GenerateBazelFile(Path.Combine(_rulesPath, $"dotnet/stdlib.core/{tfm.Version}/generated.bzl"),
-                     refs);
+                await GenerateBazelFile(Path.Combine(_rulesPath, $"dotnet/private/stdlib/{tfm.Version.Replace("v", "")}.bzl"), refs);
             }
-
-            var refsDef = await defSdk.GetRefInfos(_configDir);
-            foreach (var r in refsDef)
-            {
-                r.Ref = r.Ref?.Replace($"_{defSdk.Version}", "");
-                r.StdlibPath = r.StdlibPath?.Replace($"_{defSdk.Version}", "");
-            }
-
-            await GenerateBazelFile(Path.Combine(_rulesPath, $"dotnet/stdlib.core/generated.bzl"),
-                refsDef);
         }
 
 
         private async Task GenerateBazelFile(string outpath, List<RefInfo> packRefs)
         {
             await using var f = new StreamWriter(outpath);
+            await f.WriteLineAsync("\"\"");
+            await f.WriteLineAsync();
             await f.WriteLineAsync("load(\"@io_bazel_rules_dotnet//dotnet/private:rules/stdlib.bzl\", \"core_stdlib_internal\")");
             await f.WriteLineAsync("load(\"@io_bazel_rules_dotnet//dotnet/private:rules/libraryset.bzl\", \"core_libraryset\")");
             await f.WriteLineAsync();
-            await f.WriteLineAsync("def define_stdlib(context_data):");
+            await f.WriteLineAsync("# buildifier: disable=unnamed-macro");
+            await f.WriteLineAsync("def define_stdlib():");
+            await f.WriteLineAsync("    \"Declares stdlib\"");
 
             int cnt = 0;
             foreach (var p in packRefs.Select(x => x.Pack).Distinct())
@@ -83,7 +76,7 @@ namespace nuget2bazel.rules
                         var n = dep.Replace(":", $":{pfx}");
                         await f.WriteLineAsync($"            {n},");
                     }
-                    await f.WriteLineAsync($"        ]");
+                    await f.WriteLineAsync($"        ],");
                     await f.WriteLineAsync($"    )");
                 }
 

@@ -13,7 +13,12 @@ filegroup(
 
 filegroup(
     name = "fsc",
-    srcs = ["core/sdk/{sdkVersion}/FSharp/fsc.exe"],
+    # We glob both fsc.dll and fsc.exe for backwards compatibility
+    # Pre .Net 5.0 the file was called fsc.exe but has been changed to fsc.dll
+    srcs = glob([
+        "core/sdk/{sdkVersion}/FSharp/fsc.dll*",
+        "core/sdk/{sdkVersion}/FSharp/fsc.exe*",
+    ]),
     data = glob([
         "core/sdk/{sdkVersion}/FSharp/**/*",
     ]),

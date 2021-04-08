@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using ICSharpCode.SharpZipLib.Tar;
@@ -36,7 +37,10 @@ namespace nuget2bazel.rules
             using var archive = ZipFile.OpenRead(file);
             foreach (var entry in archive.Entries)
             {
-                var dest = Path.Combine(dir, entry.FullName);
+                // This allows you to run this program on Linux/MacOS since the
+                // Windows zip files have `\` intead of `/` in their paths
+                var fullName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? entry.FullName : entry.FullName.Replace("\\", "/");
+                var dest = Path.Combine(dir, fullName);
                 Directory.CreateDirectory(Path.GetDirectoryName(dest));
                 if (!File.Exists(dest))
                     entry.ExtractToFile(dest);

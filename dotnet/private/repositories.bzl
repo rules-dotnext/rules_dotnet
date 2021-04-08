@@ -61,7 +61,7 @@ def _core_stdlib_impl(ctx):
     ctx.file("ROOT")
 
     body = ""
-    for target in ["libraryset", "NETStandard.Library", "Microsoft.AspNetCore.App", "Microsoft.NETCore.App", "Microsoft.WindowsDesktop.App"]:
+    for target in ["libraryset", "NETStandard.Library", "Microsoft.AspNetCore.App"]:
         values = ""
         for os, arch in DOTNET_OS_ARCH:
             for sdk in DOTNET_CORE_FRAMEWORKS:
