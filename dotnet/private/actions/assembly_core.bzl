@@ -401,6 +401,13 @@ def emit_assembly_core_fsharp(
         arguments = action_args,
         mnemonic = "Compile",
         tools = runner_tools,
+        env = {
+            # Set to get rid of the following error:
+            # warning FS3384: The .NET SDK for this script could not be determined.
+            # If the script is in a directory using a 'global.json' then ensure the relevant .NET SDK is installed. The output from '/path/to/dotnet --version' in the directory '/path' was:
+            # 'The user's home directory could not be determined. Set the 'DOTNET_CLI_HOME' environment variable to specify the directory to use.' and the exit code was '1'.
+            "DOTNET_CLI_HOME": runner.executable.dirname,
+        },
         progress_message = (
             "Compiling " + dotnet.label.package + ":" + dotnet.label.name
         ),
