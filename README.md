@@ -1,3 +1,4 @@
+# TODO: Rewrite this readme
 .Net Rules for Bazel
 ===================
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-908a85?logo=gitpod)](https://gitpod.io/#https://github.com/bazelbuild/rules_dotnet)
@@ -12,9 +13,7 @@ Build status
 
 Documentation
 -------------
-
-The full documentation is [here](https://tomaszstrejczek.github.io/rules_dotnet/).
-
+TODO: Rewrite this section
 
 Overview
 --------
@@ -38,60 +37,4 @@ elevated permissions. However, newer versions of Windows have a [workaround](htt
 
 Setup
 -----
-
-* The rules take full advantage of Bazel [platforms](https://docs.bazel.build/versions/master/platforms.html)
-  and [toolchains](https://docs.bazel.build/versions/master/toolchains.html)
-
-* When building any project the platform has to be specified. For example:
-
-  ```bash
-      bazel build --host_platform=@io_bazel_rules_dotnet//dotnet/toolchain:linux_amd64_6.0.101 --platforms=@io_bazel_rules_dotnet//dotnet/toolchain:linux_amd64_6.0.101 //...
-  ```
-
-* The platform specification has the form of //dotnet/toolchain:<os>_<arch>_<sdkversion>. 
-  The available values are listed in dotnet/platform/list.bzl in variables DOTNET_OS_ARCH and DOTNET_CORE_FRAMEWORKS.
-  Typically the --host_platform and --platforms values are set in [.bazelrc file](https://docs.bazel.build/versions/master/guide.html).
-
-* Add the following to your `WORKSPACE` file to add the external repositories:
-
-  ```python
-
-  # A newer version should be fine
-  load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
-  git_repository(
-      name = "io_bazel_rules_dotnet",
-      remote = "https://github.com/bazelbuild/rules_dotnet",
-      branch = "master",
-  )
-
-  load("@io_bazel_rules_dotnet//dotnet:deps.bzl", "dotnet_repositories")
-  dotnet_repositories()
-
-  load(
-      "@io_bazel_rules_dotnet//dotnet:defs.bzl",
-      "dotnet_register_toolchains",
-      "dotnet_repositories_nugets",
-  )
-
-  dotnet_register_toolchains()
-  dotnet_repositories_nugets()
-  ```
-
-  The [dotnet_repositories](docs/api.md#dotnet_repositories) rule fetches external dependencies which have to be defined before loading any other file of rules_dotnet. [dotnet_repositories_nugets](docs/api.md#dotnet_repositories_nugets) loads nuget packages 
-  required by test rules.
-
-  The [dotnet_register_toolchains](docs/api.md#dotnet_register_toolchains) configures toolchains.
-
-* Add a file named ``BUILD.bazel`` in the root directory of your project. In general, you need one of these files in every directory with dotnet code.
-
-  At the top of the file used rules should be imported:
-
-  ```python
-
-    load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "csharp_library", "csharp_binary")
-  ```
-
-* See [nuget2bazel](docs/nuget2bazel.md) for using nuget dependencies.
-
-* See ``examples`` folder for examples.
-
+TODO: Rewrite this section

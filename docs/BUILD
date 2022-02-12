@@ -2,42 +2,40 @@ load("@io_bazel_stardoc//stardoc:stardoc.bzl", "stardoc")
 load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 
 bzl_library(
-    name = "private",
-    srcs = ["//dotnet/private:all_rules"],
+    name = "bazel_dependencies",
+    srcs = [
+        "@bazel_tools//tools:bzl_srcs",
+        "@bazel_skylib//lib:paths",
+        "@bazel_skylib//lib:dicts",
+    ],
 )
 
 bzl_library(
-    name = "toolchain",
-    srcs = ["//dotnet/toolchain:all_rules"],
-)
-
-bzl_library(
-    name = "platform",
-    srcs = ["//dotnet/platform:all_rules"],
-)
-
-bzl_library(
-    name = "our_skylib",
-    srcs = ["@rules_dotnet_skylib//:distribution"],
-)
-
-bzl_library(
-    name = "bazeltools",
-    srcs = ["@bazel_tools//tools:bzl_srcs"],
+    name = "rules_dotnet",
+    srcs = [
+        "//dotnet/private:bzl_srcs",
+    ],
 )
 
 stardoc(
-    name = "my-docs",
-    out = "api.md",
-    func_template = "func.vm",
-    input = "docs.bzl",
-    rule_template = "rule.vm",
-    tags = ["manual"],
+    name = "core",
+    out = "APIReference.md",
+    input = "//dotnet:defs.bzl",
+    symbol_names = [
+        "csharp_binary",
+        "csharp_library",
+        "library_set",
+        "csharp_nunit_test",
+        "dotnet_register_toolchains",
+        "dotnet_repositories",
+        "import_multiframework_library",
+        "import_library",
+        "import_nuget_package",
+        "nuget_package",
+    ],
+    tags = ["fix-windows"],
     deps = [
-        ":bazeltools",
-        ":our_skylib",
-        ":platform",
-        ":private",
-        ":toolchain",
+        ":bazel_dependencies",
+        ":rules_dotnet",
     ],
 )

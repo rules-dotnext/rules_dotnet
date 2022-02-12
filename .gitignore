@@ -1,6 +1,6 @@
 *.swp
 *~
-/bazel-*
+bazel-*
 .vscode
 bin
 obj

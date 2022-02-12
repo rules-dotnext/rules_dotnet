@@ -1,5 +1,24 @@
+load(":toolchains.bzl", "configure_toolchain")
+
 filegroup(
-    name = "all_rules",
+    name = "bzl_srcs",
     srcs = glob(["**/*.bzl"]),
-    visibility = ["//visibility:public"],
+    visibility = ["//docs:__pkg__"],
 )
+
+exports_files([
+    "nunit/shim.cs",
+    "wrappers/dotnet.cc",
+    "runtimeconfig.json.tpl",
+    "deps.json.tpl",
+    "launcher.sh.tpl",
+    "launcher.bat.tpl",
+])
+
+toolchain_type(name = "toolchain_type")
+
+configure_toolchain(os = "windows")
+
+configure_toolchain(os = "linux")
+
+configure_toolchain(os = "osx")

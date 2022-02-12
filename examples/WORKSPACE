@@ -1,0 +1,30 @@
+local_repository(
+    name = "rules_dotnet",
+    path = "..",
+)
+
+load(
+    "@rules_dotnet//dotnet/private:repositories.bzl",
+    "dotnet_register_toolchains",
+    "dotnet_repositories",
+)
+
+dotnet_repositories()
+
+dotnet_register_toolchains()
+
+load(
+    "@rules_dotnet//dotnet:defs.bzl",
+    "import_nuget_package",
+)
+
+import_nuget_package(
+    name = "ExamplePackageFolder",
+    dir = "import_nuget_package/ExamplePackageFolder",
+)
+
+import_nuget_package(
+    name = "ExampleNupkg",
+    file = "import_nuget_package/Example.nupkg",
+    sha256 = "a658761334ffab1773c10dc53c7aa964f61a793963bb8111d416d2e1e1e95635",
+)
