@@ -10,8 +10,6 @@ load(
 load("//dotnet/private:providers.bzl", "AnyTargetFrameworkInfo", "DotnetAssemblyInfo")
 
 def _library_set(ctx):
-    files = []
-
     tfm = ctx.attr.target_framework
 
     (refs, runfiles, native_dlls) = collect_transitive_info(ctx.attr.name, ctx.attr.deps, tfm)

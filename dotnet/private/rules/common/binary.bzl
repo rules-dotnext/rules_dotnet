@@ -16,16 +16,9 @@ load(
 )
 load("@bazel_skylib//lib:paths.bzl", "paths")
 
-def _to_manifest_path(ctx, file):
-    if file.short_path.startswith("../"):
-        return file.short_path[3:]
-    else:
-        return ctx.workspace_name + "/" + file.short_path
-
 def _create_shim_exe(ctx, dll):
     runtime = ctx.toolchains["@rules_dotnet//dotnet/private:toolchain_type"].runtime
     apphost = ctx.toolchains["@rules_dotnet//dotnet/private:toolchain_type"].apphost
-    manifest_loader = ctx.attr._manifest_loader
     output = ctx.actions.declare_file(paths.replace_extension(dll.basename, ".exe"), sibling = dll)
 
     ctx.actions.run(
@@ -42,9 +35,9 @@ def _create_launcher(ctx, runfiles, executable):
     runtime = ctx.toolchains["@rules_dotnet//dotnet/private:toolchain_type"].runtime
     windows_constraint = ctx.attr._windows_constraint[platform_common.ConstraintValueInfo]
 
-    launcher = ctx.actions.declare_file(paths.replace_extension(executable.basename, ".bat" if  ctx.target_platform_has_constraint(windows_constraint) else ".sh"), sibling = executable)
+    launcher = ctx.actions.declare_file(paths.replace_extension(executable.basename, ".bat" if ctx.target_platform_has_constraint(windows_constraint) else ".sh"), sibling = executable)
 
-    if  ctx.target_platform_has_constraint(windows_constraint):
+    if ctx.target_platform_has_constraint(windows_constraint):
         ctx.actions.expand_template(
             template = ctx.file._launcher_bat,
             output = launcher,
@@ -74,8 +67,23 @@ def _symlink_manifest_loader(ctx, executable):
     ctx.actions.symlink(output = loader, target_file = GetDotnetAssemblyInfoFromLabel(ctx.attr._manifest_loader).out)
     return loader
 
-# TODO: Add docs
 def build_binary(ctx, compile_action):
+    """Builds a .Net binary from a compilation action
+
+    Args:
+        ctx: Bazel build ctx.
+        compile_action: A compilation function
+            Args:
+                ctx: Bazel build ctx.
+                tfm: Target framework string
+                stdrefs: .Net standard library references
+                runtimeconfig: .Net runtimeconfig file
+                depsjson: .Net depsjson file
+            Returns:
+                An DotnetAssemblyInfo provider
+    Returns:
+        A collection of the references, runfiles and native dlls.
+    """
     providers = {}
 
     stdrefs = [ctx.attr._stdrefs] if ctx.attr.include_stdrefs else []

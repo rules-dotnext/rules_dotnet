@@ -21,7 +21,7 @@ def _make_dotnet_provider(tfm):
             "transitive_runfiles": "Runfiles from the transitive dependencies.",
             "actual_tfm": "The target framework of the actual dlls",
             "runtimeconfig": "An optional runtimeconfig.json for executable assemblies",
-            "depsjson": "An optional deps.json for executable assemblies"
+            "depsjson": "An optional deps.json for executable assemblies",
         },
     )
 
@@ -242,7 +242,6 @@ def GetDotnetAssemblyInfoFromLabel(label):
         else:
             continue
     fail("No DotnetAassemlyInfo provider found in label {}".format(label))
-
 
 def GetFrameworkVersionInfo(tfm):
     return (

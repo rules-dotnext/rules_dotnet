@@ -7,8 +7,21 @@ load(
     "fill_in_missing_frameworks",
 )
 
-# TODO: Add docs
 def build_library(ctx, compile_action):
+    """Builds a .Net library from a compilation action
+
+    Args:
+        ctx: Bazel build ctx.
+        compile_action: A compilation function
+            Args:
+                ctx: Bazel build ctx.
+                tfm: Target framework string
+                stdrefs: .Net standard library references
+            Returns:
+                An DotnetAssemblyInfo provider
+    Returns:
+        A collection of the references, runfiles and native dlls.
+    """
     providers = {}
 
     stdrefs = [ctx.attr._stdrefs] if ctx.attr.include_stdrefs else []

@@ -4,11 +4,6 @@ Users should not load files under "/dotnet"
 """
 
 load(
-    "//dotnet/private:repositories.bzl",
-    _dotnet_register_toolchains = "dotnet_register_toolchains",
-    _dotnet_repositories = "dotnet_repositories",
-)
-load(
     "//dotnet/private:rules/csharp/binary.bzl",
     _csharp_binary = "csharp_binary",
 )
@@ -48,8 +43,6 @@ csharp_binary = _csharp_binary
 csharp_library = _csharp_library
 library_set = _library_set
 csharp_nunit_test = _csharp_nunit_test
-dotnet_register_toolchains = _dotnet_register_toolchains
-dotnet_repositories = _dotnet_repositories
 import_multiframework_library = _import_multiframework_library
 import_library = _import_library
 import_nuget_package = _import_nuget_package

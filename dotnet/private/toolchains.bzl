@@ -46,7 +46,7 @@ dotnet_toolchain = rule(
 
 # This is called in BUILD
 # buildifier: disable=unnamed-macro
-def configure_toolchain(os, exe = "dotnetw"):
+def configure_toolchain(os):
     dotnet_toolchain(
         name = "dotnet_x86_64-" + os,
         runtime = Label("@netcore-sdk-%s//:runtime" % (os)),

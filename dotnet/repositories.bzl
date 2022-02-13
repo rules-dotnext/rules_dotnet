@@ -2,7 +2,7 @@
 Rules to load all the .NET SDK & framework dependencies of rules_dotnet.
 """
 
-load(":sdk.bzl", "DOTNET_SDK")
+load("//dotnet/private:sdk.bzl", "DOTNET_SDK")
 load("//dotnet/private:rules/create_net_workspace.bzl", "create_net_workspace")
 load("//dotnet/private:macros/nuget.bzl", "nuget_package")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")

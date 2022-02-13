@@ -104,7 +104,7 @@ def fill_in_missing_frameworks(name, providers):
         # nested loop isn't bad.
         # Order by providers that didn't "cross the netstandard boundary" so
         # newer netstandard will be preferred, if applicable
-        for (base, compatible_tfm) in sorted([(providers[compatible_tfm], compatible_tfm) for compatible_tfm in FRAMEWORK_COMPATIBILITY[tfm] if compatible_tfm in providers], key = _get_provided_by_netstandard):
+        for (base, _compatible_tfm) in sorted([(providers[compatible_tfm], compatible_tfm) for compatible_tfm in FRAMEWORK_COMPATIBILITY[tfm] if compatible_tfm in providers], key = _get_provided_by_netstandard):
             # Copy the output from the compatible tfm, re-resolving the deps
             (refs, runfiles, native_dlls) = collect_transitive_info(name, base.deps, tfm)
             providers[tfm] = DotnetAssemblyInfo[tfm](

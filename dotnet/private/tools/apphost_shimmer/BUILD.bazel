@@ -5,8 +5,11 @@ load(
 
 csharp_binary_without_shim(
     name = "apphost_shimmer",
-    srcs = ["Program.cs", "AppHostShellShimMaker.cs"],
+    srcs = [
+        "AppHostShellShimMaker.cs",
+        "Program.cs",
+    ],
     target_frameworks = ["net6.0"],
-    deps = ["@Microsoft.NET.HostModel//:Microsoft.NET.HostModel"],
     visibility = ["//visibility:public"],
+    deps = ["@Microsoft.NET.HostModel//:Microsoft.NET.HostModel"],
 )

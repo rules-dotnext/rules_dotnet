@@ -4,7 +4,7 @@ local_repository(
 )
 
 load(
-    "@rules_dotnet//dotnet/private:repositories.bzl",
+    "@rules_dotnet//dotnet:repositories.bzl",
     "dotnet_register_toolchains",
     "dotnet_repositories",
 )

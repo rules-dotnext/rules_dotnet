@@ -4,9 +4,9 @@ load("@bazel_skylib//:bzl_library.bzl", "bzl_library")
 bzl_library(
     name = "bazel_dependencies",
     srcs = [
-        "@bazel_tools//tools:bzl_srcs",
-        "@bazel_skylib//lib:paths",
         "@bazel_skylib//lib:dicts",
+        "@bazel_skylib//lib:paths",
+        "@bazel_tools//tools:bzl_srcs",
     ],
 )
 

@@ -48,7 +48,7 @@ COMMON_ATTRS = {
         doc = "The standard set of assemblies to reference.",
         default = "@net//:StandardReferences",
     ),
-    "_windows_constraint": attr.label(default = '@platforms//os:windows'),
+    "_windows_constraint": attr.label(default = "@platforms//os:windows"),
 }
 
 # These are attributes that are common across all the binary/library/test C# rules
