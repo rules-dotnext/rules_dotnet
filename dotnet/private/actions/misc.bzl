@@ -42,7 +42,6 @@ def write_depsjson(actions, template, name, tfm):
       name: The name of the executable.
       tfm: The target framework moniker for the exe being built.
     """
-
     output = actions.declare_file("bazelout/%s/%s.deps.json" % (tfm, name))
 
     # We're doing this as a template rather than a static file to allow users
@@ -57,7 +56,7 @@ def write_depsjson(actions, template, name, tfm):
 
     return output
 
-def write_internals_visible_to(actions, name, others):
+def write_internals_visible_to_csharp(actions, name, others):
     """Write a .cs file containing InternalsVisibleTo attributes.
 
     Letting Bazel see which assemblies we are going to have InternalsVisibleTo
@@ -88,3 +87,58 @@ def write_internals_visible_to(actions, name, others):
     actions.write(output, attrs)
 
     return output
+
+def write_internals_visible_to_fsharp(actions, name, others):
+    """Write a .fs file containing InternalsVisibleTo attributes.
+
+    Letting Bazel see which assemblies we are going to have InternalsVisibleTo
+    allows for more robust caching of compiles.
+
+    Args:
+      actions: An actions module, usually from ctx.actions.
+      name: The assembly name.
+      others: The names of other assemblies.
+
+    Returns:
+      A File object for a generated .fs file
+    """
+
+    if len(others) == 0:
+        return None
+
+    content = """
+module AssemblyInfo
+
+"""
+    for other in others:
+        content += """
+[<assembly: System.Runtime.CompilerServices.InternalsVisibleTo(\"%s\")>]
+do()
+
+""" % other
+
+    output = actions.declare_file("bazelout/%s/internalsvisibleto.fs" % name)
+    actions.write(output, content)
+
+    return output
+
+def framework_preprocessor_symbols(tfm):
+    """Gets the standard preprocessor symbols for the target framework.
+
+    See https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/preprocessor-directives/preprocessor-if#remarks
+    for the official list.
+
+    Args:
+        tfm: The target framework moniker target being built.
+    Returns:
+        A list of preprocessor symbols.
+    """
+
+    specific = tfm.upper().replace(".", "_")
+
+    if tfm.startswith("netstandard"):
+        return ["NETSTANDARD", specific]
+    elif tfm.startswith("netcoreapp"):
+        return ["NETCOREAPP", specific]
+    else:
+        return ["NETFRAMEWORK", specific]

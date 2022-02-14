@@ -43,6 +43,14 @@ def dotnet_repositories():
         sha256 = "62b67516a08951a20b12b02e5d20b5045edbb687c3aabe9170286ec5bb9000a1",
     )
 
+    # TODO: This should probably be fetched from the SDK
+    nuget_package(
+        name = "FSharp.Core",
+        package = "FSharp.Core",
+        version = "6.0.1",
+        sha256 = "121b20b779c22628e9695b8982e0b54cf54429290977a3d2734ec3d994127a62",
+    )
+
     # Required for building the Apphost shimming program
     nuget_package(
         name = "Microsoft.NET.HostModel",

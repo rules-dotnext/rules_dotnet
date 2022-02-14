@@ -187,7 +187,7 @@ _subsystem_version = {
     "net6.0": None,
 }
 
-_default_lang_version = {
+_default_lang_version_csharp = {
     "netstandard": "7.3",
     "netstandard1.0": "7.3",
     "netstandard1.1": "7.3",
@@ -246,7 +246,7 @@ def GetDotnetAssemblyInfoFromLabel(label):
 def GetFrameworkVersionInfo(tfm):
     return (
         _subsystem_version[tfm],
-        _default_lang_version[tfm],
+        _default_lang_version_csharp[tfm],
     )
 
 # A convenience used in attributes that need to specify that they accept any
