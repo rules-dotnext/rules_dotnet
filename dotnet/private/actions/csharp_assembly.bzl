@@ -13,7 +13,7 @@ load(
     "DotnetAssemblyInfo",
     "GetFrameworkVersionInfo",
 )
-load("//dotnet/private:actions/misc.bzl", "write_internals_visible_to_csharp", "framework_preprocessor_symbols")
+load("//dotnet/private:actions/misc.bzl", "framework_preprocessor_symbols", "write_internals_visible_to_csharp")
 
 def _format_ref_arg(assembly):
     return "/r:" + assembly.path

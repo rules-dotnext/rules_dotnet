@@ -122,6 +122,6 @@ FSHARP_COMMON_ATTRS = dicts.add(
 
 # These are attributes that are common across all the binary/library/test F# rules
 FSHARP_BINARY_COMMON_ATTRS = dicts.add(
-        FSHARP_COMMON_ATTRS,
-        BINARY_COMMON_ATTRS,
+    FSHARP_COMMON_ATTRS,
+    BINARY_COMMON_ATTRS,
 )

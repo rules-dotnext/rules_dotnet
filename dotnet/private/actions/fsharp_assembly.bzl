@@ -5,16 +5,16 @@ Actions for compiling targets with C#.
 load(
     "//dotnet/private:common.bzl",
     "collect_transitive_info",
-    "use_highentropyva",
-    "is_standard_framework",
     "is_core_framework",
+    "is_standard_framework",
+    "use_highentropyva",
 )
 load(
     "//dotnet/private:providers.bzl",
     "DotnetAssemblyInfo",
     "GetFrameworkVersionInfo",
 )
-load("//dotnet/private:actions/misc.bzl", "write_internals_visible_to_fsharp", "framework_preprocessor_symbols")
+load("//dotnet/private:actions/misc.bzl", "framework_preprocessor_symbols", "write_internals_visible_to_fsharp")
 
 def _format_ref_arg(assembly):
     return "/r:" + assembly.path
@@ -31,7 +31,7 @@ def _format_targetprofile(tfm):
 
     if is_core_framework(tfm):
         return "/targetprofile:netcore"
-    
+
     return "/targetprofile:mscorlib"
 
 def AssemblyAction(
@@ -86,6 +86,7 @@ def AssemblyAction(
     out_ext = "dll"
 
     out_dll = actions.declare_file("%s/%s.%s" % (out_dir, assembly_name, out_ext))
+
     # TODO: Reintroduce once the F# compiler supports reference assemblies
     # out_iref = None
     # out_ref = actions.declare_file("%s/ref/%s.%s" % (out_dir, assembly_name, out_ext))
@@ -209,7 +210,7 @@ def _compile(
     # https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/compiler-options
     args = actions.args()
     args.add("/checked-")
-    args.add("/noframework") 
+    args.add("/noframework")
     args.add("/utf8output")
     args.add("/deterministic+")
     args.add("/nowin32manifest")
@@ -245,11 +246,13 @@ def _compile(
     # outputs
     if out_dll != None:
         args.add("/out:" + out_dll.path)
+
         # TODO: Reintroduce once the F# compiler supports reference assemblies
         # args.add("/refout:" + out_ref.path)
         args.add("/pdb:" + out_pdb.path)
         outputs = [out_dll, out_pdb]
         # outputs = [out_dll, out_ref, out_pdb]
+
     else:
         fail("F# compiler does not support reference assemblies")
         # TODO: Reintroduce once the F# compiler supports reference assemblies
