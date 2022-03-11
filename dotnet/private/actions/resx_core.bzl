@@ -5,7 +5,7 @@ load(
     "DotnetResourceInfo",
 )
 
-def _make_runner_arglist(dotnet, source, output, resgen):
+def _make_runner_arglist(dotnet, source, output):
     args = dotnet.actions.args()
 
     if type(source) == "Target":
@@ -46,7 +46,7 @@ def emit_resx_core(
     else:
         result = dotnet.actions.declare_file(out)
 
-    args = _make_runner_arglist(dotnet, src, result, customresgen.files_to_run.executable.path)
+    args = _make_runner_arglist(dotnet, src, result)
 
     # We use the command to extrace shell path and force runfiles creation
     resolve = dotnet._ctx.resolve_tools(tools = [customresgen])

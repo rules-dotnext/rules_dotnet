@@ -1,10 +1,6 @@
 ".resource rules"
 
 load(
-    "@io_bazel_rules_dotnet//dotnet/private:context.bzl",
-    "dotnet_context",
-)
-load(
     "@io_bazel_rules_dotnet//dotnet/private:providers.bzl",
     "DotnetResourceInfo",
     "DotnetResourceListInfo",
@@ -13,7 +9,6 @@ load("@rules_dotnet_skylib//lib:paths.bzl", "paths")
 
 def _resource_impl(ctx):
     """core_resource_impl emits actions for embeding file as resource."""
-    dotnet = dotnet_context(ctx, "csharp")
     name = ctx.label.name
 
     resource = DotnetResourceInfo(
@@ -31,9 +26,6 @@ def _resource_impl(ctx):
     ]
 
 def _resource_multi_impl(ctx):
-    dotnet = dotnet_context(ctx, "csharp")
-    name = ctx.label.name
-
     if ctx.attr.identifierBase != "" and ctx.attr.fixedIdentifierBase != "":
         fail("Both identifierBase and fixedIdentifierBase cannot be specified")
 
