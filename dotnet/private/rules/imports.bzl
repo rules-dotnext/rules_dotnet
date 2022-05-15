@@ -12,9 +12,6 @@ load("//dotnet/private:providers.bzl", "AnyTargetFrameworkInfo", "DotnetAssembly
 def _import_library(ctx):
     files = []
 
-    if ctx.file.dll == None and ctx.file.refdll == None:
-        fail("At least one of dll or refdll must be specified")
-
     if ctx.file.dll != None:
         files.append(ctx.file.dll)
 
@@ -25,6 +22,7 @@ def _import_library(ctx):
         files.append(ctx.file.refdll)
 
     files += ctx.files.native_dlls
+    files += ctx.files.data
 
     tfm = ctx.attr.target_framework
 
@@ -76,6 +74,10 @@ import_library = rule(
         "deps": attr.label_list(
             doc = "other DLLs that this DLL depends on.",
             providers = AnyTargetFrameworkInfo,
+        ),
+        "data": attr.label_list(
+            doc = "Other files that this DLL depends on at runtime",
+            allow_files = True,
         ),
     },
     executable = False,

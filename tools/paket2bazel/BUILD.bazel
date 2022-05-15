@@ -1,0 +1,23 @@
+load("@rules_dotnet//dotnet:defs.bzl", "fsharp_binary")
+
+fsharp_binary(
+    name = "paket2bazel.exe",
+    srcs = [
+        # Keep order
+        "Models.fs",
+        "Paket.fs",
+        "Gen.fs",
+        "Main.fs",
+    ],
+    target_frameworks = ["net6.0"],
+    deps = [
+        "@paket2bazel.argu//:lib",
+        "@paket2bazel.fsharp.core//:lib",
+        "@paket2bazel.fsharp.systemtextjson//:lib",
+        "@paket2bazel.fsharpx.collections//:lib",
+        "@paket2bazel.fsharpx.extras//:lib",
+        "@paket2bazel.nuget.packagemanagement//:lib",
+        "@paket2bazel.paket.core//:lib",
+        "@paket2bazel.system.text.json//:lib",
+    ],
+)

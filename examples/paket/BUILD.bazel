@@ -1,0 +1,32 @@
+load("@rules_dotnet//dotnet:defs.bzl", "fsharp_binary")
+
+fsharp_binary(
+    name = "paket_example.exe",
+    srcs = [
+        # Keep order
+        "Main.fs",
+    ],
+    tags = ["requires-network"],
+    target_frameworks = ["net6.0"],
+    deps = [
+        "@main.argu//:lib",
+        "@main.fsharp.core//:lib",
+        "@main.fsharp.data//:lib",
+    ],
+)
+
+# NOTE: Do not mix package groups. Mixing package groups can lead to unexpected results.
+fsharp_binary(
+    name = "paket_example_with_dependency_group.exe",
+    srcs = [
+        # Keep order
+        "Main.fs",
+    ],
+    tags = ["requires-network"],
+    target_frameworks = ["net6.0"],
+    deps = [
+        "@othergroup.argu//:lib",
+        "@othergroup.fsharp.core//:lib",
+        "@othergroup.fsharp.data//:lib",
+    ],
+)
