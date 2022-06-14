@@ -50,7 +50,10 @@ set RUNFILES_MANIFEST_ONLY=1
 set DOTNET_MULTILEVEL_LOOKUP="false"
 set DOTNET_NOLOGO="1"
 set DOTNET_CLI_TELEMETRY_OPTOUT="1"
-set DOTNET_ROOT="TEMPLATED_dotnet_root"
+
+set dotnet_executable="TEMPLATED_dotnet"
+call :rlocation "TEMPLATED_dotnet" dotnet_executable
+for %%F in (%dotnet_executable%) do set DOTNET_ROOT=%%~dpF
 
 call :rlocation "TEMPLATED_executable" run_script
 set args=%*

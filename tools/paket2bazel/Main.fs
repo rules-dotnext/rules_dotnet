@@ -5,7 +5,6 @@ open Argu
 open System
 open System.Collections.Generic
 open System.IO
-open Paket2Bazel.Paket
 open Paket2Bazel.Gen
 open Paket2Bazel.Models
 open System.Text.Json
@@ -54,23 +53,17 @@ let main argv =
     let dependenciesFile =
         Path.GetFullPath(results.GetResult Dependencies_File)
 
-    let paketDir = Path.GetDirectoryName(dependenciesFile)
-
-    let lockFile = paketDir + "/paket.lock"
-
     let outputFolder = results.GetResult Output_Folder
 
     let config = getConfig results
 
     let cache = Dictionary<string, Package>()
 
-    let dependencies =
+    let groups =
         getDependencies dependenciesFile config cache
 
-    let processedPackages =
-        processInstalledPackages dependencies paketDir
 
-    let bazelFile = generateBazelFile processedPackages
+    let bazelFile = generateBazelFile groups
 
     File.WriteAllText($"{outputFolder}/BUILD.bazel", "")
     File.WriteAllText($"{outputFolder}/paket.bzl", bazelFile)

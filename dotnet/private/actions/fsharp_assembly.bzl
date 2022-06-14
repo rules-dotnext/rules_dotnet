@@ -8,6 +8,7 @@ load(
     "is_core_framework",
     "is_standard_framework",
     "use_highentropyva",
+    "format_ref_arg",
 )
 load(
     "//dotnet/private:providers.bzl",
@@ -15,15 +16,6 @@ load(
     "GetFrameworkVersionInfo",
 )
 load("//dotnet/private:actions/misc.bzl", "framework_preprocessor_symbols", "write_internals_visible_to_fsharp")
-
-def _format_ref_arg(assembly):
-    return "/r:" + assembly.path
-
-def _format_resource_arg(resource):
-    return "/resource:" + resource.path
-
-def _format_define(symbol):
-    return "/d:" + symbol
 
 def _format_targetprofile(tfm):
     if is_standard_framework(tfm):
@@ -79,7 +71,7 @@ def AssemblyAction(
 
     assembly_name = target_name if out == "" else out
     (subsystem_version, _default_lang_version) = GetFrameworkVersionInfo(target_framework)
-    (refs, runfiles, native_dlls) = collect_transitive_info(target_name, deps, target_framework)
+    (irefs, prefs, analyzers, runfiles, overrides) = collect_transitive_info(target_name, deps)
     defines = framework_preprocessor_symbols(target_framework) + defines
 
     out_dir = "bazelout/" + target_framework
@@ -99,8 +91,8 @@ def AssemblyAction(
             defines,
             keyfile,
             langversion,
-            native_dlls,
-            refs,
+            irefs,
+            overrides,
             resources,
             srcs,
             subsystem_version,
@@ -109,17 +101,9 @@ def AssemblyAction(
             target_framework,
             toolchain,
             out_dll = out_dll,
-            # TODO: Reintroduce once the F# compiler supports reference assemblies
-            # out_ref = out_ref,
             out_pdb = out_pdb,
         )
     else:
-        # If the user is using internals_visible_to generate an additional
-        # reference-only DLL that contains the internals. We want the
-        # InternalsVisibleTo in the main DLL too to be less suprising to users.
-        # TODO: Reintroduce once the F# compiler supports reference assemblies
-        # out_iref = actions.declare_file("%s/iref/%s.%s" % (out_dir, assembly_name, out_ext))
-
         internals_visible_to_cs = write_internals_visible_to_fsharp(
             actions,
             name = target_name,
@@ -132,8 +116,8 @@ def AssemblyAction(
             defines,
             keyfile,
             langversion,
-            native_dlls,
-            refs,
+            irefs,
+            overrides,
             resources,
             srcs + [internals_visible_to_cs],
             subsystem_version,
@@ -141,50 +125,25 @@ def AssemblyAction(
             target_name,
             target_framework,
             toolchain,
-            # TODO: Reintroduce once the F# compiler supports reference assemblies
-            # out_ref = out_iref
             out_dll = out_dll,
             out_pdb = out_pdb,
         )
 
-        # Generate a ref-only DLL without internals
-        # TODO: Reintroduce once the F# compiler supports reference assemblies
-        # _compile(
-        #     actions,
-        #     debug,
-        #     defines,
-        #     keyfile,
-        #     langversion,
-        #     native_dlls,
-        #     refs,
-        #     resources,
-        #     srcs,
-        #     subsystem_version,
-        #     target,
-        #     target_name,
-        #     target_framework,
-        #     toolchain,
-        #     out_dll = None,
-        #     out_ref = None,
-        #     out_pdb = None,
-        # )
-
-    return DotnetAssemblyInfo[target_framework](
-        out = out_dll,
-        # TODO: Reintroduce once the F# compiler supports reference assemblies
-        # irefout = out_iref or out_ref,
-        # prefout = out_ref,
-        irefout = None,
-        prefout = None,
+    return DotnetAssemblyInfo(
+        libs = [out_dll],
+        analyzers = [],
+        irefs = [out_dll],
+        prefs = [out_dll],
         internals_visible_to = internals_visible_to or [],
-        pdb = out_pdb,
-        native_dlls = native_dlls,
+        data = [out_pdb] if out_pdb else [],
         deps = deps,
-        transitive_refs = refs,
+        transitive_prefs = prefs,
+        transitive_analyzers = analyzers,
         transitive_runfiles = runfiles,
         actual_tfm = target_framework,
         runtimeconfig = runtimeconfig,
         depsjson = depsjson,
+        targeting_pack_overrides = {},
     )
 
 def _compile(
@@ -193,8 +152,8 @@ def _compile(
         defines,
         keyfile,
         langversion,
-        native_dlls,
         refs,
+        overrides,
         resources,
         srcs,
         subsystem_version,
@@ -215,6 +174,7 @@ def _compile(
     args.add("/deterministic+")
     args.add("/nowin32manifest")
     args.add("/nocopyfsharpcore")
+    args.add("/simpleresolution")
     args.add(_format_targetprofile(target_framework))
     args.add("/nologo")
 
@@ -261,16 +221,16 @@ def _compile(
         # outputs = [out_ref]
 
     # assembly references
-    args.add_all(refs, map_each = _format_ref_arg)
+    format_ref_arg(args, refs, overrides)
 
     # .fs files
-    args.add_all([cs for cs in srcs])
+    args.add_all(srcs)
 
     # resources
-    args.add_all(resources, map_each = _format_resource_arg)
+    args.add_all(resources, format_each = "/resource:%s")
 
     # defines
-    args.add_all(defines, map_each = _format_define)
+    args.add_all(defines, format_each = "/d:%s")
 
     # keyfile
     if keyfile != None:
@@ -293,7 +253,7 @@ def _compile(
         progress_message = "Compiling " + target_name + (" (internals ref-only dll)" if out_dll == None else ""),
         inputs = depset(
             direct = direct_inputs,
-            transitive = [refs] + [native_dlls],
+            transitive = [refs],
         ),
         outputs = outputs,
         executable = toolchain.runtime.files_to_run,

@@ -4,11 +4,10 @@ Rules to load all the .NET SDK & framework dependencies of rules_dotnet.
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:utils.bzl", "maybe")
-load("//dotnet/private:rules/create_net_workspace.bzl", "create_net_workspace")
-load("//dotnet/private:macros/nuget.bzl", "nuget_package")
 load("//dotnet/private:toolchains_repo.bzl", "PLATFORMS", "toolchains_repo")
 load("//dotnet/private:versions.bzl", "TOOL_VERSIONS")
 load("//tools/paket2bazel/deps:paket.bzl", "paket")
+load("//dotnet/private:rules/nuget_repo.bzl", "nuget_repo")
 
 # WARNING: any changes in this function may be BREAKING CHANGES for users
 # because we'll fetch a dependency which may be different from one that
@@ -29,134 +28,36 @@ def rules_dotnet_dependencies():
         sha256 = "f7be3474d42aae265405a592bb7da8e171919d74c16f082a5457840f06054728",
     )
 
-    # Download dependencies of dotnet rules
-    _net_workspace()
-
-    create_net_workspace()
-
-    # NUnit
-    # TODO: Create testing toolchain for NUnit
-    nuget_package(
-        name = "NUnitLite",
-        package = "NUnitLite",
-        version = "3.12.0",
-        sha256 = "0b05b83f05b4eee07152e88b7b60b093fa408bfea56489a977ae655b640992f2",
-    )
-
-    # TODO: Create testing toolchain for NUnit
-    nuget_package(
-        name = "NUnit",
-        package = "NUnit",
-        version = "3.12.0",
-        sha256 = "62b67516a08951a20b12b02e5d20b5045edbb687c3aabe9170286ec5bb9000a1",
-    )
-
-    # TODO: This should probably be fetched from the SDK
-    nuget_package(
-        name = "FSharp.Core",
-        package = "FSharp.Core",
-        version = "6.0.4",
-        sha256 = "cd259093eb9dedc7d161c655837433b0e9e951c5e96c5ed48e7fd3d59378cd62",
-    )
-
-    # Required for building the Apphost shimming program
-    nuget_package(
-        name = "Microsoft.NET.HostModel",
-        package = "Microsoft.NET.HostModel",
-        version = "3.1.6",
-        sha256 = "a142f0a518e5a0dfa3f5e00dc131f386dc9de9a6f817a5984ac2f251c0e895c3",
-    )
-
-def _net_framework_pkg(tfm, sha256):
-    nuget_package(
-        name = tfm,
-        package = "Microsoft.NETFramework.ReferenceAssemblies.%s" % tfm,
-        version = "1.0.0",
-        sha256 = sha256,
-        build_file = "@rules_dotnet//dotnet/private:frameworks/%s.BUILD" % tfm,
-    )
-
-def _net_workspace():
-    _net_framework_pkg("net20", "82450fb8a67696bdde41174918d385d50691f18945a246907cd96dfa3f670c82")
-    _net_framework_pkg("net40", "4e97e946e032ab5538ff97d1a215c6814336b3ffda6806495e3f3150f3ca06ee")
-    _net_framework_pkg("net45", "9b9e76d6497bfc6d0328528eb50f5fcc886a3eba4f47cdabd3df66f94174eac6")
-    _net_framework_pkg("net451", "706278539689d45219715ff3fa19ff459127fc90104102eefcc236c1550f71e7")
-    _net_framework_pkg("net452", "e8a90f1699d9b542e1bd6fdbc9f60f36acf420b95cace59e23d6be376dc61bb8")
-    _net_framework_pkg("net46", "514e991aaacd84759f01b2933e6f4aa44a7d4caa39599f7d6c0a454b630286fa")
-    _net_framework_pkg("net461", "a12eec50ccca0642e686082a6c8e9e06a6f538f022a47d130d36836818b17303")
-    _net_framework_pkg("net462", "c4115c862f5ca778dc3fb649f455d38c095dfd10a1dc116b687944111462734d")
-    _net_framework_pkg("net47", "261e3476e6be010a525064ce0901b8f77b09cdb7ea1fec88832a00ebe0356503")
-    _net_framework_pkg("net471", "554c9305a9f064086861ae7db57b407147ec0850de2dfc5d86adabfa35b33180")
-    _net_framework_pkg("net472", "2c8fd79ea19bd03cece40ed92b7bafde024f87c73abcebe3eff8da6e05b611af")
-    _net_framework_pkg("net48", "fd0ba0a0c5ccce36e104abd055d2f4bf596ff3afc0dbc1f201d6cf9a50b783ce")
-
-    # .NET Core
-    nuget_package(
-        name = "netcoreapp2.1",
-        package = "Microsoft.NETCore.App",
-        version = "2.1.14",
-        sha256 = "5f2b5c98addeab2de380302ac26caa3e38cb2c050b38f8f25b451415a2e79c0b",
-        build_file = "@rules_dotnet//dotnet/private:frameworks/netcoreapp21.BUILD",
-    )
-
-    nuget_package(
-        name = "netcoreapp2.2",
-        package = "Microsoft.NETCore.App",
-        version = "2.2.8",
-        sha256 = "987b05eabc15cb625f1f9c6ee7bfad8408afca5b4761397f66c93a999c4011a1",
-        build_file = "@rules_dotnet//dotnet/private:frameworks/netcoreapp22.BUILD",
-    )
-
-    nuget_package(
-        name = "netcoreapp3.0",
-        package = "Microsoft.NETCore.App.Ref",
-        version = "3.0.0",
-        sha256 = "3c7a2fbddfa63cdf47a02174ac51274b4d79a7b623efaf9ef5c7d253824023e2",
-        build_file = "@rules_dotnet//dotnet/private:frameworks/netcoreapp30.BUILD",
-    )
-
-    nuget_package(
-        name = "netcoreapp3.1",
-        package = "Microsoft.NETCore.App.Ref",
-        version = "3.1.0",
-        sha256 = "9ee02f1f0989dacdce6f5a8d0c7d7eb95ddac0e65a5a5695dc57a74e63d45b23",
-        build_file = "@rules_dotnet//dotnet/private:frameworks/netcoreapp31.BUILD",
-    )
-
-    nuget_package(
-        name = "net5.0",
-        package = "Microsoft.NETCore.App.Ref",
-        version = "5.0.0",
-        sha256 = "910f30a51e1cad6a2acbf8ebb246addf863736bde76f1a12a443cc9f1c9cc2dc",
-        build_file = "@rules_dotnet//dotnet/private:frameworks/net50.BUILD",
-    )
-
-    nuget_package(
-        name = "net6.0",
-        package = "Microsoft.NETCore.App.Ref",
-        version = "6.0.0",
-        sha256 = "2a8287267ab57c8b24128f0232ff3bc31da37cd5abe6fd76d6e24d4c559e6fea",
-        build_file = "@rules_dotnet//dotnet/private:frameworks/net60.BUILD",
-    )
-
-    # .NET Standard (& .NET Core)
-    nuget_package(
-        name = "NetStandard.Library",
-        package = "NetStandard.Library",
-        version = "2.0.3",
-        sha256 = "3eb87644f79bcffb3c0331dbdac3c7837265f2cdf58a7bfd93e431776f77c9ba",
-        build_file = "@rules_dotnet//dotnet/private:frameworks/netstandard20.BUILD",
-    )
-
-    nuget_package(
-        name = "NetStandard.Library.Ref",
-        package = "NetStandard.Library.Ref",
-        version = "2.1.0",
-        sha256 = "46ea2fcbd10a817685b85af7ce0c397d12944bdc81209e272de1e05efd33c78a",
-        build_file = "@rules_dotnet//dotnet/private:frameworks/netstandard21.BUILD",
+    nuget_repo(
+        name = "rules_dotnet_deps",
+        packages = [
+            ("Microsoft.NETCore.App.Ref", "6.0.5", "sha512-quj/gyLoZLypJO7PwsZ8ib6ZSgFv1C9s5SJgwzl/gztynTJ/3oO/stA2gNMf0C33vTJ0J3SSF/kRPQ/ifY5xZg==", [], ["Microsoft.CSharp|4.4.0", "Microsoft.Win32.Primitives|4.3.0", "Microsoft.Win32.Registry|4.4.0", "runtime.debian.8-x64.runtime.native.System|4.3.0", "runtime.debian.8-x64.runtime.native.System.IO.Compression|4.3.0", "runtime.debian.8-x64.runtime.native.System.Net.Http|4.3.0", "runtime.debian.8-x64.runtime.native.System.Net.Security|4.3.0", "runtime.debian.8-x64.runtime.native.System.Security.Cryptography|4.3.0", "runtime.debian.8-x64.runtime.native.System.Security.Cryptography.OpenSsl|4.3.0", "runtime.fedora.23-x64.runtime.native.System|4.3.0", "runtime.fedora.23-x64.runtime.native.System.IO.Compression|4.3.0", "runtime.fedora.23-x64.runtime.native.System.Net.Http|4.3.0", "runtime.fedora.23-x64.runtime.native.System.Net.Security|4.3.0", "runtime.fedora.23-x64.runtime.native.System.Security.Cryptography|4.3.0", "runtime.fedora.23-x64.runtime.native.System.Security.Cryptography.OpenSsl|4.3.0", "runtime.fedora.24-x64.runtime.native.System|4.3.0", "runtime.fedora.24-x64.runtime.native.System.IO.Compression|4.3.0", "runtime.fedora.24-x64.runtime.native.System.Net.Http|4.3.0", "runtime.fedora.24-x64.runtime.native.System.Net.Security|4.3.0", "runtime.fedora.24-x64.runtime.native.System.Security.Cryptography|4.3.0", "runtime.fedora.24-x64.runtime.native.System.Security.Cryptography.OpenSsl|4.3.0", "runtime.opensuse.13.2-x64.runtime.native.System|4.3.0", "runtime.opensuse.13.2-x64.runtime.native.System.IO.Compression|4.3.0", "runtime.opensuse.13.2-x64.runtime.native.System.Net.Http|4.3.0", "runtime.opensuse.13.2-x64.runtime.native.System.Net.Security|4.3.0", "runtime.opensuse.13.2-x64.runtime.native.System.Security.Cryptography|4.3.0", "runtime.opensuse.13.2-x64.runtime.native.System.Security.Cryptography.OpenSsl|4.3.0", "runtime.opensuse.42.1-x64.runtime.native.System|4.3.0", "runtime.opensuse.42.1-x64.runtime.native.System.IO.Compression|4.3.0", "runtime.opensuse.42.1-x64.runtime.native.System.Net.Http|4.3.0", "runtime.opensuse.42.1-x64.runtime.native.System.Net.Security|4.3.0", "runtime.opensuse.42.1-x64.runtime.native.System.Security.Cryptography|4.3.0", "runtime.opensuse.42.1-x64.runtime.native.System.Security.Cryptography.OpenSsl|4.3.0", "runtime.osx.10.10-x64.runtime.native.System|4.3.0", "runtime.osx.10.10-x64.runtime.native.System.IO.Compression|4.3.0", "runtime.osx.10.10-x64.runtime.native.System.Net.Http|4.3.0", "runtime.osx.10.10-x64.runtime.native.System.Net.Security|4.3.0", "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography|4.3.0", "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography.Apple|4.3.0", "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography.OpenSsl|4.3.0", "runtime.rhel.7-x64.runtime.native.System|4.3.0", "runtime.rhel.7-x64.runtime.native.System.IO.Compression|4.3.0", "runtime.rhel.7-x64.runtime.native.System.Net.Http|4.3.0", "runtime.rhel.7-x64.runtime.native.System.Net.Security|4.3.0", "runtime.rhel.7-x64.runtime.native.System.Security.Cryptography|4.3.0", "runtime.rhel.7-x64.runtime.native.System.Security.Cryptography.OpenSsl|4.3.0", "runtime.ubuntu.14.04-x64.runtime.native.System|4.3.0", "runtime.ubuntu.14.04-x64.runtime.native.System.IO.Compression|4.3.0", "runtime.ubuntu.14.04-x64.runtime.native.System.Net.Http|4.3.0", "runtime.ubuntu.14.04-x64.runtime.native.System.Net.Security|4.3.0", "runtime.ubuntu.14.04-x64.runtime.native.System.Security.Cryptography|4.3.0", "runtime.ubuntu.14.04-x64.runtime.native.System.Security.Cryptography.OpenSsl|4.3.0", "runtime.ubuntu.16.04-x64.runtime.native.System|4.3.0", "runtime.ubuntu.16.04-x64.runtime.native.System.IO.Compression|4.3.0", "runtime.ubuntu.16.04-x64.runtime.native.System.Net.Http|4.3.0", "runtime.ubuntu.16.04-x64.runtime.native.System.Net.Security|4.3.0", "runtime.ubuntu.16.04-x64.runtime.native.System.Security.Cryptography|4.3.0", "runtime.ubuntu.16.04-x64.runtime.native.System.Security.Cryptography.OpenSsl|4.3.0", "runtime.ubuntu.16.10-x64.runtime.native.System|4.3.0", "runtime.ubuntu.16.10-x64.runtime.native.System.IO.Compression|4.3.0", "runtime.ubuntu.16.10-x64.runtime.native.System.Net.Http|4.3.0", "runtime.ubuntu.16.10-x64.runtime.native.System.Net.Security|4.3.0", "runtime.ubuntu.16.10-x64.runtime.native.System.Security.Cryptography|4.3.0", "runtime.ubuntu.16.10-x64.runtime.native.System.Security.Cryptography.OpenSsl|4.3.0", "System.AppContext|4.3.0", "System.Buffers|4.4.0", "System.Collections|4.3.0", "System.Collections.Concurrent|4.3.0", "System.Collections.Immutable|1.4.0", "System.Collections.NonGeneric|4.3.0", "System.Collections.Specialized|4.3.0", "System.ComponentModel|4.3.0", "System.ComponentModel.EventBasedAsync|4.3.0", "System.ComponentModel.Primitives|4.3.0", "System.ComponentModel.TypeConverter|4.3.0", "System.Console|4.3.0", "System.Data.Common|4.3.0", "System.Diagnostics.Contracts|4.3.0", "System.Diagnostics.Debug|4.3.0", "System.Diagnostics.DiagnosticSource|4.4.0", "System.Diagnostics.FileVersionInfo|4.3.0", "System.Diagnostics.Process|4.3.0", "System.Diagnostics.StackTrace|4.3.0", "System.Diagnostics.TextWriterTraceListener|4.3.0", "System.Diagnostics.Tools|4.3.0", "System.Diagnostics.TraceSource|4.3.0", "System.Diagnostics.Tracing|4.3.0", "System.Dynamic.Runtime|4.3.0", "System.Globalization|4.3.0", "System.Globalization.Calendars|4.3.0", "System.Globalization.Extensions|4.3.0", "System.IO|4.3.0", "System.IO.Compression|4.3.0", "System.IO.Compression.ZipFile|4.3.0", "System.IO.FileSystem|4.3.0", "System.IO.FileSystem.AccessControl|4.4.0", "System.IO.FileSystem.DriveInfo|4.3.0", "System.IO.FileSystem.Primitives|4.3.0", "System.IO.FileSystem.Watcher|4.3.0", "System.IO.IsolatedStorage|4.3.0", "System.IO.MemoryMappedFiles|4.3.0", "System.IO.Pipes|4.3.0", "System.IO.UnmanagedMemoryStream|4.3.0", "System.Linq|4.3.0", "System.Linq.Expressions|4.3.0", "System.Linq.Queryable|4.3.0", "System.Net.Http|4.3.0", "System.Net.NameResolution|4.3.0", "System.Net.Primitives|4.3.0", "System.Net.Requests|4.3.0", "System.Net.Security|4.3.0", "System.Net.Sockets|4.3.0", "System.Net.WebHeaderCollection|4.3.0", "System.ObjectModel|4.3.0", "System.Private.DataContractSerialization|4.3.0", "System.Reflection|4.3.0", "System.Reflection.Emit|4.3.0", "System.Reflection.Emit.ILGeneration|4.3.0", "System.Reflection.Emit.Lightweight|4.3.0", "System.Reflection.Extensions|4.3.0", "System.Reflection.Metadata|1.5.0", "System.Reflection.Primitives|4.3.0", "System.Reflection.TypeExtensions|4.3.0", "System.Resources.ResourceManager|4.3.0", "System.Runtime|4.3.0", "System.Runtime.Extensions|4.3.0", "System.Runtime.Handles|4.3.0", "System.Runtime.InteropServices|4.3.0", "System.Runtime.InteropServices.RuntimeInformation|4.3.0", "System.Runtime.Loader|4.3.0", "System.Runtime.Numerics|4.3.0", "System.Runtime.Serialization.Formatters|4.3.0", "System.Runtime.Serialization.Json|4.3.0", "System.Runtime.Serialization.Primitives|4.3.0", "System.Security.AccessControl|4.4.0", "System.Security.Claims|4.3.0", "System.Security.Cryptography.Algorithms|4.3.0", "System.Security.Cryptography.Cng|4.4.0", "System.Security.Cryptography.Csp|4.3.0", "System.Security.Cryptography.Encoding|4.3.0", "System.Security.Cryptography.OpenSsl|4.4.0", "System.Security.Cryptography.Primitives|4.3.0", "System.Security.Cryptography.X509Certificates|4.3.0", "System.Security.Cryptography.Xml|4.4.0", "System.Security.Principal|4.3.0", "System.Security.Principal.Windows|4.4.0", "System.Text.Encoding|4.3.0", "System.Text.Encoding.Extensions|4.3.0", "System.Text.RegularExpressions|4.3.0", "System.Threading|4.3.0", "System.Threading.Overlapped|4.3.0", "System.Threading.Tasks|4.3.0", "System.Threading.Tasks.Extensions|4.3.0", "System.Threading.Tasks.Parallel|4.3.0", "System.Threading.Thread|4.3.0", "System.Threading.ThreadPool|4.3.0", "System.Threading.Timer|4.3.0", "System.ValueTuple|4.3.0", "System.Xml.ReaderWriter|4.3.0", "System.Xml.XDocument|4.3.0", "System.Xml.XmlDocument|4.3.0", "System.Xml.XmlSerializer|4.3.0", "System.Xml.XPath|4.3.0", "System.Xml.XPath.XDocument|4.3.0"]),
+            ("Microsoft.NET.HostModel", "3.1.6", "sha512-hzPXcTF6xmZZMmtumMgI7wcsWvU/S4oszoBWVZuASIVRDkjKJJ+QVesvhdjH2+JaqjxCHwQ2TagOtR7yGgT2Hg==", [], []),
+            # TODO: Nuget tool deps, maybe not force end users to download them if they are not using it?
+            ("McMaster.Extensions.CommandLineUtils", "2.5.0", "sha512-00uJOWYKPCPqDB6RxyOLXNnoPGeRmzKTZhu5OdZJaWn5+JV/n6mzB3/M+Z1yMpkabag3Lym9S11G/ITLrptOiw==", [], []),
+            ("Nuget.Commands", "5.10.0", "sha512-Q7ANXnmLUPC4pWgCZjBy2R7vRDABiaJz5NsBtoErE0dLylx/zQWRMyoa+m4Y478SKvUpt7S1V7LhAOlMRCTPpg==", [], []),
+            ("Nuget.Common", "5.10.0", None, [], []),
+            ("Nuget.Configuration", "5.10.0", None, [], []),
+            ("Nuget.DependencyResolver.Core", "5.10.0", None, [], []),
+            ("Nuget.Frameworks", "5.10.0", None, [], []),
+            ("Nuget.PackageManagement", "5.10.0", None, [], []),
+            ("Nuget.Packaging.Core", "5.10.0", None, [], []),
+            ("Nuget.Packaging", "5.10.0", None, [], []),
+            ("Nuget.ProjectModel", "5.10.0", None, [], []),
+            ("Nuget.Protocol", "5.10.0", None, [], []),
+            ("Nuget.Resolver", "5.10.0", None, [], []),
+            ("Nuget.Versioning", "5.10.0", None, ["Nuget.Credentials", "Nuget.LibraryModel"], []),
+            ("Nuget.Credentials", "5.10.0", None, [], []),
+            ("Nuget.LibraryModel", "5.10.0", None, [], []),
+            # TODO: Create a toolchain for NUnit
+            ("NUnit", "3.12.0", "sha512-HAhwFxr+Z+PJf8hXzc747NecvsDwEZ+3X8SA5+GIRM43GAy1Ap+TQPMHsWCnisfes5vPZ1/a2md/91u+shoTsQ==", [], []),
+            ("NUnitLite", "3.12.0", "sha512-M9VVS4x3KURXFS4HTl2b7uJOX7vOi2wzpHACmNX6ANlBmb0/hIehJLciiVvddD3ubIIL81EF4Qk54kpsUOtVFQ==", [], []),
+        ],
     )
 
     # paket2bazel dependencies
+    # This should probably be moved to a separate macro so that
+    # Those who are not using Paket will not have to download the paket2bazel dependencies
     paket()
 
 ########
@@ -189,17 +90,17 @@ exports_files(
 
 filegroup(
     name = "runtime",
-    srcs = glob(
-        [
-            "dotnet",
-            "dotnet.exe",  # windows
-        ],
-        allow_empty = True,
-    ),
+    srcs = select({{
+        "@bazel_tools//src/conditions:windows": ["dotnet.exe"],
+        "//conditions:default": ["dotnet"],
+    }}),
     data = glob([
         "host/**/*",
         "shared/**/*",
-    ]),
+    ]) + select({{
+        "@bazel_tools//src/conditions:windows": ["dotnet.exe"],
+        "//conditions:default": ["dotnet"],
+    }}),
     visibility = ["//visibility:public"],
 )
 
@@ -226,47 +127,40 @@ filegroup(
 cc_binary(
     name = "dotnetw",
     srcs = [":main-cc"],
-    data = glob(
-        [
-            "dotnet",
-            "dotnet.exe",
-        ],
-        allow_empty = True,
-    ),
+    data = select({{
+        "@bazel_tools//src/conditions:windows": ["dotnet.exe"],
+        "//conditions:default": ["dotnet"],
+    }}),
     visibility = ["//visibility:public"],
     deps = ["@bazel_tools//tools/cpp/runfiles"],
 )
 
 dotnet_wrapper(
     name = "main-cc",
-    dotnet = glob(
-        [
-            "dotnet",
-            "dotnet.exe",
-        ],
-        allow_empty = True,
-    ),
+    dotnet = select({{
+        "@bazel_tools//src/conditions:windows": ["dotnet.exe"],
+        "//conditions:default": ["dotnet"],
+    }}),
 )
 
 dotnet_toolchain(
     name = "dotnet_toolchain", 
     runtime = ":runtime",
-    csharp_compiler = ":sdk/{0}/Roslyn/bincore/csc.dll",
+    csharp_compiler = ":sdk/{sdk_version}/Roslyn/bincore/csc.dll",
     fsharp_compiler = ":fsc_binary",
     apphost = ":apphost",
-    sdk_version = "{1}",
-    runtime_version = "{2}",
-    runtime_tfm = "{3}",
-    csharp_default_version = "{4}",
-    fsharp_default_version = "{5}",
+    sdk_version = "{sdk_version}",
+    runtime_version = "{runtime_version}",
+    runtime_tfm = "{runtime_tfm}",
+    csharp_default_version = "{csharp_default_version}",
+    fsharp_default_version = "{fsharp_default_version}",
 )
 """.format(
-        repository_ctx.attr.dotnet_version,
-        repository_ctx.attr.dotnet_version,
-        TOOL_VERSIONS[repository_ctx.attr.dotnet_version]["runtimeVersion"],
-        TOOL_VERSIONS[repository_ctx.attr.dotnet_version]["runtimeTfm"],
-        TOOL_VERSIONS[repository_ctx.attr.dotnet_version]["csharpDefaultVersion"],
-        TOOL_VERSIONS[repository_ctx.attr.dotnet_version]["fsharpDefaultVersion"],
+        sdk_version = repository_ctx.attr.dotnet_version,
+        runtime_version = TOOL_VERSIONS[repository_ctx.attr.dotnet_version]["runtimeVersion"],
+        runtime_tfm = TOOL_VERSIONS[repository_ctx.attr.dotnet_version]["runtimeTfm"],
+        csharp_default_version = TOOL_VERSIONS[repository_ctx.attr.dotnet_version]["csharpDefaultVersion"],
+        fsharp_default_version = TOOL_VERSIONS[repository_ctx.attr.dotnet_version]["fsharpDefaultVersion"],
     )
 
     # Base BUILD file for this repository

@@ -5,8 +5,8 @@ Actions for compiling targets with C#.
 load(
     "//dotnet/private:common.bzl",
     "collect_transitive_info",
-    "get_analyzer_dll",
     "use_highentropyva",
+    "format_ref_arg",
 )
 load(
     "//dotnet/private:providers.bzl",
@@ -15,25 +15,9 @@ load(
 )
 load("//dotnet/private:actions/misc.bzl", "framework_preprocessor_symbols", "write_internals_visible_to_csharp")
 
-def _format_ref_arg(assembly):
-    return "/r:" + assembly.path
-
-def _format_analyzer_arg(analyzer):
-    return "/analyzer:" + analyzer
-
-def _format_additionalfile_arg(additionalfile):
-    return "/additionalfile:" + additionalfile.path
-
-def _format_resource_arg(resource):
-    return "/resource:" + resource.path
-
-def _format_define(symbol):
-    return "/d:" + symbol
-
 def AssemblyAction(
         actions,
         additionalfiles,
-        analyzers,
         debug,
         defines,
         deps,
@@ -79,8 +63,7 @@ def AssemblyAction(
 
     assembly_name = target_name if out == "" else out
     (subsystem_version, default_lang_version) = GetFrameworkVersionInfo(target_framework)
-    (refs, runfiles, native_dlls) = collect_transitive_info(target_name, deps, target_framework)
-    analyzer_assemblies = [get_analyzer_dll(a) for a in analyzers]
+    (irefs, prefs, analyzers, runfiles, overrides) = collect_transitive_info(target_name, deps)
     defines = framework_preprocessor_symbols(target_framework) + defines
 
     out_dir = "bazelout/" + target_framework
@@ -95,14 +78,14 @@ def AssemblyAction(
         _compile(
             actions,
             additionalfiles,
-            analyzer_assemblies,
+            analyzers,
             debug,
             default_lang_version,
             defines,
             keyfile,
             langversion,
-            native_dlls,
-            refs,
+            irefs,
+            overrides,
             resources,
             srcs,
             subsystem_version,
@@ -129,14 +112,14 @@ def AssemblyAction(
         _compile(
             actions,
             additionalfiles,
-            analyzer_assemblies,
+            analyzers,
             debug,
             default_lang_version,
             defines,
             keyfile,
             langversion,
-            native_dlls,
-            refs,
+            irefs,
+            overrides,
             resources,
             srcs + [internals_visible_to_cs],
             subsystem_version,
@@ -153,14 +136,14 @@ def AssemblyAction(
         _compile(
             actions,
             additionalfiles,
-            analyzer_assemblies,
+            analyzers,
             debug,
             default_lang_version,
             defines,
             keyfile,
             langversion,
-            native_dlls,
-            refs,
+            irefs,
+            overrides,
             resources,
             srcs,
             subsystem_version,
@@ -173,19 +156,21 @@ def AssemblyAction(
             out_pdb = None,
         )
 
-    return DotnetAssemblyInfo[target_framework](
-        out = out_dll,
-        irefout = out_iref or out_ref,
-        prefout = out_ref,
+    return DotnetAssemblyInfo(
+        libs = [out_dll],
+        analyzers = [],
+        irefs = [out_iref] if out_iref else [out_ref],
+        prefs = [out_ref],
         internals_visible_to = internals_visible_to or [],
-        pdb = out_pdb,
-        native_dlls = native_dlls,
+        data = [out_pdb] if out_pdb else [],
         deps = deps,
-        transitive_refs = refs,
+        transitive_prefs = prefs,
+        transitive_analyzers = analyzers,
         transitive_runfiles = runfiles,
         actual_tfm = target_framework,
         runtimeconfig = runtimeconfig,
         depsjson = depsjson,
+        targeting_pack_overrides = {},
     )
 
 def _compile(
@@ -197,8 +182,8 @@ def _compile(
         defines,
         keyfile,
         langversion,
-        native_dlls,
         refs,
+        overrides,
         resources,
         srcs,
         subsystem_version,
@@ -257,20 +242,20 @@ def _compile(
         outputs = [out_ref]
 
     # assembly references
-    args.add_all(refs, map_each = _format_ref_arg)
+    format_ref_arg(args, refs, overrides)
 
     # analyzers
-    args.add_all(analyzer_assemblies, map_each = _format_analyzer_arg)
-    args.add_all(additionalfiles, map_each = _format_additionalfile_arg)
+    args.add_all(analyzer_assemblies, format_each = "/analyzer:%s")
+    args.add_all(additionalfiles, format_each = "/additionalfile:%s")
 
     # .cs files
-    args.add_all([cs for cs in srcs])
+    args.add_all(srcs)
 
     # resources
-    args.add_all(resources, map_each = _format_resource_arg)
+    args.add_all(resources, format_each = "/resource:%s")
 
     # defines
-    args.add_all(defines, map_each = _format_define)
+    args.add_all(defines, format_each = "/d:%s")
 
     # keyfile
     if keyfile != None:
@@ -300,7 +285,7 @@ def _compile(
     # of 1024 bytes, so always use a param file.
     args.use_param_file("@%s", use_always = True)
 
-    direct_inputs = srcs + resources + analyzer_assemblies + additionalfiles + [toolchain.csharp_compiler]
+    direct_inputs = srcs + resources + additionalfiles + [toolchain.csharp_compiler]
     direct_inputs += [keyfile] if keyfile else []
 
     # dotnet.exe csc.dll /noconfig <other csc args>
@@ -310,7 +295,7 @@ def _compile(
         progress_message = "Compiling " + target_name + (" (internals ref-only dll)" if out_dll == None else ""),
         inputs = depset(
             direct = direct_inputs,
-            transitive = [refs] + [native_dlls],
+            transitive = [refs, analyzer_assemblies],
         ),
         outputs = outputs,
         executable = toolchain.runtime.files_to_run,

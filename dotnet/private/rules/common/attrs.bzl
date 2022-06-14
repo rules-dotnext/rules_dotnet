@@ -1,13 +1,15 @@
 "The attributes used by binary/library/test rules"
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
-load("//dotnet/private:providers.bzl", "AnyTargetFrameworkInfo")
+load("//dotnet/private:providers.bzl", "DotnetAssemblyInfo")
+load("//dotnet/private:macros/register_tfms.bzl", "nuget_framework_transition")
 
 # These are attributes that are common across all the binary/library/test .Net rules
 COMMON_ATTRS = {
     "deps": attr.label_list(
         doc = "Other libraries, binaries, or imported DLLs",
-        providers = AnyTargetFrameworkInfo,
+        providers = [DotnetAssemblyInfo],
+        cfg = nuget_framework_transition,
     ),
     "keyfile": attr.label(
         doc = "The key file used to sign the assembly with a strong name.",
@@ -26,25 +28,24 @@ COMMON_ATTRS = {
     "target_frameworks": attr.string_list(
         doc = "A list of target framework monikers to build" +
               "See https://docs.microsoft.com/en-us/dotnet/standard/frameworks",
-        allow_empty = False,
+        allow_empty = True,
+        default = [],
     ),
     "defines": attr.string_list(
         doc = "A list of preprocessor directive symbols to define.",
         default = [],
         allow_empty = True,
     ),
-    "include_stdrefs": attr.bool(
-        doc = "Whether to reference @net//:StandardReferences (the default set of references that MSBuild adds to every project).",
-        default = True,
-    ),
     "internals_visible_to": attr.string_list(
         doc = "Other libraries that can see the assembly's internal symbols. Using this rather than the InternalsVisibleTo assembly attribute will improve build caching.",
     ),
-    "_stdrefs": attr.label(
-        doc = "The standard set of assemblies to reference.",
-        default = "@net//:StandardReferences",
+    "_target_framework": attr.label(
+        default = "@rules_dotnet//dotnet:target_framework"
     ),
     "_windows_constraint": attr.label(default = "@platforms//os:windows"),
+    "_allowlist_function_transition": attr.label(
+        default = "@bazel_tools//tools/allowlists/function_transition_allowlist"
+    ),
 }
 
 # These are attributes that are common across all binary/test rules
@@ -66,7 +67,7 @@ BINARY_COMMON_ATTRS = {
     ),
     "_manifest_loader": attr.label(
         default = "@rules_dotnet//dotnet/private/tools/manifest_loader:ManifestLoader",
-        providers = AnyTargetFrameworkInfo,
+        providers = [DotnetAssemblyInfo],
     ),
     "_bash_runfiles": attr.label(
         default = "@bazel_tools//tools/bash/runfiles",
@@ -91,10 +92,6 @@ CSHARP_COMMON_ATTRS = dicts.add(
         "srcs": attr.label_list(
             doc = "The source files used in the compilation.",
             allow_files = [".cs"],
-        ),
-        "analyzers": attr.label_list(
-            doc = "A list of analyzer references.",
-            providers = AnyTargetFrameworkInfo,
         ),
         "additionalfiles": attr.label_list(
             doc = "Extra files to configure analyzers.",
