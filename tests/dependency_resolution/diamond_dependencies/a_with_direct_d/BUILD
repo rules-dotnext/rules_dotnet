@@ -1,17 +1,18 @@
 load(
     "@rules_dotnet//dotnet:defs.bzl",
-    "csharp_library",
+    "csharp_nunit_test",
 )
 
-csharp_library(
-    name = "ab",
-    srcs = ["ab.cs"],
+csharp_nunit_test(
+    name = "a",
+    srcs = ["a.cs"],
     private_deps = [
         "@rules_dotnet_test_deps//microsoft.netcore.app.ref",
     ],
     target_frameworks = ["net6.0"],
-    visibility = ["//visibility:public"],
     deps = [
+        "//tests/dependency_resolution/diamond_dependencies/ab",
+        "//tests/dependency_resolution/diamond_dependencies/ac",
         "//tests/dependency_resolution/diamond_dependencies/d",
     ],
 )

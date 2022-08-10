@@ -5,17 +5,21 @@ Rules for compiling F# libraries.
 load("//dotnet/private:actions/fsharp_assembly.bzl", "AssemblyAction")
 load("//dotnet/private:rules/common/library.bzl", "build_library")
 load("//dotnet/private:rules/common/attrs.bzl", "FSHARP_COMMON_ATTRS")
+load("//dotnet/private:transitions/tfm_transition.bzl", "tfm_transition")
 load(
     "//dotnet/private:common.bzl",
     "is_debug",
+    "is_strict_deps_enabled",
 )
 
 def _compile_action(ctx, tfm):
+    toolchain = ctx.toolchains["@rules_dotnet//dotnet:toolchain_type"]
     return AssemblyAction(
         ctx.actions,
         debug = is_debug(ctx),
         defines = ctx.attr.defines,
         deps = ctx.attr.deps,
+        private_deps = ctx.attr.private_deps,
         internals_visible_to = ctx.attr.internals_visible_to,
         keyfile = ctx.file.keyfile,
         langversion = ctx.attr.langversion,
@@ -26,7 +30,8 @@ def _compile_action(ctx, tfm):
         target = "library",
         target_name = ctx.attr.name,
         target_framework = tfm,
-        toolchain = ctx.toolchains["@rules_dotnet//dotnet:toolchain_type"],
+        toolchain = toolchain,
+        strict_deps = is_strict_deps_enabled(toolchain, ctx.attr.strict_deps),
     )
 
 def _library_impl(ctx):
@@ -38,4 +43,5 @@ fsharp_library = rule(
     attrs = FSHARP_COMMON_ATTRS,
     executable = False,
     toolchains = ["@rules_dotnet//dotnet:toolchain_type"],
+    cfg = tfm_transition,
 )

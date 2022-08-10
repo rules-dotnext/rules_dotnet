@@ -9,10 +9,13 @@ csharp_library(
             "**/bin/**",
         ],
     ),
+    private_deps = [
+        "@rules_dotnet_deps//microsoft.netcore.app.ref",
+    ],
+    target_frameworks = ["net6.0"],
     visibility = ["//visibility:public"],
     deps = [
         #Adding built-in .Net libs
-        "@rules_dotnet_deps//microsoft.netcore.app.ref",
         "@rules_dotnet_deps//nuget.commands",
         "@rules_dotnet_deps//nuget.common",
         "@rules_dotnet_deps//nuget.configuration",
@@ -25,5 +28,7 @@ csharp_library(
         "@rules_dotnet_deps//nuget.protocol",
         "@rules_dotnet_deps//nuget.resolver",
         "@rules_dotnet_deps//nuget.versioning",
+        "@rules_dotnet_deps//nuget.credentials",
+        "@rules_dotnet_deps//nuget.librarymodel",
     ],
 )

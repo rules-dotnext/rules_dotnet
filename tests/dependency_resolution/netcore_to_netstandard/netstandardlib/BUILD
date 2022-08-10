@@ -4,12 +4,12 @@ load(
 )
 
 csharp_library(
-    name = "runfiles",
-    srcs = ["Runfiles.cs"],
+    name = "netstandardlib",
+    srcs = ["netstandardlib.cs"],
     private_deps = [
-        "@rules_dotnet_deps//microsoft.netcore.app.ref",
+        "@rules_dotnet_test_deps//netstandard.library.ref",
     ],
-    target_frameworks = ["net6.0"],
+    target_frameworks = ["netstandard2.1"],
     visibility = ["//visibility:public"],
     deps = [
     ],

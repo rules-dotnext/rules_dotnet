@@ -6,6 +6,7 @@ load(
     "//dotnet/private:common.bzl",
     "collect_transitive_info",
     "format_ref_arg",
+    "get_framework_version_info",
     "is_core_framework",
     "is_standard_framework",
     "use_highentropyva",
@@ -13,7 +14,6 @@ load(
 load(
     "//dotnet/private:providers.bzl",
     "DotnetAssemblyInfo",
-    "GetFrameworkVersionInfo",
 )
 load("//dotnet/private:actions/misc.bzl", "framework_preprocessor_symbols", "write_internals_visible_to_fsharp")
 
@@ -31,6 +31,7 @@ def AssemblyAction(
         debug,
         defines,
         deps,
+        private_deps,
         internals_visible_to,
         keyfile,
         langversion,
@@ -42,6 +43,7 @@ def AssemblyAction(
         target_name,
         target_framework,
         toolchain,
+        strict_deps,
         runtimeconfig = None,
         depsjson = None):
     """Creates an action that runs the F# compiler with the specified inputs.
@@ -53,6 +55,7 @@ def AssemblyAction(
         debug: Emits debugging information.
         defines: The list of conditional compilation symbols.
         deps: The list of other libraries to be linked in to the assembly.
+        private_deps: The list of libraries that are private to the target. These deps are not passed transitively.
         internals_visible_to: An optional list of assemblies that can see this assemblies internal symbols.
         keyfile: Specifies a strong name key file of the assembly.
         langversion: Specify language version: Default, ISO-1, ISO-2, 3, 4, 5, 6, 7, 7.1, 7.2, 7.3, or Latest
@@ -64,6 +67,7 @@ def AssemblyAction(
         target: Specifies the format of the output file by using one of four options.
         target_framework: The target framework moniker for the assembly.
         toolchain: The toolchain that supply the F# compiler.
+        strict_deps: Whether or not to use strict dependencies.
         runtimeconfig: The runtime configuration of the assembly.
         depsjson: The deps.json for the assembly.
 
@@ -72,8 +76,8 @@ def AssemblyAction(
     """
 
     assembly_name = target_name if out == "" else out
-    (subsystem_version, _default_lang_version) = GetFrameworkVersionInfo(target_framework)
-    (irefs, prefs, analyzers, transitive_runfiles, overrides) = collect_transitive_info(target_name, deps)
+    (subsystem_version, _default_lang_version) = get_framework_version_info(target_framework)
+    (irefs, prefs, analyzers, transitive_runfiles, private_refs, _private_analyzers, overrides) = collect_transitive_info(target_name, deps, private_deps, strict_deps)
     defines = framework_preprocessor_symbols(target_framework) + defines
 
     out_dir = "bazelout/" + target_framework
@@ -94,6 +98,7 @@ def AssemblyAction(
             keyfile,
             langversion,
             irefs,
+            private_refs,
             overrides,
             resources,
             srcs,
@@ -119,6 +124,7 @@ def AssemblyAction(
             keyfile,
             langversion,
             irefs,
+            private_refs,
             overrides,
             resources,
             srcs + [internals_visible_to_cs],
@@ -147,7 +153,6 @@ def AssemblyAction(
         transitive_prefs = prefs,
         transitive_analyzers = analyzers,
         transitive_runfiles = transitive_runfiles,
-        actual_tfm = target_framework,
         runtimeconfig = runtimeconfig,
         depsjson = depsjson,
         targeting_pack_overrides = {},
@@ -160,6 +165,7 @@ def _compile(
         keyfile,
         langversion,
         refs,
+        private_refs,
         overrides,
         resources,
         srcs,
@@ -175,7 +181,6 @@ def _compile(
     # Our goal is to match msbuild as much as reasonable
     # https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/compiler-options
     args = actions.args()
-    args.add("/checked-")
     args.add("/noframework")
     args.add("/utf8output")
     args.add("/deterministic+")
@@ -203,6 +208,7 @@ def _compile(
         args.add("/debug+")
         args.add("/optimize-")
         args.add("/define:TRACE;DEBUG")
+        args.add("/tailcalls-")
     else:
         args.add("/debug-")
         args.add("/optimize+")
@@ -228,7 +234,7 @@ def _compile(
         # outputs = [out_ref]
 
     # assembly references
-    format_ref_arg(args, refs, overrides)
+    format_ref_arg(args, depset(transitive = [private_refs, refs]), overrides)
 
     # .fs files
     args.add_all(srcs)
@@ -247,8 +253,6 @@ def _compile(
     # makes that call based on limitations of the OS).
     args.set_param_file_format("multiline")
 
-    # Our wrapper uses _spawnv to launch dotnet, and that has a command line limit
-    # of 1024 bytes, so always use a param file.
     args.use_param_file("@%s", use_always = True)
 
     direct_inputs = srcs + resources + [toolchain.fsharp_compiler]
@@ -260,7 +264,7 @@ def _compile(
         progress_message = "Compiling " + target_name + (" (internals ref-only dll)" if out_dll == None else ""),
         inputs = depset(
             direct = direct_inputs,
-            transitive = [refs],
+            transitive = [refs, private_refs],
         ),
         outputs = outputs,
         executable = toolchain.runtime.files_to_run,

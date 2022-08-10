@@ -2,14 +2,14 @@
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//dotnet/private:providers.bzl", "DotnetAssemblyInfo")
-load("//dotnet/private:macros/register_tfms.bzl", "nuget_framework_transition")
+load("//dotnet/private:transitions/nuget_transition.bzl", "nuget_transition")
 
 # These are attributes that are common across all the binary/library/test .Net rules
 COMMON_ATTRS = {
     "deps": attr.label_list(
         doc = "Other libraries, binaries, or imported DLLs",
         providers = [DotnetAssemblyInfo],
-        cfg = nuget_framework_transition,
+        cfg = nuget_transition,
     ),
     "data": attr.label_list(
         doc = "Runtime files. It is recommended to use the @rules_dotnet//tools/runfiles library to read the runtime files.",
@@ -34,8 +34,8 @@ COMMON_ATTRS = {
     "target_frameworks": attr.string_list(
         doc = "A list of target framework monikers to build" +
               "See https://docs.microsoft.com/en-us/dotnet/standard/frameworks",
-        allow_empty = True,
-        default = [],
+        mandatory = True,
+        allow_empty = False,
     ),
     "defines": attr.string_list(
         doc = "A list of preprocessor directive symbols to define.",
@@ -44,6 +44,23 @@ COMMON_ATTRS = {
     ),
     "internals_visible_to": attr.string_list(
         doc = "Other libraries that can see the assembly's internal symbols. Using this rather than the InternalsVisibleTo assembly attribute will improve build caching.",
+    ),
+    "private_deps": attr.label_list(
+        doc = """Private dependencies 
+
+        This attribute should be used for dependencies are only private to the target. 
+        The dependencies will not be propagated transitively to parent targets and 
+        do not become part of the targets runfiles.
+        """,
+        providers = [DotnetAssemblyInfo],
+        cfg = nuget_transition,
+    ),
+    "strict_deps": attr.bool(
+        doc = """Whether to use strict dependencies or not. 
+        
+        This attribute mirrors the DisableTransitiveProjectReferences in MSBuild.
+        The default setting of this attribute can be overridden in the toolchain configuration""",
+        default = True,
     ),
     "_target_framework": attr.label(
         default = "@rules_dotnet//dotnet:target_framework",
@@ -123,7 +140,7 @@ FSHARP_COMMON_ATTRS = dicts.add(
     },
 )
 
-# These are attributes that are common across all the binary/library/test F# rules
+# These are attributes that are common across all the binary F# rules
 FSHARP_BINARY_COMMON_ATTRS = dicts.add(
     FSHARP_COMMON_ATTRS,
     BINARY_COMMON_ATTRS,
