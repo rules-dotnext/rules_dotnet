@@ -1,0 +1,34 @@
+load("@rules_dotnet//dotnet:defs.bzl", "csharp_library")
+
+csharp_library(
+    name = "Afas.BazelDotnet.Nuget",
+    srcs = glob(
+        ["**/*.cs"],
+        exclude = [
+            "**/obj/**",
+            "**/bin/**",
+        ],
+    ),
+    private_deps = [
+        "@rules_dotnet_nuget_packages//microsoft.netcore.app.ref",
+    ],
+    target_frameworks = ["net6.0"],
+    visibility = ["//visibility:public"],
+    deps = [
+        #Adding built-in .Net libs
+        "@rules_dotnet_nuget_packages//nuget.commands",
+        "@rules_dotnet_nuget_packages//nuget.common",
+        "@rules_dotnet_nuget_packages//nuget.configuration",
+        "@rules_dotnet_nuget_packages//nuget.dependencyresolver.core",
+        "@rules_dotnet_nuget_packages//nuget.frameworks",
+        "@rules_dotnet_nuget_packages//nuget.packagemanagement",
+        "@rules_dotnet_nuget_packages//nuget.packaging.core",
+        "@rules_dotnet_nuget_packages//nuget.packaging",
+        "@rules_dotnet_nuget_packages//nuget.projectmodel",
+        "@rules_dotnet_nuget_packages//nuget.protocol",
+        "@rules_dotnet_nuget_packages//nuget.resolver",
+        "@rules_dotnet_nuget_packages//nuget.versioning",
+        "@rules_dotnet_nuget_packages//nuget.credentials",
+        "@rules_dotnet_nuget_packages//nuget.librarymodel",
+    ],
+)

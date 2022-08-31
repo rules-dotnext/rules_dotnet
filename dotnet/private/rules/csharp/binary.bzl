@@ -2,19 +2,18 @@
 Rules for compiling C# binaries.
 """
 
-load("//dotnet/private:providers.bzl", "DotnetAssemblyInfo")
-load("//dotnet/private:actions/csharp_assembly.bzl", "AssemblyAction")
+load("//dotnet/private/rules/csharp/actions:csharp_assembly.bzl", "AssemblyAction")
+load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load(
     "//dotnet/private:common.bzl",
     "is_debug",
-    "is_strict_deps_enabled",
 )
-load("//dotnet/private:rules/common/binary.bzl", "build_binary")
-load("//dotnet/private:rules/common/attrs.bzl", "CSHARP_BINARY_COMMON_ATTRS")
-load("//dotnet/private:transitions/tfm_transition.bzl", "tfm_transition")
+load("//dotnet/private/rules/common:binary.bzl", "build_binary")
+load("//dotnet/private/rules/common:attrs.bzl", "CSHARP_BINARY_COMMON_ATTRS")
+load("//dotnet/private/transitions:tfm_transition.bzl", "tfm_transition")
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 
-def _compile_action(ctx, tfm, runtimeconfig, depsjson):
+def _compile_action(ctx, tfm):
     toolchain = ctx.toolchains["@rules_dotnet//dotnet:toolchain_type"]
     return AssemblyAction(
         ctx.actions,
@@ -22,6 +21,7 @@ def _compile_action(ctx, tfm, runtimeconfig, depsjson):
         debug = is_debug(ctx),
         defines = ctx.attr.defines,
         deps = ctx.attr.deps,
+        exports = [],
         private_deps = ctx.attr.private_deps,
         internals_visible_to = ctx.attr.internals_visible_to,
         keyfile = ctx.file.keyfile,
@@ -34,9 +34,12 @@ def _compile_action(ctx, tfm, runtimeconfig, depsjson):
         target_name = ctx.attr.name,
         target_framework = tfm,
         toolchain = toolchain,
-        strict_deps = is_strict_deps_enabled(toolchain, ctx.attr.strict_deps),
-        runtimeconfig = runtimeconfig,
-        depsjson = depsjson,
+        strict_deps = ctx.attr.strict_deps if ctx.attr.override_strict_deps else toolchain.strict_deps,
+        include_host_model_dll = ctx.attr.include_host_model_dll,
+        treat_warnings_as_errors = ctx.attr.treat_warnings_as_errors if ctx.attr.override_treat_warnings_as_errors else toolchain.dotnetinfo.csharp_treat_warnings_as_errors[BuildSettingInfo].value,
+        warnings_as_errors = ctx.attr.warnings_as_errors if ctx.attr.override_warnings_as_errors else toolchain.dotnetinfo.csharp_warnings_as_errors[BuildSettingInfo].value,
+        warnings_not_as_errors = ctx.attr.warnings_not_as_errors if ctx.attr.override_warnings_not_as_errors else toolchain.dotnetinfo.csharp_warnings_not_as_errors[BuildSettingInfo].value,
+        warning_level = ctx.attr.warning_level if ctx.attr.override_warning_level else toolchain.dotnetinfo.csharp_warning_level[BuildSettingInfo].value,
     )
 
 def _binary_private_impl(ctx):
@@ -48,35 +51,8 @@ csharp_binary = rule(
     attrs = dicts.add(
         CSHARP_BINARY_COMMON_ATTRS,
         {
-            "_apphost_shimmer": attr.label(
-                default = "@rules_dotnet//dotnet/private/tools/apphost_shimmer:apphost_shimmer",
-                providers = [DotnetAssemblyInfo],
-                executable = True,
-                cfg = "exec",
-            ),
-            "use_apphost_shim": attr.bool(
-                doc = "Whether to create a executable shim for the binary.",
-                default = True,
-            ),
-        },
-    ),
-    executable = True,
-    toolchains = [
-        "@rules_dotnet//dotnet:toolchain_type",
-    ],
-    cfg = tfm_transition,
-)
-
-csharp_binary_without_shim = rule(
-    _binary_private_impl,
-    doc = """Compile a C# exe. 
-This rule is internal only and is only used to compile the apphost shimmer. 
-It is needed to remove a circular dependency between csharp_binary and the apphost shimmer when building the apphost shimmer""",
-    attrs = dicts.add(
-        CSHARP_BINARY_COMMON_ATTRS,
-        {
-            "use_apphost_shim": attr.bool(
-                doc = "Whether to create a executable shim for the binary.",
+            "include_host_model_dll": attr.bool(
+                doc = "Whether to include Microsoft.NET.HostModel from the toolchain. This is only required to build tha apphost shimmer.",
                 default = False,
             ),
         },
@@ -84,7 +60,6 @@ It is needed to remove a circular dependency between csharp_binary and the appho
     executable = True,
     toolchains = [
         "@rules_dotnet//dotnet:toolchain_type",
-        "@bazel_tools//tools/sh:toolchain_type",
     ],
     cfg = tfm_transition,
 )

@@ -1,5 +1,5 @@
 ---
-bazel: 5.0.0
+bazel: 5.3.0
 
 buildifier:
   version: latest
@@ -10,21 +10,30 @@ tasks:
     platform: windows
     include_json_profile:
       - build
+      - test
     build_targets:
+      - "//..."
+    test_targets:
       - "//..."
   ubuntu1804:
     name: Rules on Linux
     platform: ubuntu1804
     include_json_profile:
       - build
+      - test
     build_targets:
+      - "//..."
+    test_targets:
       - "//..."
   macos:
     name: Rules on MacOS
     platform: macos
     include_json_profile:
       - build
+      - test
     build_targets:
+      - "//..."
+    test_targets:
       - "//..."
   examples-windows:
     name: Examples on Windows

@@ -2,14 +2,14 @@
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("//dotnet/private:providers.bzl", "DotnetAssemblyInfo")
-load("//dotnet/private:transitions/nuget_transition.bzl", "nuget_transition")
+load("//dotnet/private/transitions:tfm_transition.bzl", "tfm_transition")
 
 # These are attributes that are common across all the binary/library/test .Net rules
 COMMON_ATTRS = {
     "deps": attr.label_list(
         doc = "Other libraries, binaries, or imported DLLs",
         providers = [DotnetAssemblyInfo],
-        cfg = nuget_transition,
+        cfg = tfm_transition,
     ),
     "data": attr.label_list(
         doc = "Runtime files. It is recommended to use the @rules_dotnet//tools/runfiles library to read the runtime files.",
@@ -37,6 +37,11 @@ COMMON_ATTRS = {
         mandatory = True,
         allow_empty = False,
     ),
+    "runtime_identifier": attr.string(
+        doc = "The runtime identifier that is being targeted. " +
+              "See https://docs.microsoft.com/en-us/dotnet/core/rid-catalog",
+        mandatory = True,
+    ),
     "defines": attr.string_list(
         doc = "A list of preprocessor directive symbols to define.",
         default = [],
@@ -53,7 +58,41 @@ COMMON_ATTRS = {
         do not become part of the targets runfiles.
         """,
         providers = [DotnetAssemblyInfo],
-        cfg = nuget_transition,
+        cfg = tfm_transition,
+    ),
+    "treat_warnings_as_errors": attr.bool(
+        doc = "Treat all compiler warnings as errors. Note that this attribute can not be used in conjunction with warnings_as_errors.",
+        mandatory = False,
+    ),
+    "override_treat_warnings_as_errors": attr.bool(
+        doc = "Whether or not to override the treat_warnings_as_errors attribute.",
+        mandatory = False,
+    ),
+    "warnings_as_errors": attr.string_list(
+        doc = "List of compiler warning codes that should be considered as errors. Note that this attribute can not be used in conjunction with treat_warning_as_errors.",
+        mandatory = False,
+    ),
+    "override_warnings_as_errors": attr.bool(
+        doc = "Whether or not to override the warnings_as_errors attribute.",
+        mandatory = False,
+    ),
+    "warnings_not_as_errors": attr.string_list(
+        doc = "List of compiler warning codes that should not be considered as errors. Note that this attribute can only be used in conjunction with treat_warning_as_errors.",
+        mandatory = False,
+    ),
+    "override_warnings_not_as_errors": attr.bool(
+        doc = "Whether or not to override the warnings_not_as_errors attribute.",
+        mandatory = False,
+    ),
+    "warning_level": attr.int(
+        doc = "The warning level that should be used by the compiler.",
+        mandatory = False,
+        values = [0, 1, 2, 3, 4, 5],
+        default = 3,
+    ),
+    "override_warning_level": attr.bool(
+        doc = "Whether or not to override the warning_level attribute.",
+        mandatory = False,
     ),
     "strict_deps": attr.bool(
         doc = """Whether to use strict dependencies or not. 
@@ -61,6 +100,10 @@ COMMON_ATTRS = {
         This attribute mirrors the DisableTransitiveProjectReferences in MSBuild.
         The default setting of this attribute can be overridden in the toolchain configuration""",
         default = True,
+    ),
+    "override_strict_deps": attr.bool(
+        doc = "Whether or not to override the strict_deps attribute.",
+        mandatory = False,
     ),
     "_target_framework": attr.label(
         default = "@rules_dotnet//dotnet:target_framework",
@@ -71,6 +114,19 @@ COMMON_ATTRS = {
     ),
 }
 
+# These are attributes that are common across all libarary rules
+LIBRARY_COMMON_ATTRS = {
+    "exports": attr.label_list(
+        doc = """
+        List of targets to add to the dependencies of those that depend on this target. 
+        Use this sparingly as it weakens the precision of the build graph.
+        
+        This attribute does nothing if you don't have strict dependencies enabled.""",
+        default = [],
+        providers = [DotnetAssemblyInfo],
+    ),
+}
+
 # These are attributes that are common across all binary/test rules
 BINARY_COMMON_ATTRS = {
     "winexe": attr.bool(
@@ -78,15 +134,10 @@ BINARY_COMMON_ATTRS = {
               "output a console-style executable.",
         default = False,
     ),
-    "runtimeconfig_template": attr.label(
-        doc = "A template file to use for generating runtimeconfig.json",
-        default = ":runtimeconfig.json.tpl",
-        allow_single_file = True,
-    ),
-    "depsjson_template": attr.label(
-        doc = "A template file to use for generating deps.json",
-        default = ":deps.json.tpl",
-        allow_single_file = True,
+    "apphost_shimmer": attr.label(
+        providers = [DotnetAssemblyInfo],
+        executable = True,
+        cfg = "exec",
     ),
     "_manifest_loader": attr.label(
         default = "@rules_dotnet//dotnet/private/tools/manifest_loader:ManifestLoader",
@@ -98,12 +149,12 @@ BINARY_COMMON_ATTRS = {
     ),
     "_launcher_sh": attr.label(
         doc = "A template file for the launcher on Linux/MacOS",
-        default = ":launcher.sh.tpl",
+        default = "@rules_dotnet//dotnet/private:launcher.sh.tpl",
         allow_single_file = True,
     ),
     "_launcher_bat": attr.label(
         doc = "A template file for the launcher on Windows",
-        default = ":launcher.bat.tpl",
+        default = "@rules_dotnet//dotnet/private:launcher.bat.tpl",
         allow_single_file = True,
     ),
 }
@@ -123,6 +174,12 @@ CSHARP_COMMON_ATTRS = dicts.add(
     },
 )
 
+# These are attributes that are common across all the library C# rules
+CSHARP_LIBRARY_COMMON_ATTRS = dicts.add(
+    CSHARP_COMMON_ATTRS,
+    LIBRARY_COMMON_ATTRS,
+)
+
 # These are attributes that are common across all the binary C# rules
 CSHARP_BINARY_COMMON_ATTRS = dicts.add(
     CSHARP_COMMON_ATTRS,
@@ -138,6 +195,12 @@ FSHARP_COMMON_ATTRS = dicts.add(
             allow_files = [".fs"],
         ),
     },
+)
+
+# These are attributes that are common across all the library F# rules
+FSHARP_LIBRARY_COMMON_ATTRS = dicts.add(
+    FSHARP_COMMON_ATTRS,
+    LIBRARY_COMMON_ATTRS,
 )
 
 # These are attributes that are common across all the binary F# rules

@@ -6,8 +6,10 @@ load("@bazel_skylib//lib:sets.bzl", "sets")
 load(
     "//dotnet/private:providers.bzl",
     "DotnetAssemblyInfo",
+    "DotnetDepVariantInfo",
     "NuGetInfo",
 )
+load("//dotnet/private:rids.bzl", "RUNTIME_GRAPH")
 
 def _collect_transitive():
     t = {}
@@ -186,90 +188,132 @@ def format_ref_arg(args, refs, targeting_pack_overrides):
 
     return args
 
-def collect_transitive_info(name, deps, private_deps, strict_deps):
+def collect_transitive_info(name, deps, private_deps, exports, strict_deps):
     """Determine the transitive dependencies by the target framework.
 
     Args:
         name: The name of the assembly that is asking.
         deps: Dependencies that the compilation target depends on.
         private_deps: Private dependencies that the compilation target depends on.
+        exports: Exported targets
         strict_deps: Whether or not to use strict dependencies.
 
     Returns:
         A collection of the overrides, references, analyzers and runfiles.
     """
-    direct_irefs = []
-    direct_prefs = []
-    transitive_prefs = []
-    direct_runfiles = []
-    transitive_runfiles = []
+    direct_iref = []
+    direct_ref = []
+    transitive_ref = []
+    direct_lib = []
+    transitive_lib = []
+    direct_native = []
+    transitive_native = []
+    direct_data = []
+    transitive_data = []
     direct_analyzers = []
     transitive_analyzers = []
+    direct_runtime_deps = []
+    transitive_runtime_deps = []
 
-    direct_private_refs = []
-    transitive_private_refs = []
+    direct_private_ref = []
+    transitive_private_ref = []
     direct_private_analyzers = []
     transitive_private_analyzers = []
     direct_labels = [d.label for d in deps]
 
+    exports_files = []
+
     overrides = {}
     for dep in deps + private_deps:
-        assembly = dep[DotnetAssemblyInfo]
+        if NuGetInfo in dep:
+            nuget_info = dep[NuGetInfo]
 
-        for override_name, override_version in assembly.targeting_pack_overrides.items():
-            # TODO: In case there are multiple overrides of the same package
-            # we should take the one with the highest version
-            # Need to get a semver comparison function to do that
-            overrides[override_name] = override_version
+            for override_name, override_version in nuget_info.targeting_pack_overrides.items():
+                # TODO: In case there are multiple overrides of the same package
+                # we should take the one with the highest version
+                # Need to get a semver comparison function to do that
+                overrides[override_name] = override_version
 
     for dep in deps:
         assembly = dep[DotnetAssemblyInfo]
 
         # See docs/ReferenceAssemblies.md for more info on why we use (and prefer) refout
         # and the mechanics of irefout vs. prefout.
-        direct_irefs.extend(assembly.irefs if name in assembly.internals_visible_to else assembly.prefs)
-        direct_prefs.extend(assembly.prefs)
+        direct_iref.extend(assembly.irefs if name in assembly.internals_visible_to else assembly.refs)
+        direct_ref.extend(assembly.refs)
         direct_analyzers.extend(assembly.analyzers)
-        direct_runfiles.extend(assembly.libs)
+        direct_lib.extend(assembly.libs)
+        direct_native.extend(assembly.native)
+        direct_data.extend(assembly.data)
+        direct_runtime_deps.extend(assembly.runtime_deps)
+        transitive_runtime_deps.append(assembly.transitive_runtime_deps)
+
+        # We take all the exports of each dependency and add them
+        # to the direct refs.
+        direct_iref.extend(assembly.exports)
 
         # Runfiles are always collected transitively
         # We need to make sure that we do not include multiple versions of the same first party dll
         # in the runfiles. We can do that by taking the direct first party deps and see if any of them are already
         # in the runfiles and if they are we remove them from the transitive runfiles.
         if NuGetInfo in dep:
-            transitive_runfiles.append(assembly.transitive_runfiles)
+            transitive_lib.append(assembly.transitive_libs)
+            transitive_native.append(assembly.transitive_native)
+            transitive_data.append(assembly.transitive_data)
         else:
-            runfiles = []
-            for transitive_runfile in assembly.transitive_runfiles.to_list():
-                if transitive_runfile.owner in direct_labels:
+            # TODO: This might be a performance issue. See if we can do this without
+            # having to iterate over the transitive files.
+            lib = []
+            native = []
+            data = []
+            for tlib in assembly.transitive_libs.to_list():
+                if tlib.owner in direct_labels:
                     continue
-                runfiles.append(transitive_runfile)
+                lib.append(tlib)
 
-            transitive_runfiles.append(depset(runfiles))
+            for tnative in assembly.transitive_native.to_list():
+                if tnative.owner in direct_labels:
+                    continue
+                native.append(tnative)
 
-        direct_runfiles.extend(assembly.data)
+            for tdata in assembly.transitive_data.to_list():
+                if tdata.owner in direct_labels:
+                    continue
+                data.append(tdata)
+
+            transitive_lib.append(depset(lib))
+            transitive_native.append(depset(native))
+            transitive_data.append(depset(data))
 
         if not strict_deps:
-            transitive_prefs.append(assembly.transitive_prefs)
+            transitive_ref.append(assembly.transitive_refs)
             transitive_analyzers.append(assembly.transitive_analyzers)
 
     for dep in private_deps:
         assembly = dep[DotnetAssemblyInfo]
 
-        direct_private_refs.extend(assembly.irefs if name in assembly.internals_visible_to else assembly.prefs)
+        direct_private_ref.extend(assembly.irefs if name in assembly.internals_visible_to else assembly.refs)
         direct_private_analyzers.extend(assembly.analyzers)
 
         if not strict_deps:
-            transitive_private_refs.append(assembly.transitive_prefs)
+            transitive_private_ref.append(assembly.transitive_refs)
             transitive_private_analyzers.append(assembly.transitive_analyzers)
 
+    for export in exports:
+        assembly = export[DotnetAssemblyInfo]
+        exports_files.extend(assembly.refs)
+
     return (
-        depset(direct = direct_irefs, transitive = transitive_prefs),
-        depset(direct = direct_prefs, transitive = transitive_prefs),
+        depset(direct = direct_iref, transitive = transitive_ref),
+        depset(direct = direct_ref, transitive = transitive_ref),
         depset(direct = direct_analyzers, transitive = transitive_analyzers),
-        depset(direct = direct_runfiles, transitive = transitive_runfiles),
-        depset(direct = direct_private_refs, transitive = transitive_private_refs),
+        depset(direct = direct_lib, transitive = transitive_lib),
+        depset(direct = direct_native, transitive = transitive_native),
+        depset(direct = direct_data, transitive = transitive_data),
+        depset(direct = direct_private_ref, transitive = transitive_private_ref),
         depset(direct = direct_private_analyzers, transitive = transitive_private_analyzers),
+        depset(direct = direct_runtime_deps, transitive = transitive_runtime_deps),
+        exports_files,
         overrides,
     )
 
@@ -301,19 +345,195 @@ def get_highest_compatible_target_framework(incoming_tfm, tfms):
 
     return None
 
-def is_strict_deps_enabled(toolchain, strict_deps_attr):
-    """Determines if strict dependencies are enabled.
+def get_nuget_relative_path(file):
+    """Returns NuGet package relative path of a file that is part of a NuGet package
 
     Args:
-        toolchain: The toolchain that is being used.
-        strict_deps_attr: Target level override for strict dependencies.
+        file: A file that is part of a nuget_archive/nuget_repo.
 
     Returns:
-        True if strict dependencies are enabled, False otherwise.
+        The package relateive path of the file
     """
-    default = toolchain.strict_deps
 
-    if strict_deps_attr != default:
-        return strict_deps_attr
+    # The path of the files is of the form external/<packagename>.v<version>/<path within nuget package>
+    # So we remove the first two parts of the path to get the path within the nuget package.
+    return "/".join(file.path.split("/")[2:])
 
-    return default
+def transform_deps(deps):
+    """Transforms a [Target] into [DotnetDepVariantInfo].
+
+    This helper function is used to transform ctx.attr.deps into
+    [DotnetDepVariantInfo].
+    Args:
+        deps (list of Targets): Dependencies coming from ctx.attr.deps
+    Returns:
+        list of DotnetDepVariantInfos.
+    """
+    return [DotnetDepVariantInfo(
+        assembly_info = dep[DotnetAssemblyInfo] if DotnetAssemblyInfo in dep else None,
+        nuget_info = dep[NuGetInfo] if NuGetInfo in dep else None,
+    ) for dep in deps]
+
+def generate_warning_args(
+        args,
+        treat_warnings_as_errors,
+        warnings_as_errors,
+        warnings_not_as_errors,
+        warning_level):
+    """Generates the compiler arguments for warnings and errors
+
+    Args:
+        args: The args object that will be passed to the compilation action
+        treat_warnings_as_errors: If all warnigns should be treated as errors
+        warnings_as_errors: List of warnings that should be treated as errors
+        warnings_not_as_errors: List of warnings that should not be treated as errors
+        warning_level: The warning level to use
+    """
+    if treat_warnings_as_errors:
+        if len(warnings_as_errors) > 0:
+            fail("Cannot use both treat_warnings_as_errors and warnings_as_errors")
+
+        for warning in warnings_not_as_errors:
+            args.add("/warnaserror-:{}".format(warning))
+
+        args.add("/warnaserror+")
+    else:
+        if len(warnings_not_as_errors) > 0:
+            fail("Cannot use warnings_not_as_errors if treat_warnings_as_errors is not set")
+        for warning in warnings_as_errors:
+            args.add("/warnaserror+:{}".format(warning))
+
+    args.add("/warn:{}".format(warning_level))
+
+def framework_preprocessor_symbols(tfm):
+    """Gets the standard preprocessor symbols for the target framework.
+
+    See https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/preprocessor-directives/preprocessor-if#remarks
+    for the official list.
+
+    Args:
+        tfm: The target framework moniker target being built.
+    Returns:
+        A list of preprocessor symbols.
+    """
+    # TODO: All built in preprocessor directives: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/preprocessor-directives
+
+    specific = tfm.upper().replace(".", "_")
+
+    if tfm.startswith("netstandard"):
+        return ["NETSTANDARD", specific]
+    elif tfm.startswith("netcoreapp"):
+        return ["NETCOREAPP", specific]
+    else:
+        return ["NETFRAMEWORK", specific]
+
+# For deps.json spec see: https://github.com/dotnet/sdk/blob/main/documentation/specs/runtime-configuration-file.md
+def generate_depsjson(
+        target_framework,
+        is_self_contained,
+        runtime_deps,
+        transitive_runtime_deps,
+        runtime_identifier,
+        runtime_pack_info = None):
+    """Generates a deps.json file.
+
+    Args:
+        target_framework: The target framework moniker for the target being built.
+        is_self_contained: If the target is a self-contained publish.
+        runtime_deps: The runtime dependencies of the target.
+        transitive_runtime_deps: The transitive runtime dependencies of the target.
+        runtime_identifier: The runtime identifier of the target.
+        runtime_pack_info: The DotnetAssemblyInfo of the runtime pack that is used for a self contained publish.
+    Returns:
+        The deps.json file as a struct.
+    """
+    runtime_target = ".NETCoreApp,Version=v{}".format(
+        "{}/{}".format(
+            target_framework.replace("net", ""),
+            runtime_identifier,
+        ),
+    )
+    base = {
+        "runtimeTarget": {
+            "name": runtime_target,
+            "signature": "",
+        },
+        "compilationOptions": {},
+        "targets": {
+        },
+    }
+    base["targets"][runtime_target] = {}
+    base["libraries"] = {}
+
+    if runtime_pack_info:
+        runtime_pack_name = "runtimepack.{}/{}".format(runtime_pack_info.name, runtime_pack_info.version)
+        base["libraries"][runtime_pack_name] = {
+            "type": "runtimepack",
+            "serviceable": False,
+            "sha512": "",
+        }
+        base["targets"][runtime_target][runtime_pack_name] = {
+            "runtime": {dll.basename: {} for dll in runtime_pack_info.libs + runtime_pack_info.transitive_libs.to_list()},
+            "native": {native_file.basename: {} for native_file in runtime_pack_info.native + runtime_pack_info.transitive_native.to_list()},
+        }
+
+    if is_self_contained:
+        base["runtimes"] = {rid: RUNTIME_GRAPH[rid] for rid, supported_rids in RUNTIME_GRAPH.items() if runtime_identifier in supported_rids or runtime_identifier == rid}
+
+    for runtime_dep in runtime_deps + transitive_runtime_deps.to_list():
+        library_name = "{}/{}".format(runtime_dep.assembly_info.name, runtime_dep.assembly_info.version)
+
+        library_fragment = {
+            "type": "project",
+            "serviceable": False,
+            "sha512": "",
+        }
+
+        if runtime_dep.nuget_info:
+            library_fragment["type"] = "package"
+            library_fragment["serviceable"] = True
+            library_fragment["sha512"] = runtime_dep.nuget_info.sha512
+            library_fragment["path"] = library_name.lower()
+            library_fragment["hashPath"] = "{}.{}.nupkg.sha512".format(runtime_dep.assembly_info.name.lower(), runtime_dep.assembly_info.version)
+
+        target_fragment = {
+            "runtime": {dll.basename: {} for dll in runtime_dep.assembly_info.libs},
+            "native": {native_file.basename: {} for native_file in runtime_dep.assembly_info.native},
+            "dependencies": {dep.assembly_info.name: dep.assembly_info.version for dep in runtime_dep.assembly_info.runtime_deps},
+        }
+
+        base["libraries"][library_name] = library_fragment
+        base["targets"][runtime_target][library_name] = target_fragment
+
+    return base
+
+# For runtimeconfig.json spec see https://github.com/dotnet/sdk/blob/main/documentation/specs/runtime-configuration-file.md
+def generate_runtimeconfig(target_framework, is_self_contained, toolchain):
+    """Generates a runtimeconfig.json file.
+
+    Args:
+        target_framework: The target framework moniker for the target being built.
+        is_self_contained: If the target is a self-contained publish.
+        toolchain: The currently configured dotnet toolchain.
+    Returns:
+        The runtimeconfig.json file as a struct.
+    """
+    runtime_version = toolchain.dotnetinfo.runtime_version
+    base = {
+        "runtimeOptions": {
+            "tfm": target_framework,
+        },
+    }
+
+    if is_self_contained:
+        base["runtimeOptions"]["includedFrameworks"] = [{
+            "name": "Microsoft.NETCore.App",
+            "version": runtime_version,
+        }]
+    else:
+        base["runtimeOptions"]["framework"] = {
+            "name": "Microsoft.NETCore.App",
+            "version": runtime_version,
+        }
+
+    return base
