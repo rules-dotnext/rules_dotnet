@@ -49,8 +49,6 @@ More information on these flags can be found here:
 
 [--enable_runfiles](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles)
 
-TODO: Create the release process
-
 ### C#
 
 [csharp_binary](./csharp_binary.md)
