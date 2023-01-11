@@ -4,6 +4,8 @@ exports_files(
     [
         "launcher.sh.tpl",
         "launcher.bat.tpl",
+        "compiler_wrapper.sh",
+        "compiler_wrapper.bat",
     ],
     visibility = ["//visibility:public"],
 )
