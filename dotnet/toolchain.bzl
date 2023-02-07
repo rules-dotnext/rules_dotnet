@@ -82,11 +82,11 @@ def _dotnet_toolchain_impl(ctx):
         runtime_path = _to_manifest_path(ctx, runtime_files[0])
 
     if ctx.attr.csharp_compiler:
-        csharp_compiler_files = ctx.attr.csharp_compiler.files.to_list()
+        csharp_compiler_files = ctx.attr.csharp_compiler.files.to_list() + ctx.attr.csharp_compiler.default_runfiles.files.to_list()
         csharp_compiler_path = _to_manifest_path(ctx, csharp_compiler_files[0])
 
     if ctx.attr.fsharp_compiler:
-        fsharp_compiler_files = ctx.attr.fsharp_compiler.files.to_list()
+        fsharp_compiler_files = ctx.attr.fsharp_compiler.files.to_list() + ctx.attr.fsharp_compiler.default_runfiles.files.to_list()
         fsharp_compiler_path = _to_manifest_path(ctx, fsharp_compiler_files[0])
 
     if ctx.attr.apphost:
@@ -103,6 +103,11 @@ def _dotnet_toolchain_impl(ctx):
         "DOTNET_RUNTIME_VERSION": ctx.attr.runtime_version,
         "DOTNET_RUNTIME_TFM": ctx.attr.runtime_tfm,
     })
+
+    default = DefaultInfo(
+        files = depset(runtime_files + csharp_compiler_files + fsharp_compiler_files + apphost_files),
+        runfiles = ctx.runfiles(files = runtime_files + csharp_compiler_files + fsharp_compiler_files + apphost_files),
+    )
 
     dotnetinfo = DotnetInfo(
         runtime_path = runtime_path,
@@ -131,6 +136,7 @@ def _dotnet_toolchain_impl(ctx):
     # Export all the providers inside our ToolchainInfo
     # so the resolved_toolchain rule can grab and re-export them.
     toolchain_info = platform_common.ToolchainInfo(
+        default = default,
         dotnetinfo = dotnetinfo,
         template_variables = template_variables,
         runtime = ctx.attr.runtime,
@@ -141,6 +147,7 @@ def _dotnet_toolchain_impl(ctx):
         strict_deps = ctx.attr._strict_deps,
     )
     return [
+        default,
         toolchain_info,
         template_variables,
     ]
