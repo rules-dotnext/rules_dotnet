@@ -292,7 +292,7 @@ def _get_package_urls(rctx, sources, auth, package_id, package_version):
             # Else we expect the url to be a V2 NuGet feed and the url schema for the
             # package contents will be: {source}/package/{id}/{version}
             base_addresses[source] = source
-            package_urls.append("{source}/{package_id}/{package_version}".format(source = source, package_id = package_id, package_version = package_version))
+            package_urls.append("{source}/package/{package_id}/{package_version}".format(source = source, package_id = package_id, package_version = package_version))
 
     return package_urls
 
