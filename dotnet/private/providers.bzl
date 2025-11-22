@@ -96,3 +96,14 @@ DotnetApphostPackInfo = provider(
         "apphost": "File: The apphost file",
     },
 )
+
+# === spec-fsharp-enhancements additions ===
+FSharpSourceInfo = provider(
+    doc = "Source file information for F# targets. This provider enables downstream " +
+          "rules (e.g., Fable transpiler, project file generators) to access the " +
+          "F# source files of a target and its transitive dependencies.",
+    fields = {
+        "srcs": "list[File]: The direct F# source files (.fs and .fsi) of this target, in compilation order.",
+        "transitive_srcs": "depset[File]: All F# source files from this target and its transitive F# dependencies, in compilation order.",
+    },
+)

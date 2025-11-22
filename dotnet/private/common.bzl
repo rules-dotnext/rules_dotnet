@@ -730,7 +730,19 @@ def copy_files_to_dir(target_name, actions, is_windows, files, out_dir):
     inputs = []
     outputs = []
     for src in files:
-        dst = actions.declare_file("%s/%s" % (out_dir, src.basename))
+        # Preserve directory structure relative to the source package.
+        # For external files (short_path starts with ../), fall back to basename.
+        if src.short_path.startswith("../"):
+            rel_path = src.basename
+        elif src.owner and src.owner.package:
+            prefix = src.owner.package + "/"
+            if src.short_path.startswith(prefix):
+                rel_path = src.short_path[len(prefix):]
+            else:
+                rel_path = src.basename
+        else:
+            rel_path = src.short_path
+        dst = actions.declare_file("%s/%s" % (out_dir, rel_path))
         inputs.append(src)
         outputs.append(dst)
         if is_windows:

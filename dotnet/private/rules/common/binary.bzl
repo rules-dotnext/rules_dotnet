@@ -151,7 +151,7 @@ def build_binary(ctx, compile_action):
     if depsjson != None:
         additional_runfiles.append(depsjson)
 
-    runfiles = collect_transitive_runfiles(ctx, runtime_provider, ctx.attr.deps).merge(ctx.runfiles(files = additional_runfiles))
+    runfiles = collect_transitive_runfiles(ctx, runtime_provider, ctx.attr.deps).merge(ctx.runfiles(transitive_files = runtime_provider.appsetting_files, files = additional_runfiles))
 
     # Due to how the .Net runtime loads native DLLs we need make the native
     # DLLs available in the application root directory with the folder structure:

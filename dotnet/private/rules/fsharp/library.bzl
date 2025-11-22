@@ -8,6 +8,7 @@ load(
     "get_toolchain",
     "is_debug",
 )
+load("//dotnet/private:providers.bzl", "FSharpSourceInfo")
 load("//dotnet/private/rules/common:attrs.bzl", "FSHARP_LIBRARY_COMMON_ATTRS")
 load("//dotnet/private/rules/common:library.bzl", "build_library")
 load("//dotnet/private/rules/fsharp/actions:fsharp_assembly.bzl", "AssemblyAction")
@@ -51,7 +52,25 @@ def _compile_action(ctx, tfm):
     )
 
 def _library_impl(ctx):
-    return build_library(ctx, _compile_action)
+    providers = build_library(ctx, _compile_action)
+
+    # --- spec-fsharp-enhancements: FSharpSourceInfo provider (#315) ---
+    transitive_src_depsets = []
+    for dep in ctx.attr.deps:
+        if FSharpSourceInfo in dep:
+            transitive_src_depsets.append(dep[FSharpSourceInfo].transitive_srcs)
+
+    fsharp_source_info = FSharpSourceInfo(
+        srcs = ctx.files.srcs,
+        transitive_srcs = depset(
+            direct = ctx.files.srcs,
+            transitive = transitive_src_depsets,
+            order = "preorder",
+        ),
+    )
+    # --- end spec-fsharp-enhancements: #315 ---
+
+    return providers + [fsharp_source_info]
 
 fsharp_library = rule(
     _library_impl,

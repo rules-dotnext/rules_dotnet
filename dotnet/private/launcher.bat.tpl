@@ -57,9 +57,12 @@ for %%F in (%dotnet_executable%) do set DOTNET_ROOT=%%~dpF
 
 call :rlocation "TEMPLATED_executable" run_script
 set args=%*
-rem Escape \ and * in args before passsing it with double quote
+rem Escape double quotes in args
 if defined args (
-  set args=!args:\=\\\\!
   set args=!args:"=\"!
 )
+
+rem Change to the directory containing the DLL so that appsettings.json etc. are found
+for %%F in ("!run_script!") do cd /d "%%~dpF"
+
 "!dotnet_executable!" exec "!run_script!" !args!

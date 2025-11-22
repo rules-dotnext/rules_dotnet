@@ -32,4 +32,7 @@ export DOTNET_NOLOGO="1"
 export DOTNET_CLI_TELEMETRY_OPTOUT="1"
 export DOTNET_ROOT="$(dirname $(rlocation TEMPLATED_dotnet))"
 
-exec $(rlocation TEMPLATED_dotnet) exec $(rlocation TEMPLATED_executable) "$@"
+DOTNET_EXEC="$(rlocation TEMPLATED_dotnet)"
+ASSEMBLY="$(rlocation TEMPLATED_executable)"
+cd "$(dirname "$ASSEMBLY")"
+exec "$DOTNET_EXEC" exec "$ASSEMBLY" "$@"
