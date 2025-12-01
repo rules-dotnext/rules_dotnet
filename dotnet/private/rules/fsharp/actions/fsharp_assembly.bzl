@@ -66,6 +66,35 @@ do()
 
     return output
 
+def _write_version_fsharp(actions, label_name, dll_name, version):
+    """Write a .fs file containing assembly version attributes.
+
+    Args:
+      actions: An actions module, usually from ctx.actions.
+      label_name: The label name.
+      dll_name: The assembly name.
+      version: The version string.
+
+    Returns:
+      A File object for a generated .fs file, or None if version is empty.
+    """
+    if not version:
+        return None
+
+    content = (
+        "namespace global\n\n" +
+        "open System.Reflection\n\n" +
+        '[<assembly: AssemblyVersion("{v}")>]\n'.format(v = version) +
+        '[<assembly: AssemblyFileVersion("{v}")>]\n'.format(v = version) +
+        '[<assembly: AssemblyInformationalVersion("{v}")>]\n'.format(v = version) +
+        "do()\n"
+    )
+
+    output = actions.declare_file("%s/%s/assemblyversion.fs" % (label_name, dll_name))
+    actions.write(output, content)
+
+    return output
+
 # Reference assembly support did not come to F# until .Net 7.0
 # This check should be removed once the .Net 6.0 LTS release is no longer supported
 def _should_output_ref_assembly(toolchain):
@@ -90,6 +119,8 @@ def AssemblyAction(
         appsetting_files,
         compile_data,
         out,
+        # spec-quick-wins: #423
+        version,
         target,
         target_name,
         target_framework,
@@ -146,6 +177,16 @@ def AssemblyAction(
     """
 
     assembly_name = target_name if out == "" else out
+    effective_version = version if version else "1.0.0"
+
+    # --- spec-quick-wins: assembly version (#423) ---
+    version_fs = _write_version_fsharp(actions, target_name, assembly_name, version)
+    if version_fs:
+        # F# requires source files in dependency order; version info has no deps, so prepend
+        srcs = [version_fs] + srcs
+
+    # --- end spec-quick-wins: #423 ---
+
     subsystem_version = get_framework_version_info(target_framework)
     (
         irefs,
@@ -282,7 +323,7 @@ def AssemblyAction(
 
     return (DotnetAssemblyCompileInfo(
         name = assembly_name,
-        version = "1.0.0",  #TODO: Maybe make this configurable?
+        version = effective_version,
         project_sdk = project_sdk,
         refs = [out_dll],
         irefs = [out_iref] if out_iref else [out_ref] if out_ref else [out_dll],
@@ -301,7 +342,7 @@ def AssemblyAction(
         transitive_compile_data = transitive_compile_data,
     ), DotnetAssemblyRuntimeInfo(
         name = assembly_name,
-        version = "1.0.0",  #TODO: Maybe make this configurable?
+        version = effective_version,
         libs = [out_dll],
         resource_assemblies = [],
         pdbs = [out_pdb] if out_pdb else [],

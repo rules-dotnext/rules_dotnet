@@ -53,6 +53,13 @@ COMMON_ATTRS = {
     "out": attr.string(
         doc = "File name, without extension, of the built assembly.",
     ),
+    # spec-quick-wins: #423
+    "version": attr.string(
+        doc = "The version of the assembly. When set, generates AssemblyVersion, " +
+              "AssemblyFileVersion, and AssemblyInformationalVersion attributes. " +
+              "Also used in the deps.json file. If not set, defaults to '1.0.0'.",
+        default = "",
+    ),
     "target_frameworks": attr.string_list(
         doc = "A list of target framework monikers to build" +
               "See https://docs.microsoft.com/en-us/dotnet/standard/frameworks",
@@ -233,6 +240,13 @@ CSHARP_COMMON_ATTRS = dicts.add(
             doc = "List of warnings that should be ignored",
             mandatory = False,
             default = ["CS1701", "CS1702"],
+        ),
+        # spec-correctness: #436
+        "implicit_usings": attr.bool(
+            doc = "Whether to generate implicit global using directives. " +
+                  "When True (default), a GlobalUsings.g.cs file is generated matching MSBuild behavior " +
+                  "for the selected project_sdk. Only applies to net6.0+ target frameworks.",
+            default = True,
         ),
         "analyzer_configs": attr.label_list(
             doc = "A list of analyzer configuration files. See: https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/configuration-files",

@@ -37,6 +37,16 @@ def _import_library(ctx):
         nupkg = ctx.file.nupkg,
     )
 
+    # spec-correctness: #413
+    # If this NuGet package has no refs of its own, it is a meta-package.
+    # Automatically export direct dependency refs so strict_deps consumers
+    # see the actual compile-time DLLs.
+    auto_exports = []
+    if not ctx.files.refs and not ctx.files.libs:
+        for dep in ctx.attr.deps:
+            dep_compile = dep[DotnetAssemblyCompileInfo]
+            auto_exports.extend(dep_compile.refs)
+
     dotnet_assembly_compile_info = DotnetAssemblyCompileInfo(
         name = ctx.attr.library_name,
         version = ctx.attr.version,
@@ -48,7 +58,7 @@ def _import_library(ctx):
         analyzers_fsharp = ctx.files.analyzers_fsharp,
         analyzers_vb = ctx.files.analyzers_vb,
         compile_data = [],
-        exports = [],
+        exports = auto_exports,
         transitive_compile_data = depset([]),
         transitive_refs = prefs,
         transitive_analyzers = analyzers,

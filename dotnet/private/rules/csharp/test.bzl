@@ -19,6 +19,9 @@ load("//dotnet/private/transitions:tfm_transition.bzl", "tfm_transition")
 def _compile_action(ctx, tfm):
     toolchain = get_toolchain(ctx)
 
+    # spec-quick-wins: #524 — expand $(location) in compiler_options
+    compiler_options = [ctx.expand_location(opt, ctx.attr.compile_data) for opt in ctx.attr.compiler_options]
+
     return AssemblyAction(
         ctx.actions,
         ctx.executable._compiler_wrapper_bat if ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo]) else ctx.executable._compiler_wrapper_sh,
@@ -38,6 +41,7 @@ def _compile_action(ctx, tfm):
         appsetting_files = ctx.files.appsetting_files,
         compile_data = ctx.files.compile_data,
         out = ctx.attr.out,
+        version = ctx.attr.version,
         target = "exe",
         target_name = ctx.attr.name,
         target_framework = tfm,
@@ -57,8 +61,9 @@ def _compile_action(ctx, tfm):
         is_analyzer = False,
         is_language_specific_analyzer = False,
         analyzer_configs = ctx.files.analyzer_configs,
-        compiler_options = ctx.attr.compiler_options,
+        compiler_options = compiler_options,
         is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo]),
+        implicit_usings = ctx.attr.implicit_usings,
     )
 
 def _csharp_test_impl(ctx):

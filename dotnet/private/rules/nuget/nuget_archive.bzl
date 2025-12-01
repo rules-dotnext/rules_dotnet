@@ -251,20 +251,28 @@ def _process_analyzer_file(groups, file):
     elif len(parts) == 4:
         lang = parts[2]
         group["dotnet/{}".format(lang)].append(file)
+
+        # spec-correctness: #467 — Fix analyzer version deduplication.
+        # Track selected architecture version per language and ensure only one
+        # set of analyzer DLLs is included per language.
+
     elif len(parts) == 5:
         lang = parts[3]
         supported_architecture = parts[2]
+        lowest_key = "dotnet/{}/lowest".format(lang)
+        lang_key = "dotnet/{}".format(lang)
 
-        # Use this as a marker for the lowest version of the dll
-        if not group.get("dotnet/{}/lowest".format(lang)):
-            group["dotnet/{}/lowest".format(lang)] = file
-            group["dotnet/{}".format(lang)].append(file)
+        if not group.get(lowest_key):
+            group[lowest_key] = {"file": file, "arch": supported_architecture}
+            group[lang_key].append(file)
         else:
-            # If the current version is lower than the version we have stored we replace it
-            current_lowest_version = group["dotnet/{}/lowest".format(lang)].split("/")[2]
-            if supported_architecture < current_lowest_version:
-                group["dotnet/{}/lowest".format(lang, supported_architecture)] = file
-                group["dotnet/{}".format(lang)].append(file)
+            current = group[lowest_key]
+            if supported_architecture < current["arch"]:
+                # Remove the previously selected file and replace with the lower version
+                new_list = [f for f in group[lang_key] if f != current["file"]]
+                new_list.append(file)
+                group[lang_key] = new_list
+                group[lowest_key] = {"file": file, "arch": supported_architecture}
 
     return
 
