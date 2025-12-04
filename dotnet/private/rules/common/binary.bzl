@@ -15,6 +15,33 @@ load(
     "to_rlocation_path",
 )
 load("//dotnet/private:providers.bzl", "DotnetApphostPackInfo", "DotnetAssemblyRuntimeInfo", "DotnetBinaryInfo", "DotnetRuntimePackInfo")
+load("//dotnet/private:semver.bzl", "semver")
+
+# spec-correctness: #523 — Deduplicate transitive runtime deps by assembly name.
+# When a binary depends on a library targeting a different TFM (e.g., net8.0 -> netstandard2.1),
+# the same NuGet package may appear at two different TFM resolutions. Prefer the higher version.
+def _deduplicate_runtime_deps(deps_list):
+    """Deduplicate runtime deps by assembly name, preferring higher version.
+
+    Args:
+        deps_list: List of DotnetAssemblyRuntimeInfo providers.
+
+    Returns:
+        Deduplicated list of DotnetAssemblyRuntimeInfo providers.
+    """
+    seen = {}
+    deduped = []
+    for dep in deps_list:
+        key = dep.name.lower()
+        if key in seen:
+            existing_idx = seen[key]
+            existing = deduped[existing_idx]
+            if semver.to_comparable(dep.version, relaxed = True) > semver.to_comparable(existing.version, relaxed = True):
+                deduped[existing_idx] = dep
+        else:
+            seen[key] = len(deduped)
+            deduped.append(dep)
+    return deduped
 
 def _collect_native_dlls(assembly_runtime_info, deps):
     """Collect the native DLLs of target and its dependencies.
@@ -102,7 +129,10 @@ def build_binary(ctx, compile_action):
 
     runtimeconfig = None
     depsjson = None
-    transitive_runtime_deps = runtime_provider.deps.to_list()
+
+    # spec-correctness: #523 — Deduplicate transitive runtime deps to prevent
+    # TypeLoadException when mixing TFMs (e.g., net8.0 binary -> netstandard2.1 library).
+    transitive_runtime_deps = _deduplicate_runtime_deps(runtime_provider.deps.to_list())
 
     if is_core_framework(tfm):
         # Create the runtimeconfig.json for the binary

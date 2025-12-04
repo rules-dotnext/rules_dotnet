@@ -156,8 +156,20 @@ def _process_group_with_tfm(groups, group_name, file):
     if file.endswith("_._"):
         return
 
-    if group_name == "lib" and file.endswith(".resources.dll"):
+    # spec-correctness: #508 — Check if this file is in a subdirectory under the TFM folder.
+    # Files directly under lib/<TFM>/ have no additional path separator after tfm_end+1.
+    remainder = file[tfm_end + 1:]
+    is_in_subdirectory = "/" in remainder
+
+    # Resource assemblies follow the pattern lib/<TFM>/<locale>/<name>.resources.dll
+    if group_name == "lib" and file.endswith(".resources.dll") and is_in_subdirectory:
         _process_resource_assembly(groups, tfm, file)
+        return
+
+    # Skip files in subdirectories that are not resource assemblies.
+    # These are typically native/architecture-specific DLLs (e.g., lib/net8.0/x64/msdia140.dll)
+    # that should not be treated as managed assembly references.
+    if is_in_subdirectory:
         return
 
     if not file.endswith(".dll"):

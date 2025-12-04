@@ -177,11 +177,24 @@ def get_toolchain(ctx):
 
     return ctx.toolchains["//dotnet:toolchain_type"]
 
+# spec-correctness: #477
+# Known .NET modules (IL code without assembly manifests).
+# These must not be passed as -r: references to the compiler.
+# Ideally they would be passed with -addmodule: but that requires
+# detecting modules in nuget_archive.bzl (PE header inspection or
+# hardcoded list). For now we exclude them entirely.
+_KNOWN_NET_MODULES = [
+    "System.EnterpriseServices.Thunk.dll",
+    "System.EnterpriseServices.Wrapper.dll",
+]
+
 def _format_ref_with_overrides(assembly):
     # See https://github.com/bazel-contrib/rules_dotnet/issues/405
-    # The following files should not be passed as references to the compiler
-    if assembly.path.endswith("System.EnterpriseServices.Thunk.dll") or assembly.path.endswith("System.EnterpriseServices.Wrapper.dll"):
-        return None
+    # See https://github.com/bazel-contrib/rules_dotnet/issues/477
+    # .NET modules (raw IL without assembly manifests) must not be passed as -r: references.
+    for module_name in _KNOWN_NET_MODULES:
+        if assembly.path.endswith(module_name):
+            return None
     return "-r:" + assembly.path
 
 def format_ref_arg(args, refs):

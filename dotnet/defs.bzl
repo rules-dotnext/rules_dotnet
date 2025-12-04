@@ -4,10 +4,6 @@ Users should not load files under "/dotnet"
 """
 
 load(
-    "//dotnet/private:providers.bzl",
-    _FSharpSourceInfo = "FSharpSourceInfo",
-)
-load(
     "//dotnet/private/rules/csharp:binary.bzl",
     _csharp_binary = "csharp_binary",
 )
@@ -60,6 +56,10 @@ load(
     "//dotnet/private/rules/publish_binary:publish_binary.bzl",
     _publish_binary = "publish_binary",
 )
+load(
+    "//dotnet/private/rules/resx:resx_resource.bzl",
+    _resx_resource = "resx_resource",
+)
 
 csharp_binary = _csharp_binary
 csharp_library = _csharp_library
@@ -75,4 +75,4 @@ import_dll = _import_dll
 nuget_repo = _nuget_repo
 nuget_archive = _nuget_archive
 dotnet_tool = _dotnet_tool
-FSharpSourceInfo = _FSharpSourceInfo
+resx_resource = _resx_resource

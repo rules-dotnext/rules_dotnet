@@ -1,0 +1,11 @@
+load(
+    "//dotnet:defs.bzl",
+    "csharp_binary",
+)
+
+csharp_binary(
+    name = "ResxCompiler",
+    srcs = ["Program.cs"],
+    target_frameworks = ["net8.0"],
+    visibility = ["//dotnet:__subpackages__"],
+)
