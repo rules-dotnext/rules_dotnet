@@ -780,6 +780,28 @@ def copy_files_to_dir(target_name, actions, is_windows, files, out_dir):
         )
     return outputs
 
+# spec-native-interop: #349
+def extract_native_libs_from_cc(native_deps):
+    """Extract shared library files from CcInfo providers for P/Invoke.
+
+    Args:
+        native_deps: List of targets providing CcInfo.
+
+    Returns:
+        A list of File objects for shared libraries (.so, .dylib, .dll).
+    """
+    libs = []
+    for dep in native_deps:
+        if CcInfo not in dep:
+            continue
+        cc_info = dep[CcInfo]
+        for linker_input in cc_info.linking_context.linker_inputs.to_list():
+            for lib in linker_input.libraries:
+                if lib.dynamic_library:
+                    real = lib.resolved_symlink_dynamic_library
+                    libs.append(real if real else lib.dynamic_library)
+    return libs
+
 _RESOURCE_TEMPLATE_CSHARP = "/resource:{}"
 _RESOURCE_TEMPLATE_FSHARP = "--resource:{}"
 

@@ -16,6 +16,7 @@ load(
 )
 load("//dotnet/private:providers.bzl", "DotnetApphostPackInfo", "DotnetAssemblyRuntimeInfo", "DotnetBinaryInfo", "DotnetRuntimePackInfo")
 load("//dotnet/private:semver.bzl", "semver")
+load("//dotnet/private/rules/common:copy_dlls.bzl", "flatten_transitive_dlls")
 
 # spec-correctness: #523 — Deduplicate transitive runtime deps by assembly name.
 # When a binary depends on a library targeting a different TFM (e.g., net8.0 -> netstandard2.1),
@@ -197,6 +198,14 @@ def build_binary(ctx, compile_action):
             )
             default_info_files.append(output)
             runfiles = runfiles.merge(ctx.runfiles(files = [output]))
+
+    # --- spec-testing-infra: #450 — Flatten all transitive DLLs into output dir ---
+    if ctx.attr.flatten_deps:
+        flat_outputs = flatten_transitive_dlls(ctx, dll, transitive_runtime_deps, tfm)
+        default_info_files.extend(flat_outputs)
+        runfiles = runfiles.merge(ctx.runfiles(files = flat_outputs))
+
+    # --- end spec-testing-infra: #450 ---
 
     if not ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo]):
         runfiles = runfiles.merge(ctx.attr._bash_runfiles[DefaultInfo].default_runfiles)

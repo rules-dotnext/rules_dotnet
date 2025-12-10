@@ -5,10 +5,10 @@ Rule for compiling F# libraries.
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load(
     "//dotnet/private:common.bzl",
+    "extract_native_libs_from_cc",
     "get_toolchain",
     "is_debug",
 )
-load("//dotnet/private:providers.bzl", "FSharpSourceInfo")
 load("//dotnet/private/rules/common:attrs.bzl", "FSHARP_LIBRARY_COMMON_ATTRS")
 load("//dotnet/private/rules/common:library.bzl", "build_library")
 load("//dotnet/private/rules/fsharp/actions:fsharp_assembly.bzl", "AssemblyAction")
@@ -17,8 +17,8 @@ load("//dotnet/private/transitions:tfm_transition.bzl", "tfm_transition")
 def _compile_action(ctx, tfm):
     toolchain = get_toolchain(ctx)
 
-    # spec-quick-wins: #524 — expand $(location) in compiler_options
-    compiler_options = [ctx.expand_location(opt, ctx.attr.compile_data) for opt in ctx.attr.compiler_options]
+    # spec-native-interop: #349
+    native = extract_native_libs_from_cc(ctx.attr.native_deps) if hasattr(ctx.attr, "native_deps") else []
 
     return AssemblyAction(
         ctx.actions,
@@ -38,7 +38,6 @@ def _compile_action(ctx, tfm):
         appsetting_files = [],
         compile_data = ctx.files.compile_data,
         out = ctx.attr.out,
-        version = ctx.attr.version,
         target = "library",
         target_name = ctx.attr.name,
         target_framework = tfm,
@@ -51,30 +50,13 @@ def _compile_action(ctx, tfm):
         warning_level = ctx.attr.warning_level,
         nowarn = ctx.attr.nowarn,
         project_sdk = ctx.attr.project_sdk,
-        compiler_options = compiler_options,
+        compiler_options = ctx.attr.compiler_options,
         is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo]),
+        native = native,
     )
 
 def _library_impl(ctx):
-    providers = build_library(ctx, _compile_action)
-
-    # --- spec-fsharp-enhancements: FSharpSourceInfo provider (#315) ---
-    transitive_src_depsets = []
-    for dep in ctx.attr.deps:
-        if FSharpSourceInfo in dep:
-            transitive_src_depsets.append(dep[FSharpSourceInfo].transitive_srcs)
-
-    fsharp_source_info = FSharpSourceInfo(
-        srcs = ctx.files.srcs,
-        transitive_srcs = depset(
-            direct = ctx.files.srcs,
-            transitive = transitive_src_depsets,
-            order = "preorder",
-        ),
-    )
-    # --- end spec-fsharp-enhancements: #315 ---
-
-    return providers + [fsharp_source_info]
+    return build_library(ctx, _compile_action)
 
 fsharp_library = rule(
     _library_impl,

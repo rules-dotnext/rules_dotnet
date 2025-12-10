@@ -15,7 +15,7 @@
 "Semver utilities."
 
 visibility([
-    "//dotnet/private/tests/semver/...",
+    "//dotnet/private/...",
 ])
 
 # Compares lower than any non-numeric identifier.

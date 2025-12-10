@@ -24,6 +24,15 @@ COMMON_ATTRS = {
         # in their data and we want the TFM graphs to be disconnected
         cfg = default_transition,
     ),
+    # spec-native-interop: #349
+    "native_deps": attr.label_list(
+        doc = "Native C/C++ library dependencies for P/Invoke interop. " +
+              "Accepts cc_library targets. Shared libraries (.so, .dylib, .dll) " +
+              "will be extracted and placed where the .NET runtime can load them.",
+        providers = [CcInfo],
+        default = [],
+        cfg = default_transition,
+    ),
     "compile_data": attr.label_list(
         doc = "Additional compile time files.",
         allow_files = True,
@@ -156,6 +165,15 @@ LIBRARY_COMMON_ATTRS = {
 
 # These are attributes that are common across all binary/test rules
 BINARY_COMMON_ATTRS = {
+    # spec-testing-infra: #450
+    "flatten_deps": attr.bool(
+        doc = """If True, copy all transitive dependency DLLs into the output
+        directory alongside the main assembly. This matches MSBuild publish
+        behavior and enables runtime assembly loading from relative paths.
+        WARNING: This disables the probing-path optimization and will increase
+        build times for targets with many transitive dependencies.""",
+        default = False,
+    ),
     "roll_forward_behavior": attr.string(
         doc = "The roll forward behavior that should be used: https://learn.microsoft.com/en-us/dotnet/core/versions/selection#control-roll-forward-behavior",
         default = "Major",

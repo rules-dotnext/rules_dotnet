@@ -32,7 +32,19 @@ export DOTNET_NOLOGO="1"
 export DOTNET_CLI_TELEMETRY_OPTOUT="1"
 export DOTNET_ROOT="$(dirname $(rlocation TEMPLATED_dotnet))"
 
-DOTNET_EXEC="$(rlocation TEMPLATED_dotnet)"
-ASSEMBLY="$(rlocation TEMPLATED_executable)"
-cd "$(dirname "$ASSEMBLY")"
-exec "$DOTNET_EXEC" exec "$ASSEMBLY" "$@"
+# spec-native-interop: #349 — P/Invoke native library search path
+NATIVE_LIB_DIR="$(dirname $(rlocation TEMPLATED_executable))"
+if [ -n "${LD_LIBRARY_PATH:-}" ]; then
+  export LD_LIBRARY_PATH="${NATIVE_LIB_DIR}:${LD_LIBRARY_PATH}"
+else
+  export LD_LIBRARY_PATH="${NATIVE_LIB_DIR}"
+fi
+if [ "$(uname)" = "Darwin" ]; then
+  if [ -n "${DYLD_LIBRARY_PATH:-}" ]; then
+    export DYLD_LIBRARY_PATH="${NATIVE_LIB_DIR}:${DYLD_LIBRARY_PATH}"
+  else
+    export DYLD_LIBRARY_PATH="${NATIVE_LIB_DIR}"
+  fi
+fi
+
+exec $(rlocation TEMPLATED_dotnet) exec $(rlocation TEMPLATED_executable) "$@"

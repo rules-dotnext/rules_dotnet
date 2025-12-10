@@ -134,7 +134,8 @@ def AssemblyAction(
         nowarn,
         project_sdk,
         compiler_options,
-        is_windows):
+        is_windows,
+        native = []):
     """Creates an action that runs the F# compiler with the specified inputs.
 
     This macro aims to match the [F# compiler](https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/compiler-options), with the inputs mapping to compiler options.
@@ -171,6 +172,7 @@ def AssemblyAction(
         project_sdk: The project SDK being targeted
         compiler_options: Additional compiler options to pass to the compiler.
         is_windows: Whether or not the target is running on Windows.
+        native: List of native shared library files for P/Invoke interop.
 
     Returns:
         The compiled fsharp artifacts.
@@ -349,7 +351,7 @@ def AssemblyAction(
         xml_docs = [out_xml] if out_xml else [],
         data = data,
         appsetting_files = depset(out_appsettings),
-        native = [],
+        native = native,
         deps = depset([dep[DotnetAssemblyRuntimeInfo] for dep in deps], transitive = [dep[DotnetAssemblyRuntimeInfo].deps for dep in deps]),
         nuget_info = None,
         direct_deps_depsjson_fragment = {dep[DotnetAssemblyRuntimeInfo].name: dep[DotnetAssemblyRuntimeInfo].version for dep in deps},
