@@ -119,6 +119,16 @@ COMMON_ATTRS = {
         mandatory = False,
         default = [],
     ),
+    # spec-ide-integration: #228
+    "pathmap": attr.string_dict(
+        doc = """Dictionary of path mappings for PDB source paths.
+Each entry maps a 'from' path prefix to a 'to' path prefix.
+This is passed to the compiler as /pathmap:from=to (C#) or --pathmap:from=to (F#).
+Use this to remap source paths in PDB files so debuggers can resolve source files
+without manual sourceFileMap configuration.
+See https://github.com/bazel-contrib/rules_dotnet/issues/228""",
+        default = {},
+    ),
     "dotnet_toolchain": attr.label(
         doc = """The .Net toolchain to use for this target.
 
@@ -147,6 +157,11 @@ COMMON_ATTRS = {
     "_targeting_pack": attr.label(
         default = "//dotnet/private/sdk/targeting_packs:targeting_pack",
         cfg = targeting_pack_transition,
+    ),
+    # spec-static-analysis: global analysis config
+    "_analysis_config": attr.label(
+        default = "//dotnet/private/rules/analysis:analysis_config",
+        doc = "Global analysis configuration. Set via .bazelrc flag.",
     ),
 }
 

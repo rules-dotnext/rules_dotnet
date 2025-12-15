@@ -14,8 +14,31 @@ _ATTRS = {
     ),
 }
 
+# spec-static-analysis: analysis tag class for global analyzer config
+_ANALYSIS_ATTRS = {
+    "config": attr.string(
+        doc = "Label of a dotnet_analysis_config target to apply globally. " +
+              "Set via .bazelrc: build --@rules_dotnet//dotnet/private/rules/analysis:analysis_config=<label>",
+        mandatory = True,
+    ),
+}
+
+def _analysis_config_repo_impl(ctx):
+    """Repository rule that stores the analysis config label for documentation purposes."""
+    ctx.file("BUILD.bazel", "")
+    ctx.file("defs.bzl", 'ANALYSIS_CONFIG = "%s"\n' % ctx.attr.config)
+
+_analysis_config_repo = repository_rule(
+    implementation = _analysis_config_repo_impl,
+    attrs = {
+        "config": attr.string(mandatory = True),
+    },
+)
+
 def _toolchain_extension(module_ctx):
     registrations = {}
+    analysis_config = None
+
     for mod in module_ctx.modules:
         for toolchain in mod.tags.toolchain:
             if toolchain.name in registrations.keys():
@@ -33,6 +56,13 @@ def _toolchain_extension(module_ctx):
                 ))
             else:
                 registrations[toolchain.name] = toolchain.dotnet_version
+
+        # spec-static-analysis: collect analysis config
+        for analysis in mod.tags.analysis:
+            if analysis_config != None:
+                fail("Multiple dotnet.analysis() declarations found. Only one is allowed.")
+            analysis_config = analysis.config
+
     for name, dotnet_version in registrations.items():
         dotnet_register_toolchains(
             name = name,
@@ -40,9 +70,17 @@ def _toolchain_extension(module_ctx):
             register = False,
         )
 
+    if analysis_config:
+        _analysis_config_repo(
+            name = "dotnet_analysis_config",
+            config = analysis_config,
+        )
+
 dotnet = module_extension(
     implementation = _toolchain_extension,
     tag_classes = {
         "toolchain": tag_class(attrs = _ATTRS),
+        # spec-static-analysis: global analysis configuration
+        "analysis": tag_class(attrs = _ANALYSIS_ATTRS),
     },
 )

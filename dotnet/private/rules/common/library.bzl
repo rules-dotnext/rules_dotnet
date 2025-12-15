@@ -21,6 +21,14 @@ def build_library(ctx, compile_action):
 
     (compile_provider, runtime_provider) = compile_action(ctx, tfm)
 
+    # spec-testing-infra: #359 — Coverage instrumentation info
+    instrumented_files_info = coverage_common.instrumented_files_info(
+        ctx,
+        source_attributes = ["srcs"],
+        dependency_attributes = ["deps", "data"],
+        extensions = ["cs", "fs"],
+    )
+
     return [
         compile_provider,
         runtime_provider,
@@ -32,4 +40,5 @@ def build_library(ctx, compile_action):
                 ctx.attr.deps,
             ),
         ),
+        instrumented_files_info,
     ]

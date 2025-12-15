@@ -4,6 +4,10 @@ Users should not load files under "/dotnet"
 """
 
 load(
+    "//dotnet/private/rules/analysis:dotnet_analysis_config.bzl",
+    _dotnet_analysis_config = "dotnet_analysis_config",
+)
+load(
     "//dotnet/private/rules/csharp:binary.bzl",
     _csharp_binary = "csharp_binary",
 )
@@ -36,6 +40,10 @@ load(
     _fsharp_test = "fsharp_test",
 )
 load(
+    "//dotnet/private/rules/ide:dotnet_project.bzl",
+    _dotnet_project = "dotnet_project",
+)
+load(
     "//dotnet/private/rules/nuget:dotnet_tool.bzl",
     _dotnet_tool = "dotnet_tool",
 )
@@ -57,10 +65,11 @@ load(
     _publish_binary = "publish_binary",
 )
 load(
-    "//dotnet/private/rules/resx:resx_resource.bzl",
-    _resx_resource = "resx_resource",
+    "//dotnet/private/rules/razor:razor_library.bzl",
+    _razor_library = "razor_library",
 )
 
+dotnet_project = _dotnet_project
 csharp_binary = _csharp_binary
 csharp_library = _csharp_library
 csharp_test = _csharp_test
@@ -74,5 +83,6 @@ import_library = _import_library
 import_dll = _import_dll
 nuget_repo = _nuget_repo
 nuget_archive = _nuget_archive
+dotnet_analysis_config = _dotnet_analysis_config
 dotnet_tool = _dotnet_tool
-resx_resource = _resx_resource
+razor_library = _razor_library

@@ -1,0 +1,15 @@
+load("//dotnet/private/rules/analysis:dotnet_analysis_config.bzl", "dotnet_analysis_config")
+
+package(default_visibility = ["//visibility:public"])
+
+# Default empty analysis config (no analyzers, no enforcement)
+dotnet_analysis_config(
+    name = "default_analysis_config",
+)
+
+# Label flag set by the user in .bazelrc:
+# build --@rules_dotnet//dotnet/private/rules/analysis:analysis_config=//:analysis
+label_flag(
+    name = "analysis_config",
+    build_setting_default = ":default_analysis_config",
+)

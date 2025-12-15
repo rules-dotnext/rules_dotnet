@@ -97,13 +97,12 @@ DotnetApphostPackInfo = provider(
     },
 )
 
-# === spec-fsharp-enhancements additions ===
-FSharpSourceInfo = provider(
-    doc = "Source file information for F# targets. This provider enables downstream " +
-          "rules (e.g., Fable transpiler, project file generators) to access the " +
-          "F# source files of a target and its transitive dependencies.",
+# === spec-razor-blazor additions ===
+RazorFilesInfo = provider(
+    doc = "Information about preprocessed Razor files.",
     fields = {
-        "srcs": "list[File]: The direct F# source files (.fs and .fsi) of this target, in compilation order.",
-        "transitive_srcs": "depset[File]: All F# source files from this target and its transitive F# dependencies, in compilation order.",
+        "razor_files": "depset[File]: The .razor and .cshtml source files",
+        "analyzer_config_template": "File: The generated .editorconfig template",
+        "assembly_info": "File: Generated RazorAssemblyInfo.cs",
     },
 )

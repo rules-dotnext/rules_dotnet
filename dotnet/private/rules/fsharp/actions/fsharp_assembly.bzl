@@ -66,35 +66,6 @@ do()
 
     return output
 
-def _write_version_fsharp(actions, label_name, dll_name, version):
-    """Write a .fs file containing assembly version attributes.
-
-    Args:
-      actions: An actions module, usually from ctx.actions.
-      label_name: The label name.
-      dll_name: The assembly name.
-      version: The version string.
-
-    Returns:
-      A File object for a generated .fs file, or None if version is empty.
-    """
-    if not version:
-        return None
-
-    content = (
-        "namespace global\n\n" +
-        "open System.Reflection\n\n" +
-        '[<assembly: AssemblyVersion("{v}")>]\n'.format(v = version) +
-        '[<assembly: AssemblyFileVersion("{v}")>]\n'.format(v = version) +
-        '[<assembly: AssemblyInformationalVersion("{v}")>]\n'.format(v = version) +
-        "do()\n"
-    )
-
-    output = actions.declare_file("%s/%s/assemblyversion.fs" % (label_name, dll_name))
-    actions.write(output, content)
-
-    return output
-
 # Reference assembly support did not come to F# until .Net 7.0
 # This check should be removed once the .Net 6.0 LTS release is no longer supported
 def _should_output_ref_assembly(toolchain):
@@ -119,8 +90,6 @@ def AssemblyAction(
         appsetting_files,
         compile_data,
         out,
-        # spec-quick-wins: #423
-        version,
         target,
         target_name,
         target_framework,
@@ -134,8 +103,8 @@ def AssemblyAction(
         nowarn,
         project_sdk,
         compiler_options,
-        is_windows,
-        native = []):
+        pathmap,
+        is_windows):
     """Creates an action that runs the F# compiler with the specified inputs.
 
     This macro aims to match the [F# compiler](https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/compiler-options), with the inputs mapping to compiler options.
@@ -171,24 +140,14 @@ def AssemblyAction(
         nowarn: List of warnings to suppress.
         project_sdk: The project SDK being targeted
         compiler_options: Additional compiler options to pass to the compiler.
+        pathmap: Dictionary of source path remappings for PDB debugger support.
         is_windows: Whether or not the target is running on Windows.
-        native: List of native shared library files for P/Invoke interop.
 
     Returns:
         The compiled fsharp artifacts.
     """
 
     assembly_name = target_name if out == "" else out
-    effective_version = version if version else "1.0.0"
-
-    # --- spec-quick-wins: assembly version (#423) ---
-    version_fs = _write_version_fsharp(actions, target_name, assembly_name, version)
-    if version_fs:
-        # F# requires source files in dependency order; version info has no deps, so prepend
-        srcs = [version_fs] + srcs
-
-    # --- end spec-quick-wins: #423 ---
-
     subsystem_version = get_framework_version_info(target_framework)
     (
         irefs,
@@ -244,6 +203,7 @@ def AssemblyAction(
             warning_level,
             nowarn,
             compiler_options,
+            pathmap = pathmap,
             out_dll = out_dll,
             out_ref = out_ref,
             out_pdb = out_pdb,
@@ -285,6 +245,7 @@ def AssemblyAction(
             warning_level,
             nowarn,
             compiler_options,
+            pathmap = pathmap,
             out_ref = out_iref,
             out_dll = out_dll,
             out_pdb = out_pdb,
@@ -317,6 +278,7 @@ def AssemblyAction(
                 warning_level,
                 nowarn,
                 compiler_options,
+                pathmap = pathmap,
                 out_dll = None,
                 out_ref = out_ref,
                 out_pdb = None,
@@ -325,7 +287,7 @@ def AssemblyAction(
 
     return (DotnetAssemblyCompileInfo(
         name = assembly_name,
-        version = effective_version,
+        version = "1.0.0",  #TODO: Maybe make this configurable?
         project_sdk = project_sdk,
         refs = [out_dll],
         irefs = [out_iref] if out_iref else [out_ref] if out_ref else [out_dll],
@@ -344,14 +306,14 @@ def AssemblyAction(
         transitive_compile_data = transitive_compile_data,
     ), DotnetAssemblyRuntimeInfo(
         name = assembly_name,
-        version = effective_version,
+        version = "1.0.0",  #TODO: Maybe make this configurable?
         libs = [out_dll],
         resource_assemblies = [],
         pdbs = [out_pdb] if out_pdb else [],
         xml_docs = [out_xml] if out_xml else [],
         data = data,
         appsetting_files = depset(out_appsettings),
-        native = native,
+        native = [],
         deps = depset([dep[DotnetAssemblyRuntimeInfo] for dep in deps], transitive = [dep[DotnetAssemblyRuntimeInfo].deps for dep in deps]),
         nuget_info = None,
         direct_deps_depsjson_fragment = {dep[DotnetAssemblyRuntimeInfo].name: dep[DotnetAssemblyRuntimeInfo].version for dep in deps},
@@ -381,6 +343,7 @@ def _compile(
         warning_level,
         nowarn,
         compiler_options,
+        pathmap = {},
         out_dll = None,
         out_ref = None,
         out_pdb = None,
@@ -470,6 +433,14 @@ def _compile(
     # Additional compiler options
     for option in compiler_options:
         args.add(option)
+
+    # Source path remapping for debugger support (#228).
+    # Maps user-specified path prefixes in PDB files so debuggers can
+    # resolve source files without manual sourceFileMap configuration.
+    # Note: the compiler wrapper already injects --pathmap:$PWD=. at
+    # execution time for sandbox path remapping.
+    for from_path, to_path in pathmap.items():
+        args.add("--pathmap:" + from_path + "=" + to_path)
 
     # spill to a "response file" when the argument list gets too big (Bazel
     # makes that call based on limitations of the OS).
