@@ -1,0 +1,31 @@
+"""spec-ide-integration targets — pathmap + csproj generation.
+
+debuggable_lib uses pathmap attr (spec-ide-integration #228).
+debuggable_csproj uses the real dotnet_project macro.
+"""
+
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@rules_dotnet//dotnet:defs.bzl", "csharp_library", "dotnet_project")
+
+# --- #228: pathmap attribute ---
+csharp_library(
+    name = "debuggable_lib",
+    srcs = ["//:Debuggable.cs"],
+    pathmap = {"__EXEC_ROOT__": "."},
+    target_frameworks = ["net8.0"],
+)
+
+dotnet_project(
+    name = "debuggable_csproj",
+    srcs = ["//:Debuggable.cs"],
+    target = ":debuggable_lib",
+    target_framework = "net8.0",
+)
+
+build_test(
+    name = "build_test",
+    targets = [
+        ":debuggable_lib",
+        ":debuggable_csproj",
+    ],
+)

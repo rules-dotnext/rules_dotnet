@@ -1,0 +1,16 @@
+"""spec-platform-features targets — .resx resource compilation."""
+
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@rules_dotnet//dotnet:defs.bzl", "resx_resource")
+
+# --- #466: .resx resource compilation ---
+resx_resource(
+    name = "greeter_resources",
+    srcs = ["//:Greeter.resx"],
+    visibility = ["//visibility:public"],
+)
+
+build_test(
+    name = "build_test",
+    targets = [":greeter_resources"],
+)
