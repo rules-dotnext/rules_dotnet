@@ -1,18 +1,17 @@
 """spec-static-analysis targets — Roslyn analyzer enforcement.
 
-Loads real dotnet_analysis_config from rules_dotnet (spec implemented).
+Uses stub rule until spec-static-analysis is implemented.
 analyzed_lib uses standard attrs only (no spec-specific attrs needed).
 """
 
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
-load(
-    "@rules_dotnet//dotnet:defs.bzl",
-    "csharp_library",
-    "dotnet_analysis_config",
-)
+load("@rules_dotnet//dotnet:defs.bzl", "csharp_library")
+load("//:stubs.bzl", "dotnet_analysis_config")
 
+# BEFORE FIX: stub genrule fails with "dotnet_analysis_config is not yet implemented"
 dotnet_analysis_config(
     name = "analysis_config",
+    analyzers = ["@paket.parity//stylecop.analyzers"],
     global_configs = ["//:.globalconfig"],
     suppressed_diagnostics = ["SA1633"],
     treat_warnings_as_errors = True,

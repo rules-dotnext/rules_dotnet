@@ -1,0 +1,25 @@
+"""spec-correctness targets — implicit usings, deterministic builds.
+
+These targets use attributes added by spec-correctness (#436).
+Issues #413 (strict_deps) and #477 (subsystem_version) are build settings
+and TFM-derived values respectively — validated via gap-proof tests, not
+per-target attributes.
+"""
+
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@rules_dotnet//dotnet:defs.bzl", "csharp_library")
+
+# --- #436: implicit usings ---
+# Code with no 'using System;' must compile when implicit_usings = True.
+# BEFORE FIX: no such attribute 'implicit_usings' in 'csharp_library' rule
+csharp_library(
+    name = "implicit_usings",
+    srcs = ["//:ImplicitUsings.cs"],
+    implicit_usings = True,
+    target_frameworks = ["net8.0"],
+)
+
+build_test(
+    name = "build_test",
+    targets = [":implicit_usings"],
+)

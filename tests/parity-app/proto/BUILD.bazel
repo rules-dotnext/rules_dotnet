@@ -1,0 +1,45 @@
+"""spec-proto-grpc targets — protobuf + gRPC code generation."""
+
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@rules_dotnet//dotnet:defs.bzl", "csharp_library")
+load("@rules_dotnet//dotnet:proto.bzl", "csharp_grpc_library", "csharp_proto_library")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
+proto_library(
+    name = "greeting_proto",
+    srcs = ["greeting.proto"],
+)
+
+csharp_proto_library(
+    name = "greeting_csharp_proto",
+    proto = ":greeting_proto",
+    target_frameworks = ["net8.0"],
+    deps = ["@paket.parity//google.protobuf"],
+)
+
+csharp_grpc_library(
+    name = "greeting_csharp_grpc",
+    deps = [
+        ":greeting_csharp_proto",
+        "@paket.parity//google.protobuf",
+        "@paket.parity//grpc.core.api",
+    ],
+    proto = ":greeting_proto",
+    target_frameworks = ["net8.0"],
+)
+
+csharp_library(
+    name = "proto_consumer",
+    srcs = ["ProtoConsumer.cs"],
+    target_frameworks = ["net8.0"],
+    deps = [":greeting_csharp_proto"],
+)
+
+build_test(
+    name = "build_test",
+    targets = [
+        ":greeting_csharp_proto",
+        ":greeting_csharp_grpc",
+        ":proto_consumer",
+    ],
+)

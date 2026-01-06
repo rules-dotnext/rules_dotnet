@@ -1,9 +1,13 @@
-"""spec-platform-features targets — .resx resource compilation."""
+"""spec-platform-features targets — .resx resource compilation.
+
+Uses stub rules until spec-platform-features is implemented (#466).
+"""
 
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
-load("@rules_dotnet//dotnet:defs.bzl", "resx_resource")
+load("//:stubs.bzl", "resx_resource")
 
 # --- #466: .resx resource compilation ---
+# BEFORE FIX: stub genrule fails with "resx_resource is not yet implemented"
 resx_resource(
     name = "greeter_resources",
     srcs = ["//:Greeter.resx"],

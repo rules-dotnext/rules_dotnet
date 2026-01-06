@@ -1,0 +1,29 @@
+"""spec-native-interop targets — P/Invoke with cc_library.
+
+These targets use attributes added by spec-native-interop (#349).
+"""
+
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+load("@rules_dotnet//dotnet:defs.bzl", "csharp_library")
+
+cc_library(
+    name = "native_add",
+    srcs = ["//:native_add.c"],
+    linkstatic = False,
+)
+
+# --- #349: native_deps attribute ---
+# BEFORE FIX: no such attribute 'native_deps' in 'csharp_library' rule
+csharp_library(
+    name = "native_interop_lib",
+    srcs = ["//:NativeConsumer.cs"],
+    native_deps = [":native_add"],
+    target_frameworks = ["net8.0"],
+    visibility = ["//visibility:public"],
+)
+
+build_test(
+    name = "build_test",
+    targets = [":native_interop_lib"],
+)

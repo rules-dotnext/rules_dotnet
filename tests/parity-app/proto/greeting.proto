@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package parity;
+
+option csharp_namespace = "ParityApp.Proto";
+
+message GreetRequest {
+  string name = 1;
+}
+
+message GreetReply {
+  string message = 1;
+}
+
+service Greeter {
+  rpc SayHello (GreetRequest) returns (GreetReply);
+}

@@ -1,0 +1,55 @@
+"""Cross-spec integration targets.
+
+These targets depend on changes from multiple specs. They only build
+when all their dependency specs are implemented.
+
+- app: quick-wins + native-interop + fsharp-enhancements
+- versioned_lib_with_resources: quick-wins + platform-features
+"""
+
+load("@bazel_skylib//rules:build_test.bzl", "build_test")
+load("@rules_dotnet//dotnet:defs.bzl", "csharp_binary", "csharp_library")
+
+# --- spec-quick-wins #490, #526 + spec-correctness #523: app binary ---
+# Exercises appsettings directory preservation, runtime loading, and
+# runtime dedup of mixed-TFM transitive deps.
+csharp_binary(
+    name = "app",
+    srcs = ["//:Program.cs"],
+    appsetting_files = [
+        "//:appsettings.json",
+        "//:config/env/appsettings.Development.json",
+    ],
+    target_frameworks = ["net8.0"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//fsharp:fsharp_consumer",
+        "//native:native_interop_lib",
+        "//quick_wins:versioned_lib",
+    ],
+)
+
+# --- spec-platform-features + spec-quick-wins #423: versioned lib with resources ---
+# Only buildable after BOTH spec-quick-wins and spec-platform-features are done.
+csharp_library(
+    name = "versioned_lib_with_resources",
+    srcs = ["//:Greeter.cs"],
+    resources = ["//platform:greeter_resources"],
+    target_frameworks = ["net8.0"],
+    version = "2.1.0",
+)
+
+build_test(
+    name = "build_test",
+    targets = [
+        ":app",
+        ":versioned_lib_with_resources",
+    ],
+)
+
+# --- Runtime validation: app exits 0 when appsettings are correctly placed ---
+sh_test(
+    name = "app_runtime_test",
+    srcs = ["//:app_runtime_test.sh"],
+    data = [":app"],
+)

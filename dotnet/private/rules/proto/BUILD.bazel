@@ -1,0 +1,31 @@
+load("//dotnet/private/rules/proto:csharp_proto_compiler.bzl", "csharp_proto_compiler")
+
+package(default_visibility = ["//visibility:public"])
+
+# Default C# proto compiler: uses protoc's built-in --csharp_out.
+# Users must have protobuf as a bazel_dep and provide Google.Protobuf
+# NuGet package in their workspace.
+csharp_proto_compiler(
+    name = "default_csharp_proto_compiler",
+    exclusions = ["google/protobuf"],
+    protoc = "@protobuf//:protoc",
+    protoc_plugin_name = "csharp",
+    suffixes = [".cs"],
+    # NOTE: Users must override this with their own Google.Protobuf NuGet target.
+    # The default empty list means users need to add Google.Protobuf to their deps.
+    deps = [],
+)
+
+# Default C# gRPC compiler: uses grpc_csharp_plugin.
+# Users must have grpc as a bazel_dep.
+csharp_proto_compiler(
+    name = "default_csharp_grpc_compiler",
+    exclusions = ["google/protobuf"],
+    plugin = "@grpc//src/compiler:grpc_csharp_plugin",
+    plugin_name = "grpc",
+    protoc = "@protobuf//:protoc",
+    protoc_plugin_name = "csharp",
+    suffixes = ["Grpc.cs"],
+    # NOTE: Users must override this with their own Grpc.Core.Api NuGet target.
+    deps = [],
+)

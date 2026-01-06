@@ -97,12 +97,15 @@ DotnetApphostPackInfo = provider(
     },
 )
 
-# === spec-razor-blazor additions ===
-RazorFilesInfo = provider(
-    doc = "Information about preprocessed Razor files.",
+# === spec-publishing additions ===
+DotnetNativeAotPackInfo = provider(
+    doc = "Information about a .NET NativeAOT compiler pack.",
     fields = {
-        "razor_files": "depset[File]: The .razor and .cshtml source files",
-        "analyzer_config_template": "File: The generated .editorconfig template",
-        "assembly_info": "File: Generated RazorAssemblyInfo.cs",
+        "ilc": "File: The ILC (IL Compiler) executable",
+        "runtime_identifier": "string: The runtime identifier",
+        "mibc_files": "list[File]: Profile-guided optimization data files",
+        "sdk_libs": "list[File]: Static runtime libraries for linking (.a / .lib files)",
+        "framework_libs": "list[File]: Framework static libraries",
+        "reference_assemblies": "list[File]: Reference assemblies needed by ILC",
     },
 )

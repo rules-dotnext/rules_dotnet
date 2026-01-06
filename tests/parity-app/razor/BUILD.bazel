@@ -1,8 +1,12 @@
-"""spec-razor-blazor targets — Razor component compilation (#249)."""
+"""spec-razor-blazor targets — Razor component compilation.
+
+Uses stub rule until spec-razor-blazor is implemented (#249).
+"""
 
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
-load("@rules_dotnet//dotnet:defs.bzl", "razor_library")
+load("//:stubs.bzl", "razor_library")
 
+# BEFORE FIX: stub genrule fails with "razor_library is not yet implemented"
 razor_library(
     name = "razor_components",
     razor_srcs = ["//:Counter.razor"],

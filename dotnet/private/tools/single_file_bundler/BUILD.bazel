@@ -1,0 +1,19 @@
+# The single_file_bundler tool requires Microsoft.NET.HostModel NuGet package.
+# It will be built as a csharp_binary once the HostModel dependency is available.
+# For now, this is a placeholder BUILD file.
+#
+# To fully implement, add:
+#   load("//dotnet:defs.bzl", "csharp_binary")
+#   csharp_binary(
+#       name = "single_file_bundler",
+#       srcs = ["Program.cs"],
+#       deps = ["@nuget//microsoft.net.hostmodel"],
+#       target_frameworks = ["net8.0"],
+#       visibility = ["//visibility:public"],
+#   )
+
+filegroup(
+    name = "single_file_bundler",
+    srcs = ["Program.cs"],
+    visibility = ["//visibility:public"],
+)

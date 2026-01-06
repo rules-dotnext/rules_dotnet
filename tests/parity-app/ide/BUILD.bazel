@@ -1,13 +1,15 @@
 """spec-ide-integration targets — pathmap + csproj generation.
 
 debuggable_lib uses pathmap attr (spec-ide-integration #228).
-debuggable_csproj uses the real dotnet_project macro.
+dotnet_project is a stub until implemented.
 """
 
 load("@bazel_skylib//rules:build_test.bzl", "build_test")
-load("@rules_dotnet//dotnet:defs.bzl", "csharp_library", "dotnet_project")
+load("@rules_dotnet//dotnet:defs.bzl", "csharp_library")
+load("//:stubs.bzl", "dotnet_project")
 
 # --- #228: pathmap attribute ---
+# BEFORE FIX: no such attribute 'pathmap' in 'csharp_library' rule
 csharp_library(
     name = "debuggable_lib",
     srcs = ["//:Debuggable.cs"],

@@ -1,0 +1,30 @@
+"""spec-publishing targets — publish_library, dotnet_pack.
+
+Tests for publish_binary single_file (#358) and native_aot_binary (#484)
+require cross-spec dependencies (integration:app) that are not yet available.
+"""
+
+load("@rules_dotnet//dotnet:defs.bzl", "csharp_library", "dotnet_pack", "publish_library")
+
+# A simple library for publish_library and dotnet_pack testing
+csharp_library(
+    name = "pack_lib",
+    srcs = ["//:PackLib.cs"],
+    target_frameworks = ["net8.0"],
+)
+
+# --- #391: publish library ---
+publish_library(
+    name = "lib_published",
+    library = ":pack_lib",
+    target_framework = "net8.0",
+)
+
+# --- #527: dotnet pack ---
+dotnet_pack(
+    name = "lib_nupkg",
+    library = ":pack_lib",
+    package_id = "ParityApp.Pack",
+    package_version = "1.0.0",
+    target_framework = "net8.0",
+)

@@ -166,6 +166,67 @@ def _copy_to_publish(ctx, runtime_identifier, runtime_pack_info, binary_info, as
 
     return (main_dll_copy, outputs, runfiles)
 
+def _get_tfm_version(target_framework):
+    """Extract numeric version from TFM like 'net8.0' -> '8.0'."""
+    tfm = target_framework
+    if tfm.startswith("netcoreapp"):
+        return tfm.replace("netcoreapp", "")
+    if tfm.startswith("net"):
+        return tfm.replace("net", "")
+    fail("Cannot extract version from TFM: " + tfm)
+
+def _create_single_file_bundle(ctx, apphost_shim, main_dll, outputs, runtime_identifier, target_framework, runtimeconfig, depsjson):
+    """Bundle all publish outputs into a single-file executable."""
+    bundle_output = ctx.actions.declare_file(
+        "{}/single/{}".format(ctx.label.name, apphost_shim.basename),
+    )
+
+    # Build a manifest file listing all files to bundle
+    # Format: <relative-path>\t<absolute-source-path>
+    manifest_lines = []
+    manifest_lines.append("{}\t{}".format(main_dll.basename, main_dll.path))
+    manifest_lines.append("{}\t{}".format(runtimeconfig.basename, runtimeconfig.path))
+    manifest_lines.append("{}\t{}".format(depsjson.basename, depsjson.path))
+
+    for f in outputs:
+        if f == main_dll:
+            continue
+
+        # Compute relative path within the publish dir
+        prefix = "{}/publish/{}/".format(ctx.label.name, runtime_identifier)
+        idx = f.short_path.find(prefix)
+        if idx != -1:
+            rel = f.short_path[idx + len(prefix):]
+        else:
+            rel = f.basename
+        manifest_lines.append("{}\t{}".format(rel, f.path))
+
+    manifest = ctx.actions.declare_file(ctx.label.name + ".bundle_manifest.txt")
+    ctx.actions.write(output = manifest, content = "\n".join(manifest_lines))
+
+    tfm_version = _get_tfm_version(target_framework)
+
+    ctx.actions.run(
+        executable = ctx.attr._single_file_bundler[0].files_to_run,
+        arguments = [
+            apphost_shim.path,
+            bundle_output.path,
+            runtime_identifier,
+            tfm_version,
+            manifest.path,
+        ],
+        inputs = depset(
+            [apphost_shim, main_dll, runtimeconfig, depsjson, manifest] + outputs,
+            transitive = [ctx.attr._single_file_bundler[0].default_runfiles.files],
+        ),
+        tools = [ctx.attr._single_file_bundler[0].files_to_run],
+        outputs = [bundle_output],
+        mnemonic = "DotnetSingleFileBundle",
+        progress_message = "Bundling single-file .NET binary %{label}",
+    )
+
+    return bundle_output
+
 def _create_shim_exe(ctx, apphost_pack_info, dll, runtime_identifier):
     windows_constraint = ctx.attr._windows_constraint[platform_common.ConstraintValueInfo]
 
@@ -259,6 +320,32 @@ def _publish_binary_impl(ctx):
 
     apphost_shim = _create_shim_exe(ctx, binary_info.apphost_pack_info, main_dll, runtime_identifier)
 
+    # --- spec-publishing: single-file publish (#358) ---
+    if ctx.attr.single_file:
+        if not is_self_contained:
+            fail("single_file = True requires self_contained = True")
+
+        bundle = _create_single_file_bundle(
+            ctx,
+            apphost_shim,
+            main_dll,
+            outputs,
+            runtime_identifier,
+            target_framework,
+            runtimeconfig,
+            depsjson,
+        )
+
+        return [
+            DefaultInfo(
+                executable = bundle,
+                files = depset([bundle]),
+                runfiles = ctx.runfiles(files = runfiles),
+            ),
+        ]
+
+    # --- end spec-publishing: #358 ---
+
     return [
         DefaultInfo(
             executable = apphost_shim,
@@ -307,6 +394,22 @@ publish_binary = rule(
             doc = "The roll forward behavior that should be used: https://learn.microsoft.com/en-us/dotnet/core/versions/selection#control-roll-forward-behavior",
             default = "Minor",
             values = ["Minor", "Major", "LatestPatch", "LatestMinor", "LatestMajor", "Disable"],
+        ),
+        # spec-publishing: #358
+        "single_file": attr.bool(
+            doc = """Whether to publish as a single file.
+
+            When true, all managed assemblies are bundled into the apphost executable,
+            equivalent to `dotnet publish -p:PublishSingleFile=true`.
+            Requires self_contained = True.
+            """,
+            default = False,
+        ),
+        "_single_file_bundler": attr.label(
+            providers = [DotnetAssemblyCompileInfo, DotnetAssemblyRuntimeInfo],
+            executable = True,
+            default = "//dotnet/private/tools/single_file_bundler:single_file_bundler",
+            cfg = default_transition,
         ),
         "_apphost_shimmer": attr.label(
             providers = [DotnetAssemblyCompileInfo, DotnetAssemblyRuntimeInfo],

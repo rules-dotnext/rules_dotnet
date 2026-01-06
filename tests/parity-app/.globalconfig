@@ -1,0 +1,6 @@
+is_global = true
+
+# Enforce StyleCop documentation rules as warnings.
+# spec-static-analysis parity: globalconfig injection into compilation.
+dotnet_diagnostic.SA1600.severity = warning
+dotnet_diagnostic.SA1633.severity = none
