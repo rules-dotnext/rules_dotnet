@@ -124,6 +124,7 @@ def _csharp_grpc_library_impl(ctx):
         appsetting_files = [],
         compile_data = [],
         out = ctx.attr.out if ctx.attr.out else "",
+        version = "",
         target = "library",
         target_name = ctx.attr.name,
         target_framework = tfm,
@@ -144,6 +145,7 @@ def _csharp_grpc_library_impl(ctx):
         is_language_specific_analyzer = False,
         analyzer_configs = [],
         compiler_options = [],
+        pathmap = {},
         is_windows = ctx.target_platform_has_constraint(
             ctx.attr._windows_constraint[platform_common.ConstraintValueInfo],
         ),

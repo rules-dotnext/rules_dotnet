@@ -17,6 +17,7 @@ csharp_library(
     srcs = ["//:ImplicitUsings.cs"],
     implicit_usings = True,
     target_frameworks = ["net8.0"],
+    visibility = ["//visibility:public"],
 )
 
 build_test(

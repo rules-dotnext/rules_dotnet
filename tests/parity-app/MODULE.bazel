@@ -19,7 +19,7 @@ module(
 bazel_dep(name = "rules_dotnet", version = "0.0.0")
 local_path_override(
     module_name = "rules_dotnet",
-    path = "/home/colin/agent-publishing",  # Default: relative to this file. Agents: use absolute path to your clone.
+    path = "../..",  # rules_dotnet root (2 levels up from tests/parity-app)
 )
 
 # --- Toolchain: .NET 8 SDK (LTS) ---

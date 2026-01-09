@@ -15,6 +15,7 @@ csharp_library(
     srcs = ["//:Debuggable.cs"],
     pathmap = {"__EXEC_ROOT__": "."},
     target_frameworks = ["net8.0"],
+    visibility = ["//visibility:public"],
 )
 
 dotnet_project(

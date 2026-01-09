@@ -47,4 +47,6 @@ if [ "$(uname)" = "Darwin" ]; then
   fi
 fi
 
-exec $(rlocation TEMPLATED_dotnet) exec $(rlocation TEMPLATED_executable) "$@"
+DOTNET_EXEC="$(rlocation TEMPLATED_dotnet)"
+ASSEMBLY="$(rlocation TEMPLATED_executable)"
+exec "$DOTNET_EXEC" exec "$ASSEMBLY" "$@"

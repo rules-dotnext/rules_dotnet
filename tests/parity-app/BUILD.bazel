@@ -45,6 +45,7 @@ test_suite(
         "//correctness:build_test",
         "//fsharp:build_test",
         "//ide:build_test",
+        "//integration:all_specs_integration",
         "//integration:app_runtime_test",
         "//integration:build_test",
         "//native:build_test",

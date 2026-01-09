@@ -65,6 +65,21 @@ def parity():
                 "targeting_pack_overrides": [],
                 "framework_list": [],
             },
+            # --- spec-proto-grpc (parity): gRPC core API (ClientBase, Marshaller, etc.) ---
+            {
+                "name": "Grpc.Core.Api",
+                "id": "Grpc.Core.Api",
+                "version": "2.70.0",
+                "sha512": "sha512-EouQ/9+AoFEKXRuu4G1Axml3YcjpaKzNqjPC2LnFXJPFR7uY3AInvabxKUSqsKsNs+hmfiMCnJwi3bsN+VcMBw==",
+                "sources": ["https://api.nuget.org/v3/index.json"],
+                "dependencies": {
+                    "net6.0": [],
+                    "net8.0": [],
+                    "netstandard2.1": [],
+                },
+                "targeting_pack_overrides": [],
+                "framework_list": [],
+            },
             # --- spec-proto-grpc (parity): gRPC runtime ---
             {
                 "name": "Grpc.Tools",
