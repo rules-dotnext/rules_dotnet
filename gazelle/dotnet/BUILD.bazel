@@ -1,0 +1,32 @@
+load("@rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "dotnet",
+    srcs = [
+        "config.go",
+        "csproj.go",
+        "generate.go",
+        "lang.go",
+        "resolve.go",
+    ],
+    importpath = "github.com/bazel-contrib/rules_dotnet/gazelle/dotnet",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@bazel_gazelle//config:go_default_library",
+        "@bazel_gazelle//label:go_default_library",
+        "@bazel_gazelle//language:go_default_library",
+        "@bazel_gazelle//repo:go_default_library",
+        "@bazel_gazelle//resolve:go_default_library",
+        "@bazel_gazelle//rule:go_default_library",
+    ],
+)
+
+go_test(
+    name = "dotnet_test",
+    srcs = [
+        "csproj_test.go",
+        "generate_test.go",
+    ],
+    data = glob(["testdata/**"]),
+    embed = [":dotnet"],
+)

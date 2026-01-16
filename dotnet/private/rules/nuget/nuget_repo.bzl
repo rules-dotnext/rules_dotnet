@@ -9,7 +9,8 @@ def _deps_select_statment(ctx, deps):
     if len(deps) == 0:
         return "\"//conditions:default\": []"
 
-    return ",".join(["\n    \"@rules_dotnet//dotnet:tfm_{tfm}\": [{deps_list}]".format(tfm = tfm, deps_list = ",".join(["\"@{nuget_repo_name}//{dep_name}\"".format(dep_name = d.lower(), nuget_repo_name = ctx.attr.repo_name.lower()) for d in tfm_deps])) for (tfm, tfm_deps) in deps.items()])
+    tfm_entries = ",".join(["\n    \"@rules_dotnet//dotnet:tfm_{tfm}\": [{deps_list}]".format(tfm = tfm, deps_list = ",".join(["\"@{nuget_repo_name}//{dep_name}\"".format(dep_name = d.lower(), nuget_repo_name = ctx.attr.repo_name.lower()) for d in tfm_deps])) for (tfm, tfm_deps) in deps.items()])
+    return tfm_entries + ",\n    \"//conditions:default\": []"
 
 def _nuget_repo_impl(ctx):
     for package in ctx.attr.packages:
@@ -68,6 +69,8 @@ def _nuget_repo_impl(ctx):
             "{FRAMEWORK_LIST}": json.encode({override.lower().split("|")[0]: override.lower().split("|")[1] for override in framework_list}),
             "{TOOLS}": "\n\n".join(tool_targets),
             "{SHA_512}": sha512,
+            # spec-nuget-fixes: #401
+            "{SOURCE_URL}": package.get("url", ""),
         })
 
         # currently we only support one version of a package
@@ -126,15 +129,24 @@ def nuget_repo(name, packages):
         id = package["id"].lower()
         version = package["version"].lower()
 
+        archive_kwargs = {
+            "name": "{}.{}.v{}".format(_GLOBAL_NUGET_PREFIX, id, version),
+            "sources": package["sources"],
+            "netrc": package.get("netrc", None),
+            "id": id,
+            "version": version,
+            "sha512": package["sha512"],
+        }
+
+        # Pass through direct download URL if provided (#401)
+        url = package.get("url", "")
+        if url:
+            archive_kwargs["url"] = url
+
         # maybe another nuget_repo has the same nuget package dependency
         maybe(
             nuget_archive,
-            name = "{}.{}.v{}".format(_GLOBAL_NUGET_PREFIX, id, version),
-            sources = package["sources"],
-            netrc = package.get("netrc", None),
-            id = id,
-            version = version,
-            sha512 = package["sha512"],
+            **archive_kwargs
         )
 
     # scaffold transitive @name// dependency tree

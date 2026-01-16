@@ -469,4 +469,5 @@ def _compile(
         env = {
             "DOTNET_CLI_HOME": toolchain.runtime.files_to_run.executable.dirname,
         },
+        toolchain = "//dotnet:toolchain_type",
     )

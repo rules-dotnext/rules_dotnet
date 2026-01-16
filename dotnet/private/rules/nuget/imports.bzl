@@ -35,6 +35,7 @@ def _import_library(ctx):
         framework_list = ctx.attr.framework_list,
         sha512 = ctx.attr.sha512,
         nupkg = ctx.file.nupkg,
+        source_url = ctx.attr.source_url,
     )
 
     # spec-correctness: #413
@@ -165,6 +166,11 @@ import_library = rule(
         "nupkg": attr.label(
             doc = "The `.nupkg` file providing this import",
             allow_single_file = True,
+        ),
+        # spec-nuget-fixes: #401
+        "source_url": attr.string(
+            doc = "The URL from which the package was downloaded, for debugging and auditing",
+            default = "",
         ),
     },
     toolchains = [

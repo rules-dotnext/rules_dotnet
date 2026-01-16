@@ -17,6 +17,7 @@ import_library(
     refs = ["@{PREFIX}.{ID_LOWER}.v{VERSION}//:refs"],
     resource_assemblies = ["@{PREFIX}.{ID_LOWER}.v{VERSION}//:resource_assemblies"],
     sha512 = "{SHA_512}",
+    source_url = "{SOURCE_URL}",
     targeting_pack_overrides = {TARGETING_PACK_OVERRIDES},
     version = "{VERSION}",
     deps = select({

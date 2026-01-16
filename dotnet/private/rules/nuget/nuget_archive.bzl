@@ -184,7 +184,20 @@ def _process_build_file(groups, file):
     tfm_start = i + 1
     tfm_end = file.find("/", i + 1)
     tfm = file[tfm_start:tfm_end]
-    file_type = file[tfm_end + 1:file.find("/", tfm_end + 1)]
+
+    # Determine the file_type by looking at the path segment after the TFM.
+    # Possible layouts (#388):
+    #   build/<TFM>/ref/<assembly>.dll        -> ref
+    #   build/<TFM>/lib/<assembly>.dll        -> lib
+    #   build/<TFM>/<assembly>.dll            -> lib (direct under TFM)
+    #   build/<TFM>/<arch>/<assembly>.dll     -> lib (architecture subfolder)
+    #   build/.NETFramework/<ver>/ref/...     -> ref (legacy)
+    next_slash = file.find("/", tfm_end + 1)
+    if next_slash == -1:
+        # DLL is directly under build/<TFM>/
+        file_type = "lib"
+    else:
+        file_type = file[tfm_end + 1:next_slash]
 
     # Handle .NETFramework
     if tfm == ".NETFramework":
@@ -210,8 +223,9 @@ def _process_build_file(groups, file):
 
     if file_type == "ref":
         group[tfm]["ref"].append(file)
-
-    if file_type == "lib":
+    else:
+        # Treat "lib", direct-under-TFM, and any other subdirectory
+        # (e.g., architecture folders like x86, x64) as lib entries.
         group[tfm]["lib"].append(file)
 
     return
@@ -369,7 +383,7 @@ def _process_key_and_file(groups, key, file):
 
     return
 
-def _get_package_urls(rctx, sources, auth, package_id, package_version):
+def _get_package_urls(rctx, sources, auth, package_id, package_version, allow_insecure = False):
     base_addresses = {}
     package_urls = []
 
@@ -377,11 +391,45 @@ def _get_package_urls(rctx, sources, auth, package_id, package_version):
         if base_addresses.get(source):
             continue
 
+        # Support local file paths and file:// URLs (#124)
+        if source.startswith("file://") or source.startswith("/"):
+            local_path = source
+            if local_path.startswith("file://"):
+                local_path = local_path[len("file://"):]
+
+            # NuGet local feed layout (hierarchical):
+            # {path}/{id_lower}/{version}/{id_lower}.{version}.nupkg
+            candidate_flat = "%s/%s/%s/%s.%s.nupkg" % (
+                local_path,
+                package_id.lower(),
+                package_version,
+                package_id.lower(),
+                package_version.lower(),
+            )
+
+            # Simple flat layout:
+            # {path}/{id_lower}.{version}.nupkg
+            candidate_simple = "%s/%s.%s.nupkg" % (
+                local_path,
+                package_id.lower(),
+                package_version.lower(),
+            )
+
+            package_urls.append("file://" + candidate_flat)
+            package_urls.append("file://" + candidate_simple)
+            base_addresses[source] = source
+            continue
+
         # If the url ends with index.json we are dealing with a V3 NuGet feed
         # and the url schema for the package contents will be:
         # {base_address}/{lower_id}/{lower_version}/{lower_id}.{lower_version}.nupkg
         if source.endswith("index.json"):
-            rctx.download(source, auth = auth, output = "index.json")
+            # When allow_insecure is True, pass an empty integrity string to
+            # allow Bazel to download over plain HTTP (#431).
+            download_kwargs = {"url": source, "auth": auth, "output": "index.json"}
+            if allow_insecure:
+                download_kwargs["integrity"] = ""
+            rctx.download(**download_kwargs)
             index = json.decode(rctx.read("index.json"))
             rctx.delete("index.json")
             for resource in index["resources"]:
@@ -421,20 +469,39 @@ def _get_auth_dict(ctx, netrc, urls):
     return cred_dict
 
 def _nuget_archive_impl(ctx):
-    # First get the auth dict for the package sources since the sources can be different than the
-    # package base url when using NuGet V3 feeds.
-    auth = _get_auth_dict(ctx, ctx.attr.netrc, ctx.attr.sources)
-    urls = _get_package_urls(ctx, ctx.attr.sources, auth, ctx.attr.id, ctx.attr.version)
+    if ctx.attr.url:
+        # When a direct URL is provided, use it directly without source resolution.
+        # This supports Artifactory and other non-standard NuGet feeds (#379, #401).
+        urls = [ctx.attr.url]
+        auth = _get_auth_dict(ctx, ctx.attr.netrc, urls)
+    else:
+        # First get the auth dict for the package sources since the sources can be different than the
+        # package base url when using NuGet V3 feeds.
+        auth = _get_auth_dict(ctx, ctx.attr.netrc, ctx.attr.sources)
+        urls = _get_package_urls(ctx, ctx.attr.sources, auth, ctx.attr.id, ctx.attr.version, allow_insecure = ctx.attr.allow_insecure)
 
-    # Then get the auth dict for the package base urls
-    auth = _get_auth_dict(ctx, ctx.attr.netrc, urls)
+        # Then get the auth dict for the package base urls
+        auth = _get_auth_dict(ctx, ctx.attr.netrc, urls)
 
     # We download it as .zip because ctx.exract reads the file extension to determine the archive type
     file_name = "%s.zip" % ctx.name
     nupkg_name = "%s.%s.nupkg" % (ctx.attr.id, ctx.attr.version)
     names = [nupkg_name]
 
-    ctx.download(urls, output = file_name, integrity = ctx.attr.sha512, auth = auth)
+    # Check if any URL is a local file (#124)
+    local_path = None
+    for url in urls:
+        if url.startswith("file://"):
+            path = url[len("file://"):]
+            if ctx.path(path).exists:
+                local_path = path
+                break
+
+    if local_path:
+        # Copy local file instead of downloading
+        ctx.symlink(local_path, file_name)
+    else:
+        ctx.download(urls, output = file_name, integrity = ctx.attr.sha512, auth = auth)
     ctx.extract(archive = file_name)
     for name in names:
         ctx.symlink(file_name, name)
@@ -594,6 +661,17 @@ nuget_archive = repository_rule(
         "id": attr.string(),
         "version": attr.string(),
         "sha512": attr.string(),
+        # spec-nuget-fixes: #431
+        "allow_insecure": attr.bool(
+            default = False,
+            doc = "Allow plain HTTP package sources. By default, Bazel rejects HTTP URLs without checksums.",
+        ),
+        # spec-nuget-fixes: #401, #379
+        "url": attr.string(
+            default = "",
+            doc = "Direct download URL for the .nupkg file. When set, sources are ignored for URL construction. " +
+                  "This supports Artifactory and other non-standard NuGet feeds.",
+        ),
     },
 )
 

@@ -56,11 +56,42 @@ let tfms =
       "net10.0" ]
     |> Seq.map (fun f -> NuGetFramework.Parse(f))
 
+let ensureHomeEnvVars () =
+    // Paket.Core's Constants static initializer calls Environment.GetFolderPath
+    // for LocalApplicationData and ApplicationData, which returns null when HOME
+    // is unset (common in Bazel sandbox). Guard against this by setting HOME to
+    // a temp directory if it is not already set.
+    let ensureVar name =
+        match Environment.GetEnvironmentVariable(name) with
+        | null
+        | "" ->
+            let tmp = Path.Combine(Path.GetTempPath(), "paket2bazel_home")
+            Directory.CreateDirectory(tmp) |> ignore
+            Environment.SetEnvironmentVariable(name, tmp)
+        | _ -> ()
+
+    ensureVar "HOME"
+    ensureVar "USERPROFILE"
+
 let getPackageFilePath (packageName: string) (packageVersion: string) =
-    Paket.NuGetCache.GetTargetUserNupkg (Domain.PackageName packageName) (Paket.SemVer.Parse packageVersion)
+    let path =
+        Paket.NuGetCache.GetTargetUserNupkg (Domain.PackageName packageName) (Paket.SemVer.Parse packageVersion)
+
+    if String.IsNullOrEmpty(path) then
+        failwith
+            $"Could not resolve NuGet cache path for package {packageName} {packageVersion}. Ensure HOME environment variable is set."
+
+    path
 
 let getPackageFolderPath (packageName: string) (packageVersion: string) =
-    Paket.NuGetCache.GetTargetUserFolder (Domain.PackageName packageName) (Paket.SemVer.Parse packageVersion)
+    let path =
+        Paket.NuGetCache.GetTargetUserFolder (Domain.PackageName packageName) (Paket.SemVer.Parse packageVersion)
+
+    if String.IsNullOrEmpty(path) then
+        failwith
+            $"Could not resolve NuGet cache folder for package {packageName} {packageVersion}. Ensure HOME environment variable is set."
+
+    path
 
 let getClosestFrameworkFiles (targetFramework: NuGetFramework) (frameworkItems: FrameworkSpecificGroup seq) =
     let frameworkReducer = FrameworkReducer()
@@ -214,6 +245,8 @@ let getTools (packageName: string) (packageVersion: string) (packageReader: Pack
         Map.empty
 
 let getDependencies dependenciesFile (cache: Dictionary<string, Package>) =
+    ensureHomeEnvVars ()
+
     let maybeDeps = Dependencies.TryLocate(dependenciesFile)
 
     match maybeDeps with
