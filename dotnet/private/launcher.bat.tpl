@@ -57,7 +57,7 @@ for %%F in (%dotnet_executable%) do set DOTNET_ROOT=%%~dpF
 
 call :rlocation "TEMPLATED_executable" run_script
 
-rem spec-native-interop: #349 — P/Invoke native library search path
+rem #349 — P/Invoke native library search path
 for %%F in (!run_script!) do set NATIVE_LIB_DIR=%%~dpF
 set PATH=!NATIVE_LIB_DIR!;!PATH!
 

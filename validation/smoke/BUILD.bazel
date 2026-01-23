@@ -1,0 +1,22 @@
+load("@rules_dotnet//dotnet:defs.bzl", "csharp_binary", "csharp_library", "csharp_nunit_test")
+
+csharp_library(
+    name = "greeter",
+    srcs = ["Greeter.cs"],
+    target_frameworks = ["net8.0"],
+    version = "1.0.0",
+)
+
+csharp_binary(
+    name = "app",
+    srcs = ["Program.cs"],
+    target_frameworks = ["net8.0"],
+    deps = [":greeter"],
+)
+
+csharp_nunit_test(
+    name = "greeter_test",
+    srcs = ["GreeterTest.cs"],
+    target_frameworks = ["net8.0"],
+    deps = [":greeter"],
+)

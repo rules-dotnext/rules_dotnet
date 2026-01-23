@@ -52,6 +52,48 @@ action_args_test = analysistest.make(
     attrs = ACTION_ARGS_TEST_ARGS,
 )
 
+ACTION_ARGS_SUBSTRING_TEST_ARGS = {
+    "action_mnemonic": attr.string(),
+    "expected_arg_substrings": attr.string_list(),
+    "expected_nonexistent_arg_substrings": attr.string_list(),
+}
+
+# buildifier: disable=function-docstring
+def action_args_substring_test_impl(ctx):
+    env = analysistest.begin(ctx)
+
+    action_under_test = None
+    for action in analysistest.target_actions(env):
+        if action.mnemonic == ctx.attr.action_mnemonic:
+            if action_under_test == None:
+                action_under_test = action
+            else:
+                fail("Multiple actions with mnemonic: {}".format(ctx.attr.action_mnemonic))
+
+    if action_under_test == None:
+        fail("No action with mnemonic: {}".format(ctx.attr.action_mnemonic))
+
+    for expected_sub in ctx.attr.expected_arg_substrings:
+        found = False
+        for actual_arg in action_under_test.argv:
+            if expected_sub in actual_arg:
+                found = True
+                break
+        if not found:
+            fail("No arg containing substring: {}".format(expected_sub))
+
+    for unexpected_sub in ctx.attr.expected_nonexistent_arg_substrings:
+        for actual_arg in action_under_test.argv:
+            if unexpected_sub in actual_arg:
+                fail("Expected no arg containing substring '{}', but found: {}".format(unexpected_sub, actual_arg))
+
+    return analysistest.end(env)
+
+action_args_substring_test = analysistest.make(
+    action_args_substring_test_impl,
+    attrs = ACTION_ARGS_SUBSTRING_TEST_ARGS,
+)
+
 def get_target_tfm(target):
     """Returns the target framework of the given target.
 

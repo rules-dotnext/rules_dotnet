@@ -59,7 +59,7 @@ NuGetInfo = provider(
         "framework_list": "map[string, string]: Targeting packs like e.g. Microsoft.NETCore.App.Ref have a FrameworkList.xml that includes a list of the DLLs in the targeting pack. This is used for selecting the correct DLL versions during compilation and runtime.",
         "sha512": "string: the SHA512 SRI string for the package",
         "nupkg": "File: the underlying `.nupkg` file which provides this package",
-        # spec-nuget-fixes: #401
+        # #401
         "source_url": "string: the URL from which the package was downloaded, for debugging and auditing",
     },
 )
@@ -99,7 +99,18 @@ DotnetApphostPackInfo = provider(
     },
 )
 
-# === spec-publishing additions ===
+# F# source info provider
+FSharpSourceInfo = provider(
+    doc = "Source file information for F# targets. This provider enables downstream " +
+          "rules (e.g., Fable transpiler, project file generators) to access the " +
+          "F# source files of a target and its transitive dependencies.",
+    fields = {
+        "srcs": "list[File]: The direct F# source files (.fs and .fsi) of this target, in compilation order.",
+        "transitive_srcs": "depset[File]: All F# source files from this target and its transitive F# dependencies, in compilation order.",
+    },
+)
+
+# NativeAOT pack provider
 DotnetNativeAotPackInfo = provider(
     doc = "Information about a .NET NativeAOT compiler pack.",
     fields = {
@@ -109,5 +120,15 @@ DotnetNativeAotPackInfo = provider(
         "sdk_libs": "list[File]: Static runtime libraries for linking (.a / .lib files)",
         "framework_libs": "list[File]: Framework static libraries",
         "reference_assemblies": "list[File]: Reference assemblies needed by ILC",
+    },
+)
+
+# Razor files provider
+RazorFilesInfo = provider(
+    doc = "Information about preprocessed Razor files.",
+    fields = {
+        "razor_files": "depset[File]: The .razor and .cshtml source files",
+        "analyzer_config_template": "File: The generated .editorconfig template",
+        "assembly_info": "File: Generated RazorAssemblyInfo.cs",
     },
 )

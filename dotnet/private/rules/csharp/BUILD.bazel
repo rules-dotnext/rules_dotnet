@@ -8,6 +8,7 @@ bzl_library(
     ],
     deps = [
         "//dotnet/private:common",
+        "//dotnet/private/rules/analysis:resolve",
         "//dotnet/private/rules/common:attrs",
         "//dotnet/private/rules/common:binary",
         "//dotnet/private/rules/csharp/actions:csharp_assembly",
@@ -25,6 +26,7 @@ bzl_library(
     ],
     deps = [
         "//dotnet/private:common",
+        "//dotnet/private/rules/analysis:resolve",
         "//dotnet/private/rules/common:attrs",
         "//dotnet/private/rules/common:library",
         "//dotnet/private/rules/csharp/actions:csharp_assembly",
@@ -41,6 +43,7 @@ bzl_library(
     ],
     deps = [
         "//dotnet/private:common",
+        "//dotnet/private/rules/analysis:resolve",
         "//dotnet/private/rules/common:attrs",
         "//dotnet/private/rules/common:binary",
         "//dotnet/private/rules/csharp/actions:csharp_assembly",

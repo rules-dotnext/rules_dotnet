@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net8.0": {
+      "Newtonsoft.Json": {
+        "type": "Direct",
+        "requested": "[13.0.3, )",
+        "resolved": "13.0.3",
+        "contentHash": "HdGzkoOHnq8YKRZ4qzQ",
+        "nupkgSha512": "sha512-abc123"
+      },
+      "System.Memory": {
+        "type": "Transitive",
+        "resolved": "4.5.5",
+        "contentHash": "abcdef",
+        "nupkgSha512": "sha512-def456"
+      }
+    }
+  }
+}

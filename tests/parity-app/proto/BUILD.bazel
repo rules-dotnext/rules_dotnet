@@ -20,13 +20,13 @@ csharp_proto_library(
 
 csharp_grpc_library(
     name = "greeting_csharp_grpc",
+    proto = ":greeting_proto",
+    target_frameworks = ["net8.0"],
     deps = [
         ":greeting_csharp_proto",
         "@paket.parity//google.protobuf",
         "@paket.parity//grpc.core.api",
     ],
-    proto = ":greeting_proto",
-    target_frameworks = ["net8.0"],
 )
 
 csharp_library(

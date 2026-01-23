@@ -38,6 +38,14 @@ bzl_library(
 )
 
 bzl_library(
+    name = "nuget_lock",
+    srcs = ["nuget_lock.bzl"],
+    visibility = [
+        "//dotnet:__subpackages__",
+    ],
+)
+
+bzl_library(
     name = "dotnet_tool",
     srcs = ["dotnet_tool.bzl"],
     visibility = [

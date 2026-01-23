@@ -1,0 +1,7 @@
+common --enable_bzlmod
+
+# Validation-friendly settings
+build --verbose_failures
+build --keep_going
+build --color=yes
+build --show_timestamps

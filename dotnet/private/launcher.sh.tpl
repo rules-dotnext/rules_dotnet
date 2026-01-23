@@ -32,7 +32,7 @@ export DOTNET_NOLOGO="1"
 export DOTNET_CLI_TELEMETRY_OPTOUT="1"
 export DOTNET_ROOT="$(dirname $(rlocation TEMPLATED_dotnet))"
 
-# spec-native-interop: #349 — P/Invoke native library search path
+# #349 — P/Invoke native library search path
 NATIVE_LIB_DIR="$(dirname $(rlocation TEMPLATED_executable))"
 if [ -n "${LD_LIBRARY_PATH:-}" ]; then
   export LD_LIBRARY_PATH="${NATIVE_LIB_DIR}:${LD_LIBRARY_PATH}"

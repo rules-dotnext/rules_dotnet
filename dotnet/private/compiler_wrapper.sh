@@ -15,7 +15,7 @@ if [[ $(basename "$COMPILER") == "fsc.dll" ]]; then
 fi
 PATHMAP="$PATHMAP_FLAG:$PWD=."
 
-# --- spec-razor-blazor: editorconfig rewriting (#249) ---
+# --- Editorconfig rewriting (#249) ---
 # Razor source generator requires absolute paths in analyzerconfig section headers.
 # At analysis time we don't know the sandbox path, so razor_preprocess writes
 # sentinel values that we rewrite here at execution time.
@@ -52,7 +52,7 @@ for arg in "$@"; do
     fi
   fi
 done
-# --- end spec-razor-blazor: #249 ---
+# --- end editorconfig rewriting: #249 ---
 
 # shellcheck disable=SC2145
 ./"$@" "$PATHMAP"

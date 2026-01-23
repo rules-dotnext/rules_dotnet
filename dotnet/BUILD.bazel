@@ -31,6 +31,8 @@ bzl_library(
     srcs = ["defs.bzl"],
     visibility = ["//visibility:public"],
     deps = [
+        "//dotnet/private:providers",
+        "//dotnet/private/rules/analysis:dotnet_analysis_config",
         "//dotnet/private/rules/csharp:binary",
         "//dotnet/private/rules/csharp:library",
         "//dotnet/private/rules/csharp:nunit_test",
@@ -39,11 +41,18 @@ bzl_library(
         "//dotnet/private/rules/fsharp:library",
         "//dotnet/private/rules/fsharp:nunit_test",
         "//dotnet/private/rules/fsharp:test",
+        "//dotnet/private/rules/ide:dotnet_project",
+        "//dotnet/private/rules/native_aot:native_aot_binary",
         "//dotnet/private/rules/nuget:dotnet_tool",
         "//dotnet/private/rules/nuget:imports",
         "//dotnet/private/rules/nuget:nuget_archive",
+        "//dotnet/private/rules/nuget:nuget_lock",
         "//dotnet/private/rules/nuget:nuget_repo",
+        "//dotnet/private/rules/nuget_pack:dotnet_pack",
         "//dotnet/private/rules/publish_binary",
+        "//dotnet/private/rules/publish_library",
+        "//dotnet/private/rules/razor:razor_library",
+        "//dotnet/private/rules/resx:resx_resource",
     ],
 )
 
@@ -84,7 +93,11 @@ bzl_library(
     name = "extensions",
     srcs = ["extensions.bzl"],
     visibility = ["//visibility:public"],
-    deps = [":repositories"],
+    deps = [
+        ":repositories",
+        "//dotnet/private/rules/nuget:nuget_lock",
+        "//dotnet/private/rules/nuget:nuget_repo",
+    ],
 )
 
 bzl_library(

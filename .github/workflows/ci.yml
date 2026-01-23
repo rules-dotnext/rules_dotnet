@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [release/parity]
+  pull_request:
+    branches: [release/parity]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Mount Bazel cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/bazel
+          key: bazel-${{ runner.os }}-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock') }}
+          restore-keys: bazel-${{ runner.os }}-
+
+      - name: Unit and analysis tests
+        run: bazel test //dotnet/private/tests/...
+
+      - name: Smoke test (external consumption)
+        run: cd validation/smoke && bazel test //...
+
+      - name: Stardoc generation
+        run: bazel build //docs:rules_api
+
+  e2e:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tfm: [smoke, net8.0, net9.0, net10.0, web_sdk]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Mount Bazel cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/bazel
+          key: bazel-e2e-${{ matrix.tfm }}-${{ runner.os }}-${{ hashFiles('MODULE.bazel') }}
+          restore-keys: bazel-e2e-${{ matrix.tfm }}-${{ runner.os }}-
+
+      - name: E2E tests (${{ matrix.tfm }})
+        run: cd e2e/${{ matrix.tfm }} && bazel test //...

@@ -6,7 +6,7 @@ exports_files(
     visibility = ["//visibility:public"],
 )
 
-# spec-testing-infra: #207 — Configurable NUnit/NUnitLite defaults
+# #207 — Configurable NUnit/NUnitLite defaults
 label_flag(
     name = "nunit",
     build_setting_default = "@paket.rules_dotnet_nuget_packages//nunit",

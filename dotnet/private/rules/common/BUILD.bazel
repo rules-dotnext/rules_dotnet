@@ -5,6 +5,7 @@ bzl_library(
     srcs = ["binary.bzl"],
     visibility = ["//dotnet:__subpackages__"],
     deps = [
+        ":copy_dlls",
         "//dotnet/private:common",
         "//dotnet/private:providers",
         "@bazel_skylib//rules:common_settings",
@@ -31,5 +32,15 @@ bzl_library(
         "//dotnet/private/transitions:tfm_transition",
         "@bazel_lib//lib:expand_make_vars",
         "@bazel_skylib//lib:dicts",
+        "@rules_cc//cc/common:common",
+    ],
+)
+
+bzl_library(
+    name = "copy_dlls",
+    srcs = ["copy_dlls.bzl"],
+    visibility = ["//dotnet:__subpackages__"],
+    deps = [
+        "@bazel_skylib//lib:shell",
     ],
 )

@@ -38,7 +38,7 @@ def _import_library(ctx):
         source_url = ctx.attr.source_url,
     )
 
-    # spec-correctness: #413
+    # #413
     # If this NuGet package has no refs of its own, it is a meta-package.
     # Automatically export direct dependency refs so strict_deps consumers
     # see the actual compile-time DLLs.
@@ -167,7 +167,7 @@ import_library = rule(
             doc = "The `.nupkg` file providing this import",
             allow_single_file = True,
         ),
-        # spec-nuget-fixes: #401
+        # #401
         "source_url": attr.string(
             doc = "The URL from which the package was downloaded, for debugging and auditing",
             default = "",

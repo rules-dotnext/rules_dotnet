@@ -1,0 +1,3 @@
+load(":csharp_native_deps_tests.bzl", "csharp_native_deps_tests")
+
+csharp_native_deps_tests()

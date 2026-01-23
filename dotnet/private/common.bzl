@@ -4,6 +4,7 @@ Rules for compatability resolution of dependencies for .NET frameworks.
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
 load("@bazel_skylib//lib:shell.bzl", "shell")
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load(
     "//dotnet/private:providers.bzl",
     "DotnetAssemblyCompileInfo",
@@ -177,7 +178,7 @@ def get_toolchain(ctx):
 
     return ctx.toolchains["//dotnet:toolchain_type"]
 
-# spec-correctness: #477
+# #477
 # Known .NET modules (IL code without assembly manifests).
 # These must not be passed as -r: references to the compiler.
 # Ideally they would be passed with -addmodule: but that requires
@@ -780,7 +781,7 @@ def copy_files_to_dir(target_name, actions, is_windows, files, out_dir):
         )
     return outputs
 
-# spec-native-interop: #349
+# #349
 def extract_native_libs_from_cc(native_deps):
     """Extract shared library files from CcInfo providers for P/Invoke.
 

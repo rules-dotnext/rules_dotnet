@@ -18,7 +18,7 @@ load("//dotnet/private:providers.bzl", "DotnetApphostPackInfo", "DotnetAssemblyR
 load("//dotnet/private:semver.bzl", "semver")
 load("//dotnet/private/rules/common:copy_dlls.bzl", "flatten_transitive_dlls")
 
-# spec-correctness: #523 — Deduplicate transitive runtime deps by assembly name.
+# #523 — Deduplicate transitive runtime deps by assembly name.
 # When a binary depends on a library targeting a different TFM (e.g., net8.0 -> netstandard2.1),
 # the same NuGet package may appear at two different TFM resolutions. Prefer the higher version.
 def _deduplicate_runtime_deps(deps_list):
@@ -52,24 +52,33 @@ def _collect_native_dlls(assembly_runtime_info, deps):
         deps: Dependencies of the target.
 
     Returns:
-        A list of native DLL files that includes the transitive dependencies of the target
+        A tuple of (rid_result, unstructured) where rid_result is a dict mapping
+        RID to native DLL files (from NuGet packages), and unstructured is a list
+        of native DLL files without RID structure (from cc_library / native_deps).
     """
-    native_dlls = assembly_runtime_info.native
+    native_dlls = list(assembly_runtime_info.native)
 
     for dep in deps:
         native_dlls.extend(dep[DotnetAssemblyRuntimeInfo].native)
         for transitive_dep in dep[DotnetAssemblyRuntimeInfo].deps.to_list():
             native_dlls.extend(transitive_dep.native)
 
-    # Create a dict where the key is the RID and the value is the list of native DLLs for that RID
-    result = {}
+    # Separate into RID-structured (NuGet) and unstructured (cc_library) natives
+    rid_result = {}
+    unstructured = []
     for dll in native_dlls:
-        rid = dll.dirname.split("/")[-2]
-        if rid not in result:
-            result[rid] = []
-        result[rid].append(dll)
+        parts = dll.dirname.split("/")
 
-    return result
+        # NuGet native libs have path: .../runtimes/{rid}/native/{file}
+        if len(parts) >= 3 and parts[-3] == "runtimes" and parts[-1] == "native":
+            rid = parts[-2]
+            if rid not in rid_result:
+                rid_result[rid] = []
+            rid_result[rid].append(dll)
+        else:
+            unstructured.append(dll)
+
+    return rid_result, unstructured
 
 def _create_launcher(ctx, runfiles, executable):
     runtime = get_toolchain(ctx).runtime
@@ -131,7 +140,7 @@ def build_binary(ctx, compile_action):
     runtimeconfig = None
     depsjson = None
 
-    # spec-correctness: #523 — Deduplicate transitive runtime deps to prevent
+    # #523 — Deduplicate transitive runtime deps to prevent
     # TypeLoadException when mixing TFMs (e.g., net8.0 binary -> netstandard2.1 library).
     transitive_runtime_deps = _deduplicate_runtime_deps(runtime_provider.deps.to_list())
 
@@ -187,8 +196,10 @@ def build_binary(ctx, compile_action):
     # Due to how the .Net runtime loads native DLLs we need make the native
     # DLLs available in the application root directory with the folder structure:
     # runtimes/{rid}/native/{dlls}
-    native_dlls = _collect_native_dlls(runtime_provider, ctx.attr.deps)
-    for (rid, native_files) in native_dlls.items():
+    (native_dlls_by_rid, native_dlls_unstructured) = _collect_native_dlls(runtime_provider, ctx.attr.deps)
+
+    # Handle RID-structured native DLLs (from NuGet packages)
+    for (rid, native_files) in native_dlls_by_rid.items():
         for file in native_files:
             output_path = "{}/{}/runtimes/{}/native/{}".format(ctx.label.name, tfm, rid, file.basename)
             output = ctx.actions.declare_file(output_path)
@@ -199,13 +210,26 @@ def build_binary(ctx, compile_action):
             default_info_files.append(output)
             runfiles = runfiles.merge(ctx.runfiles(files = [output]))
 
-    # --- spec-testing-infra: #450 — Flatten all transitive DLLs into output dir ---
+    # #349
+    # Handle unstructured native DLLs (from cc_library / native_deps)
+    # Symlink them adjacent to the main DLL for P/Invoke discovery.
+    for file in native_dlls_unstructured:
+        output_path = "{}/{}/{}".format(ctx.label.name, tfm, file.basename)
+        output = ctx.actions.declare_file(output_path)
+        ctx.actions.symlink(
+            output = output,
+            target_file = file,
+        )
+        default_info_files.append(output)
+        runfiles = runfiles.merge(ctx.runfiles(files = [output]))
+
+    # --- #450 — Flatten all transitive DLLs into output dir ---
     if ctx.attr.flatten_deps:
         flat_outputs = flatten_transitive_dlls(ctx, dll, transitive_runtime_deps, tfm)
         default_info_files.extend(flat_outputs)
         runfiles = runfiles.merge(ctx.runfiles(files = flat_outputs))
 
-    # --- end spec-testing-infra: #450 ---
+    # --- end flatten deps: #450 ---
 
     if not ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo]):
         runfiles = runfiles.merge(ctx.attr._bash_runfiles[DefaultInfo].default_runfiles)
@@ -222,7 +246,7 @@ def build_binary(ctx, compile_action):
         runtime_pack_info = ctx.attr._runtime_pack[0][DotnetRuntimePackInfo],
     )
 
-    # spec-testing-infra: #359 — Coverage instrumentation info
+    # #359 — Coverage instrumentation info
     instrumented_files_info = coverage_common.instrumented_files_info(
         ctx,
         source_attributes = ["srcs"],

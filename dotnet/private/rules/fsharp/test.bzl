@@ -5,12 +5,15 @@ This rule can be used to compile and run any F# binary and run it as
 a Bazel test.
 """
 
+load("@bazel_skylib//lib:dicts.bzl", "dicts")
 load("@bazel_skylib//rules:common_settings.bzl", "BuildSettingInfo")
 load(
     "//dotnet/private:common.bzl",
+    "extract_native_libs_from_cc",
     "get_toolchain",
     "is_debug",
 )
+load("//dotnet/private/rules/analysis:resolve.bzl", "resolve_analysis_config")
 load("//dotnet/private/rules/common:attrs.bzl", "FSHARP_BINARY_COMMON_ATTRS")
 load("//dotnet/private/rules/common:binary.bzl", "build_binary")
 load("//dotnet/private/rules/fsharp/actions:fsharp_assembly.bzl", "AssemblyAction")
@@ -18,6 +21,15 @@ load("//dotnet/private/transitions:tfm_transition.bzl", "tfm_transition")
 
 def _compile_action(ctx, tfm):
     toolchain = get_toolchain(ctx)
+
+    # Resolve global analysis config (warning settings only for F#)
+    analysis = resolve_analysis_config(ctx)
+
+    # #524 — expand $(location) in compiler_options
+    compiler_options = [ctx.expand_location(opt, ctx.attr.compile_data) for opt in ctx.attr.compiler_options]
+
+    # #349
+    native = extract_native_libs_from_cc(ctx.attr.native_deps) if hasattr(ctx.attr, "native_deps") else []
 
     return AssemblyAction(
         ctx.actions,
@@ -37,30 +49,44 @@ def _compile_action(ctx, tfm):
         appsetting_files = ctx.files.appsetting_files,
         compile_data = ctx.files.compile_data,
         out = ctx.attr.out,
+        version = ctx.attr.version,
         target = "exe",
         target_name = ctx.attr.name,
         target_framework = tfm,
         toolchain = toolchain,
         strict_deps = toolchain.strict_deps[BuildSettingInfo].value,
         generate_documentation_file = ctx.attr.generate_documentation_file,
-        treat_warnings_as_errors = ctx.attr.treat_warnings_as_errors,
-        warnings_as_errors = ctx.attr.warnings_as_errors,
-        warnings_not_as_errors = ctx.attr.warnings_not_as_errors,
-        warning_level = ctx.attr.warning_level,
-        nowarn = ctx.attr.nowarn,
+        treat_warnings_as_errors = analysis.effective_treat_warnings_as_errors,
+        warnings_as_errors = analysis.effective_warnings_as_errors,
+        warnings_not_as_errors = analysis.effective_warnings_not_as_errors,
+        warning_level = analysis.effective_warning_level,
+        nowarn = analysis.effective_nowarn,
         project_sdk = ctx.attr.project_sdk,
-        compiler_options = ctx.attr.compiler_options,
+        compiler_options = compiler_options,
         pathmap = ctx.attr.pathmap,
         is_windows = ctx.target_platform_has_constraint(ctx.attr._windows_constraint[platform_common.ConstraintValueInfo]),
+        native = native,
     )
 
 def _fsharp_test_impl(ctx):
     return build_binary(ctx, _compile_action)
 
+# #359 — Test-only attrs for coverage support
+_FSHARP_TEST_ATTRS = dicts.add(
+    FSHARP_BINARY_COMMON_ATTRS,
+    {
+        "_lcov_merger": attr.label(
+            default = configuration_field(fragment = "coverage", name = "output_generator"),
+            executable = True,
+            cfg = "exec",
+        ),
+    },
+)
+
 fsharp_test = rule(
     _fsharp_test_impl,
     doc = """Compile a F# executable and runs it as a test""",
-    attrs = FSHARP_BINARY_COMMON_ATTRS,
+    attrs = _FSHARP_TEST_ATTRS,
     test = True,
     toolchains = [
         "//dotnet:toolchain_type",

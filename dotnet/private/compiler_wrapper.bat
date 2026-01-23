@@ -20,7 +20,7 @@ if %COMPILER_BASENAME% == fsc.dll set PATHMAP_FLAG=--pathmap
 
 set PATHMAP=%PATHMAP_FLAG%:"%cd%=."
 
-:: --- spec-razor-blazor: editorconfig rewriting (#249) ---
+:: --- Editorconfig rewriting (#249) ---
 :: Razor source generator requires absolute paths in analyzerconfig section headers.
 :: Rewrite sentinel values in any referenced editorconfig files.
 set RESP_FILE=
@@ -65,7 +65,7 @@ if defined RESP_FILE if exist "!RESP_FILE!" (
     )
   )
 )
-:: --- end spec-razor-blazor: #249 ---
+:: --- end editorconfig rewriting: #249 ---
 
 shift
 set args=%1

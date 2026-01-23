@@ -1,0 +1,3 @@
+load(":csharp_flatten_deps_tests.bzl", "csharp_flatten_deps_tests")
+
+csharp_flatten_deps_tests()

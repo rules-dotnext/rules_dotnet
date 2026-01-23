@@ -1,3 +1,4 @@
+load("@bazel_lib//:bzl_library.bzl", "bzl_library")
 load("//dotnet/private/rules/analysis:dotnet_analysis_config.bzl", "dotnet_analysis_config")
 
 package(default_visibility = ["//visibility:public"])
@@ -12,4 +13,28 @@ dotnet_analysis_config(
 label_flag(
     name = "analysis_config",
     build_setting_default = ":default_analysis_config",
+)
+
+bzl_library(
+    name = "providers",
+    srcs = ["providers.bzl"],
+    visibility = ["//dotnet:__subpackages__"],
+)
+
+bzl_library(
+    name = "dotnet_analysis_config",
+    srcs = ["dotnet_analysis_config.bzl"],
+    visibility = ["//dotnet:__subpackages__"],
+    deps = [
+        ":providers",
+    ],
+)
+
+bzl_library(
+    name = "resolve",
+    srcs = ["resolve.bzl"],
+    visibility = ["//dotnet:__subpackages__"],
+    deps = [
+        ":providers",
+    ],
 )

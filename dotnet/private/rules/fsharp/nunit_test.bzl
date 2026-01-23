@@ -6,7 +6,7 @@ This rule is a macro that has the same attributes as `fsharp_test`
 
 load("//dotnet/private/rules/fsharp:test.bzl", "fsharp_test")
 
-# spec-testing-infra: #207 — Configurable defaults via label_flags
+# #207 — Configurable defaults via label_flags
 _DEFAULT_NUNIT = Label("//dotnet/private/rules/common/nunit:nunit")
 _DEFAULT_NUNITLITE = Label("//dotnet/private/rules/common/nunit:nunitlite")
 _DEFAULT_SHIM = Label("//dotnet/private/rules/common/nunit:shim.fs")

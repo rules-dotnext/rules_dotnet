@@ -1,0 +1,14 @@
+load("@bazel_lib//:bzl_library.bzl", "bzl_library")
+load(":nuget_lock_test.bzl", "nuget_lock_test_suite")
+
+nuget_lock_test_suite(name = "nuget_lock_test")
+
+bzl_library(
+    name = "nuget_lock_test_lib",
+    srcs = ["nuget_lock_test.bzl"],
+    visibility = ["//dotnet:__subpackages__"],
+    deps = [
+        "//dotnet/private/rules/nuget:nuget_lock",
+        "@bazel_skylib//lib:unittest",
+    ],
+)

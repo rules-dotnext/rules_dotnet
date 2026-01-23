@@ -322,7 +322,7 @@ def _publish_binary_impl(ctx):
 
     apphost_shim = _create_shim_exe(ctx, binary_info.apphost_pack_info, main_dll, runtime_identifier)
 
-    # --- spec-publishing: single-file publish (#358) ---
+    # --- Single-file publish (#358) ---
     if ctx.attr.single_file:
         if not is_self_contained:
             fail("single_file = True requires self_contained = True")
@@ -346,7 +346,7 @@ def _publish_binary_impl(ctx):
             ),
         ]
 
-    # --- end spec-publishing: #358 ---
+    # --- end single-file publish: #358 ---
 
     return [
         DefaultInfo(
@@ -397,7 +397,7 @@ publish_binary = rule(
             default = "Minor",
             values = ["Minor", "Major", "LatestPatch", "LatestMinor", "LatestMajor", "Disable"],
         ),
-        # spec-publishing: #358
+        # #358
         "single_file": attr.bool(
             doc = """Whether to publish as a single file.
 
@@ -408,13 +408,11 @@ publish_binary = rule(
             default = False,
         ),
         "_single_file_bundler": attr.label(
-            providers = [DotnetAssemblyCompileInfo, DotnetAssemblyRuntimeInfo],
             executable = True,
             default = "//dotnet/private/tools/single_file_bundler:single_file_bundler",
             cfg = default_transition,
         ),
         "_apphost_shimmer": attr.label(
-            providers = [DotnetAssemblyCompileInfo, DotnetAssemblyRuntimeInfo],
             executable = True,
             default = "//dotnet/private/tools/apphost_shimmer:apphost_shimmer",
             cfg = default_transition,

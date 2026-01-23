@@ -1,7 +1,7 @@
 """Utilities for copying DLLs into a flat output layout.
 
 Extracted from publish_binary.bzl to be shared by binary/test rules
-when flatten_deps is enabled (spec-testing-infra: #450).
+when flatten_deps is enabled (#450).
 """
 
 load("@bazel_skylib//lib:shell.bzl", "shell")

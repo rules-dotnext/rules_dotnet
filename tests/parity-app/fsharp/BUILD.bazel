@@ -11,8 +11,8 @@ load("@rules_dotnet//dotnet:defs.bzl", "fsharp_library")
 fsharp_library(
     name = "fsharp_with_signatures",
     srcs = [
-        "//:Types.fsi",
         "//:Types.fs",
+        "//:Types.fsi",
     ],
     target_frameworks = ["net8.0"],
     visibility = ["//visibility:public"],

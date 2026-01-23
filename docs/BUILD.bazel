@@ -1,0 +1,8 @@
+load("@stardoc//stardoc:stardoc.bzl", "stardoc")
+
+stardoc(
+    name = "rules_api",
+    out = "rules_api.md",
+    input = "//dotnet:defs.bzl",
+    deps = ["//dotnet:defs"],
+)

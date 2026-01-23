@@ -1,6 +1,7 @@
 "The attributes used by binary/library/test rules"
 
 load("@bazel_skylib//lib:dicts.bzl", "dicts")
+load("@rules_cc//cc/common:cc_info.bzl", "CcInfo")
 load("//dotnet/private:providers.bzl", "DotnetAssemblyCompileInfo", "DotnetAssemblyRuntimeInfo")
 load("//dotnet/private/sdk/apphost_packs:apphost_pack_transition.bzl", "apphost_pack_transition")
 load("//dotnet/private/sdk/runtime_packs:runtime_pack_transition.bzl", "runtime_pack_transition")
@@ -24,7 +25,7 @@ COMMON_ATTRS = {
         # in their data and we want the TFM graphs to be disconnected
         cfg = default_transition,
     ),
-    # spec-native-interop: #349
+    # #349
     "native_deps": attr.label_list(
         doc = "Native C/C++ library dependencies for P/Invoke interop. " +
               "Accepts cc_library targets. Shared libraries (.so, .dylib, .dll) " +
@@ -62,7 +63,7 @@ COMMON_ATTRS = {
     "out": attr.string(
         doc = "File name, without extension, of the built assembly.",
     ),
-    # spec-quick-wins: #423
+    # #423
     "version": attr.string(
         doc = "The version of the assembly. When set, generates AssemblyVersion, " +
               "AssemblyFileVersion, and AssemblyInformationalVersion attributes. " +
@@ -119,7 +120,7 @@ COMMON_ATTRS = {
         mandatory = False,
         default = [],
     ),
-    # spec-ide-integration: #228
+    # #228
     "pathmap": attr.string_dict(
         doc = """Dictionary of path mappings for PDB source paths.
 Each entry maps a 'from' path prefix to a 'to' path prefix.
@@ -158,7 +159,7 @@ See https://github.com/bazel-contrib/rules_dotnet/issues/228""",
         default = "//dotnet/private/sdk/targeting_packs:targeting_pack",
         cfg = targeting_pack_transition,
     ),
-    # spec-static-analysis: global analysis config
+    # Global analysis config
     "_analysis_config": attr.label(
         default = "//dotnet/private/rules/analysis:analysis_config",
         doc = "Global analysis configuration. Set via .bazelrc flag.",
@@ -180,7 +181,7 @@ LIBRARY_COMMON_ATTRS = {
 
 # These are attributes that are common across all binary/test rules
 BINARY_COMMON_ATTRS = {
-    # spec-testing-infra: #450
+    # #450
     "flatten_deps": attr.bool(
         doc = """If True, copy all transitive dependency DLLs into the output
         directory alongside the main assembly. This matches MSBuild publish
@@ -274,7 +275,7 @@ CSHARP_COMMON_ATTRS = dicts.add(
             mandatory = False,
             default = ["CS1701", "CS1702"],
         ),
-        # spec-correctness: #436
+        # #436
         "implicit_usings": attr.bool(
             doc = "Whether to generate implicit global using directives. " +
                   "When True (default), a GlobalUsings.g.cs file is generated matching MSBuild behavior " +

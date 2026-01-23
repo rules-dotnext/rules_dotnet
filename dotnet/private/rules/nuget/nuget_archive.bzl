@@ -156,7 +156,7 @@ def _process_group_with_tfm(groups, group_name, file):
     if file.endswith("_._"):
         return
 
-    # spec-correctness: #508 — Check if this file is in a subdirectory under the TFM folder.
+    # #508 — Check if this file is in a subdirectory under the TFM folder.
     # Files directly under lib/<TFM>/ have no additional path separator after tfm_end+1.
     remainder = file[tfm_end + 1:]
     is_in_subdirectory = "/" in remainder
@@ -278,7 +278,7 @@ def _process_analyzer_file(groups, file):
         lang = parts[2]
         group["dotnet/{}".format(lang)].append(file)
 
-        # spec-correctness: #467 — Fix analyzer version deduplication.
+        # #467 — Fix analyzer version deduplication.
         # Track selected architecture version per language and ensure only one
         # set of analyzer DLLs is included per language.
 
@@ -661,12 +661,12 @@ nuget_archive = repository_rule(
         "id": attr.string(),
         "version": attr.string(),
         "sha512": attr.string(),
-        # spec-nuget-fixes: #431
+        # #431
         "allow_insecure": attr.bool(
             default = False,
             doc = "Allow plain HTTP package sources. By default, Bazel rejects HTTP URLs without checksums.",
         ),
-        # spec-nuget-fixes: #401, #379
+        # #401, #379
         "url": attr.string(
             default = "",
             doc = "Direct download URL for the .nupkg file. When set, sources are ignored for URL construction. " +

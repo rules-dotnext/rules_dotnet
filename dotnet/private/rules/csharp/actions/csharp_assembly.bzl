@@ -20,7 +20,7 @@ load(
     "DotnetAssemblyRuntimeInfo",
 )
 
-# spec-correctness: #436 — Implicit usings by SDK, matching MSBuild behavior.
+# #436 — Implicit usings by SDK, matching MSBuild behavior.
 # See: https://github.com/dotnet/sdk/blob/main/src/Tasks/Microsoft.NET.Build.Tasks/targets/Microsoft.NET.Sdk.CSharp.props
 _IMPLICIT_USINGS_DEFAULT = [
     "System",
@@ -190,7 +190,7 @@ def AssemblyAction(
         appsetting_files,
         compile_data,
         out,
-        # spec-quick-wins: #423
+        # #423
         version,
         target,
         target_name,
@@ -212,10 +212,13 @@ def AssemblyAction(
         is_language_specific_analyzer,
         analyzer_configs,
         compiler_options,
+        pathmap,
         is_windows,
-        # spec-correctness: #436
+        # #436
         implicit_usings = True,
-        # spec-static-analysis: extra analyzer files from global config
+        # #349
+        native = [],
+        # Extra analyzer files from global config
         extra_analyzer_files = None):
     """Creates an action that runs the CSharp compiler with the specified inputs.
 
@@ -260,8 +263,10 @@ def AssemblyAction(
         is_language_specific_analyzer: Whether or not the target is a language specific analyzer.
         analyzer_configs: List of analyzer configuration files.
         compiler_options: Additional options to pass to the compiler.
+        pathmap: Dictionary of source path remappings for PDB debugger support.
         is_windows: Whether or not the target is running on Windows.
         implicit_usings: Whether to generate implicit global using directives for net6.0+.
+        native: List of native shared library files for P/Invoke interop.
         extra_analyzer_files: depset of additional analyzer DLL files from global analysis config.
     Returns:
         The compiled csharp artifacts.
@@ -270,14 +275,14 @@ def AssemblyAction(
     assembly_name = target_name if out == "" else out
     effective_version = version if version else "1.0.0"
 
-    # --- spec-quick-wins: assembly version (#423) ---
+    # --- Assembly version (#423) ---
     version_cs = _write_version_csharp(actions, target_name, assembly_name, version)
     if version_cs:
         srcs = srcs + [version_cs]
 
-    # --- end spec-quick-wins: #423 ---
+    # --- end assembly version: #423 ---
 
-    # --- spec-correctness: implicit usings (#436) ---
+    # --- Implicit usings (#436) ---
     if _should_generate_implicit_usings(target_framework, implicit_usings):
         global_usings_file = _generate_global_usings_file(
             actions,
@@ -288,7 +293,7 @@ def AssemblyAction(
         )
         srcs = [global_usings_file] + srcs
 
-    # --- end spec-correctness: #436 ---
+    # --- end implicit usings: #436 ---
 
     subsystem_version = get_framework_version_info(target_framework)
     (
@@ -309,11 +314,11 @@ def AssemblyAction(
         strict_deps,
     )
 
-    # --- spec-static-analysis: append analyzers from global analysis config ---
+    # --- Append analyzers from global analysis config ---
     if extra_analyzer_files:
         analyzers = depset(transitive = [analyzers, extra_analyzer_files])
 
-    # --- end spec-static-analysis ---
+    # --- end global analyzers ---
 
     if (is_analyzer or is_language_specific_analyzer) and target_framework != "netstandard2.0":
         fail("Analyzers must have `target_frameworks = [\"netstandard2.0\"]`.")
@@ -367,6 +372,7 @@ def AssemblyAction(
             nullable,
             run_analyzers,
             compiler_options,
+            pathmap = pathmap,
             out_dll = out_dll,
             out_ref = out_ref,
             out_pdb = out_pdb,
@@ -416,6 +422,7 @@ def AssemblyAction(
             nullable,
             run_analyzers,
             compiler_options,
+            pathmap = pathmap,
             out_ref = out_iref,
             out_dll = out_dll,
             out_pdb = out_pdb,
@@ -454,6 +461,7 @@ def AssemblyAction(
             nullable,
             run_analyzers,
             compiler_options,
+            pathmap = pathmap,
             out_dll = None,
             out_ref = out_ref,
             out_pdb = None,
@@ -488,7 +496,7 @@ def AssemblyAction(
         xml_docs = [out_xml] if out_xml else [],
         data = data,
         appsetting_files = depset(out_appsettings),
-        native = [],
+        native = native,
         deps = depset(
             [dep[DotnetAssemblyRuntimeInfo] for dep in deps] + [toolchain.host_model[DotnetAssemblyRuntimeInfo]] if include_host_model_dll else [dep[DotnetAssemblyRuntimeInfo] for dep in deps],
             transitive = [dep[DotnetAssemblyRuntimeInfo].deps for dep in deps],
@@ -528,6 +536,7 @@ def _compile(
         nullable,
         run_analyzers,
         compiler_options,
+        pathmap = {},
         out_dll = None,
         out_ref = None,
         out_pdb = None,
@@ -631,6 +640,14 @@ def _compile(
     # Additional compiler flags
     for option in compiler_options:
         args.add(option)
+
+    # Source path remapping for debugger support (#228).
+    # Maps user-specified path prefixes in PDB files so debuggers can
+    # resolve source files without manual sourceFileMap configuration.
+    # Note: the compiler wrapper already injects -pathmap:$PWD=. at
+    # execution time for sandbox path remapping.
+    for from_path, to_path in pathmap.items():
+        args.add("/pathmap:" + from_path + "=" + to_path)
 
     # spill to a "response file" when the argument list gets too big (Bazel
     # makes that call based on limitations of the OS).

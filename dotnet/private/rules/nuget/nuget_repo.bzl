@@ -69,7 +69,7 @@ def _nuget_repo_impl(ctx):
             "{FRAMEWORK_LIST}": json.encode({override.lower().split("|")[0]: override.lower().split("|")[1] for override in framework_list}),
             "{TOOLS}": "\n\n".join(tool_targets),
             "{SHA_512}": sha512,
-            # spec-nuget-fixes: #401
+            # #401
             "{SOURCE_URL}": package.get("url", ""),
         })
 
