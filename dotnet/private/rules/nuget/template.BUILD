@@ -8,6 +8,7 @@ import_library(
     analyzers_csharp = ["@{PREFIX}.{ID_LOWER}.v{VERSION}//:analyzers_csharp"],
     analyzers_fsharp = ["@{PREFIX}.{ID_LOWER}.v{VERSION}//:analyzers_fsharp"],
     analyzers_vb = ["@{PREFIX}.{ID_LOWER}.v{VERSION}//:analyzers_vb"],
+    content_srcs = ["@{PREFIX}.{ID_LOWER}.v{VERSION}//:content_srcs"],
     data = ["@{PREFIX}.{ID_LOWER}.v{VERSION}//:data"],
     framework_list = {FRAMEWORK_LIST},
     library_name = "{ID}",

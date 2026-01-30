@@ -4,6 +4,24 @@ Provides a pure-Starlark parser that converts the standard NuGet lock file forma
 into the package dict list expected by nuget_repo().
 """
 
+def _normalize_tfm(tfm):
+    """Normalize NuGet lock file TFM identifiers to short form.
+
+    NuGet lock files may use long-form TFMs like ".NETStandard,Version=v2.0"
+    or ".NETCoreApp,Version=v8.0". This normalizes them to the short form
+    ("netstandard2.0", "net8.0") expected by rules_dotnet.
+    """
+    if tfm.startswith(".NETStandard,Version=v"):
+        version = tfm.split("=v")[1]
+        return "netstandard" + version
+    if tfm.startswith(".NETCoreApp,Version=v"):
+        version = tfm.split("=v")[1]
+        return "net" + version
+    if tfm.startswith(".NETFramework,Version=v"):
+        version = tfm.split("=v")[1]
+        return "net" + version.replace(".", "")
+    return tfm
+
 def parse_nuget_lock_file(lock_file_content, sources, netrc = None):
     """Parses a NuGet packages.lock.json and returns a list of package dicts.
 
@@ -41,7 +59,8 @@ def parse_nuget_lock_file(lock_file_content, sources, netrc = None):
 
     tfm_sections = lock.get("dependencies", {})
 
-    for tfm, packages in tfm_sections.items():
+    for raw_tfm, packages in tfm_sections.items():
+        tfm = _normalize_tfm(raw_tfm)
         for package_id, info in packages.items():
             version = info["resolved"]
             key = "%s|%s" % (package_id.lower(), version)

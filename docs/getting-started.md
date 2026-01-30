@@ -37,6 +37,7 @@ csharp_library(
     name = "greeter",
     srcs = ["Greeter.cs"],
     target_frameworks = ["net8.0"],
+    visibility = ["//visibility:public"],
 )
 ```
 

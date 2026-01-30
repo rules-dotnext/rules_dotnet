@@ -14,6 +14,8 @@ package-lock.json
 package.json
 .ionide
 .bazelrc.user
+bb_cookies.json
+bb_browser_state.json
 .fake
 tools/paket2bazel/packages
 examples/paket/packages

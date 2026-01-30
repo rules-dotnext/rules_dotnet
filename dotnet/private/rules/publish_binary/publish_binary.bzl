@@ -35,8 +35,10 @@ def _get_assembly_files(assembly_info, transitive_runtime_deps, deps_json_struct
 
             if "runtimeTargets" in target:
                 for file in dep.native:
-                    if file.basename in target["runtimeTargets"].keys() and target["runtimeTargets"][file.basename]["assetType"] == "native":
-                        native.append(file)
+                    for rt_key, rt_val in target["runtimeTargets"].items():
+                        if rt_key.endswith("/" + file.basename) and rt_val.get("assetType") == "native":
+                            native.append(file)
+                            break
 
             if "runtime" in target:
                 for file in dep.libs:

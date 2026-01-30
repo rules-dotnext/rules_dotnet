@@ -60,7 +60,7 @@ jq -r '.dependencies | to_entries[] | .value | to_entries[] | [.key, .value.reso
 
     echo "Downloading ${id}@${version}..." >&2
     if curl -sSL -o "$nupkg_file" "$url"; then
-        hash=$(sha512sum "$nupkg_file" | awk '{print $1}' | xxd -r -p | base64 -w0)
+        hash=$(openssl dgst -sha512 -binary "$nupkg_file" | base64 -w0)
         echo "${id}|${version}|sha512-${hash}"
     else
         echo "Warning: Failed to download ${id}@${version} from ${url}" >&2

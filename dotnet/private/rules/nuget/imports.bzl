@@ -22,6 +22,7 @@ def _import_library(ctx):
         _compile_data,
         _framework_files,
         _exports,
+        _dep_content_srcs,
     ) = collect_compile_info(
         ctx.label.name,
         ctx.attr.deps,
@@ -48,6 +49,12 @@ def _import_library(ctx):
             dep_compile = dep[DotnetAssemblyCompileInfo]
             auto_exports.extend(dep_compile.refs)
 
+    # Collect transitive content_srcs from deps
+    transitive_content_srcs_depsets = []
+    for dep in ctx.attr.deps:
+        dep_compile = dep[DotnetAssemblyCompileInfo]
+        transitive_content_srcs_depsets.append(depset(dep_compile.content_srcs, transitive = [dep_compile.transitive_content_srcs]))
+
     dotnet_assembly_compile_info = DotnetAssemblyCompileInfo(
         name = ctx.attr.library_name,
         version = ctx.attr.version,
@@ -67,6 +74,8 @@ def _import_library(ctx):
         transitive_analyzers_fsharp = analyzers_fsharp,
         transitive_analyzers_vb = analyzers_vb,
         internals_visible_to = [],
+        content_srcs = ctx.files.content_srcs,
+        transitive_content_srcs = depset(transitive = transitive_content_srcs_depsets),
     )
 
     dotnet_assembly_runtime_info = DotnetAssemblyRuntimeInfo(
@@ -148,6 +157,11 @@ import_library = rule(
             doc = "Other DLLs that this DLL depends on.",
             providers = [DotnetAssemblyRuntimeInfo, DotnetAssemblyCompileInfo],
         ),
+        "content_srcs": attr.label_list(
+            doc = "Source files from source-only NuGet packages (contentFiles/cs/) to inject into consuming compilations.",
+            allow_files = True,
+            allow_empty = True,
+        ),
         "data": attr.label_list(
             doc = "Other files that this DLL depends on at runtime",
             allow_files = True,
@@ -199,6 +213,8 @@ def _import_dll(ctx):
         transitive_analyzers_fsharp = depset([]),
         transitive_analyzers_vb = depset([]),
         internals_visible_to = [],
+        content_srcs = [],
+        transitive_content_srcs = depset([]),
     )
     assembly_runtime_info = DotnetAssemblyRuntimeInfo(
         name = ctx.file.dll.basename[:-4],

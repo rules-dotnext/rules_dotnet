@@ -1,0 +1,78 @@
+name: Validation Proof Sequence
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Bazel target pattern to build/test'
+        required: false
+        default: '//dotnet/private/tests/...'
+
+permissions:
+  contents: read
+
+jobs:
+  proof-sequence:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    name: Proof (${{ matrix.os }})
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Cache Bazel
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/bazel
+            ~/.cache/bazelisk
+          key: bazel-${{ matrix.os }}-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock') }}
+          restore-keys: bazel-${{ matrix.os }}-
+
+      - name: Create BEP output directory
+        run: mkdir -p validation/proof-sequence
+
+      # Invocation 1: Cold build
+      - name: "Invocation 1: Cold build"
+        run: |
+          bazel clean
+          bazel test ${{ github.event.inputs.target }} \
+            --build_event_json_file=validation/proof-sequence/01_cold_${{ matrix.os }}.bep.json \
+            --profile=validation/proof-sequence/01_cold_${{ matrix.os }}.profile.gz \
+            || true
+
+      # Invocation 2: Warm rebuild (hermeticity proof)
+      - name: "Invocation 2: Warm rebuild"
+        run: |
+          bazel test ${{ github.event.inputs.target }} \
+            --build_event_json_file=validation/proof-sequence/02_warm_${{ matrix.os }}.bep.json \
+            || true
+
+      # Invocation 3: Incremental (touch one file)
+      - name: "Invocation 3: Incremental build"
+        run: |
+          echo "// validation marker $(date)" >> dotnet/private/tests/appsettings/Main.cs
+          bazel test ${{ github.event.inputs.target }} \
+            --build_event_json_file=validation/proof-sequence/03_incremental_${{ matrix.os }}.bep.json \
+            || true
+          git checkout dotnet/private/tests/appsettings/Main.cs
+
+      - name: Analyze BEP files
+        run: |
+          for f in validation/proof-sequence/*.bep.json; do
+            echo ""
+            python3 validation/tools/analyze_bep.py "$f"
+          done
+
+      - name: Upload BEP artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: bep-${{ matrix.os }}
+          path: validation/proof-sequence/
+          retention-days: 90

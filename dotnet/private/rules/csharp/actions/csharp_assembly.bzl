@@ -306,6 +306,7 @@ def AssemblyAction(
         transitive_compile_data,
         framework_files,
         exports_files,
+        dep_content_srcs,
     ) = collect_compile_info(
         assembly_name,
         deps + [toolchain.host_model] if include_host_model_dll else deps,
@@ -313,6 +314,11 @@ def AssemblyAction(
         exports,
         strict_deps,
     )
+
+    # Inject source files from source-only NuGet packages into compilation
+    content_src_files = dep_content_srcs.to_list()
+    if content_src_files:
+        srcs = srcs + content_src_files
 
     # --- Append analyzers from global analysis config ---
     if extra_analyzer_files:
@@ -487,6 +493,8 @@ def AssemblyAction(
         transitive_analyzers_fsharp = analyzers_fsharp,
         transitive_analyzers_vb = analyzers_vb,
         transitive_compile_data = transitive_compile_data,
+        content_srcs = [],
+        transitive_content_srcs = dep_content_srcs,
     ), DotnetAssemblyRuntimeInfo(
         name = assembly_name,
         version = effective_version,

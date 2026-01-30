@@ -20,6 +20,8 @@ DotnetAssemblyCompileInfo = provider(
         "transitive_analyzers_csharp": "depset[File]: Transitive C# analyzer dlls. Only used when strict deps are off.",
         "transitive_analyzers_fsharp": "depset[File]: Transitive F# analyzer dlls. Only used when strict deps are off.",
         "transitive_analyzers_vb": "depset[File]: Transitive VB analyzer dlls. Only used when strict deps are off.",
+        "content_srcs": "list[File]: Source files from source-only NuGet packages to inject into consuming compilations.",
+        "transitive_content_srcs": "depset[File]: Transitive content source files from source-only NuGet packages.",
     },
 )
 

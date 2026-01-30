@@ -202,6 +202,7 @@ def AssemblyAction(
         transitive_compile_data,
         framework_files,
         exports_files,
+        _dep_content_srcs,
     ) = collect_compile_info(
         assembly_name,
         deps,
@@ -347,6 +348,8 @@ def AssemblyAction(
         transitive_analyzers_fsharp = analyzers_fsharp,
         transitive_analyzers_vb = analyzers_vb,
         transitive_compile_data = transitive_compile_data,
+        content_srcs = [],
+        transitive_content_srcs = _dep_content_srcs,
     ), DotnetAssemblyRuntimeInfo(
         name = assembly_name,
         version = effective_version,

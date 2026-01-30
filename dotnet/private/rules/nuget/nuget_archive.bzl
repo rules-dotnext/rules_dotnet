@@ -306,6 +306,16 @@ def _process_content_file(groups, file):
     group = groups["contentFiles"]
     group["any"].append(file)
 
+    # Source-only NuGet package support: parse contentFiles/cs/{tfm}/*.cs
+    # into a TFM-aware content_srcs group for compilation injection.
+    parts = file.split("/")
+    if len(parts) >= 4 and parts[1] == "cs" and file.endswith(".cs"):
+        tfm = _replace_non_standard_tfm(parts[2])
+        content_srcs = groups["content_srcs"]
+        if tfm not in content_srcs:
+            content_srcs[tfm] = []
+        content_srcs[tfm].append(file)
+
     return
 
 def _process_runtimes_file(groups, file):
@@ -523,6 +533,8 @@ def _nuget_archive_impl(ctx):
         "contentFiles": {
             "any": [],
         },
+        # Source-only NuGet packages: .cs files under contentFiles/cs/{tfm}/
+        "content_srcs": {},
         # Format: lib/<TFM>/<assembly>.dll
         "lib": {},
         # Resource assemblies: https://learn.microsoft.com/en-us/nuget/create-packages/creating-localized-packages
@@ -648,6 +660,7 @@ load("@rules_dotnet//dotnet/private/rules/nuget:nuget_archive.bzl", "tfm_filegro
         "filegroup(name = \"data\", srcs = [])",
         _create_rid_native_select("native", native) or "filegroup(name = \"native\", srcs = [])",
         "filegroup(name = \"content_files\", srcs = [%s])" % ",".join(["\n  \"%s\"" % a for a in groups.get("contentFiles")["any"]]),
+        _create_framework_select("content_srcs", groups["content_srcs"], True) or "filegroup(name = \"content_srcs\", srcs = [])",
         "filegroup(name = \"files\", srcs = [%s])" % ",".join(["\n  \"%s\"" % _sanitize_path(a) for a in all_files]),
         _create_tools_select(groups["tools"]) or "filegroup(name = \"tools\", srcs = [])",
         "exports_files([\"%s\"])" % nupkg_name,

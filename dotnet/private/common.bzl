@@ -237,6 +237,8 @@ def collect_compile_info(name, deps, targeting_pack, exports, strict_deps):
     transitive_ref = []
     direct_compile_data = []
     transitive_compile_data = []
+    direct_content_srcs = []
+    transitive_content_srcs = []
     direct_analyzers = []
     direct_analyzers_csharp = []
     direct_analyzers_fsharp = []
@@ -297,6 +299,10 @@ def collect_compile_info(name, deps, targeting_pack, exports, strict_deps):
             direct_analyzers_fsharp.extend(assembly.analyzers_fsharp)
             direct_analyzers_vb.extend(assembly.analyzers_vb)
             direct_compile_data.extend(assembly.compile_data)
+            direct_content_srcs.extend(assembly.content_srcs)
+
+        # Always collect transitive content_srcs (needed even with strict deps)
+        transitive_content_srcs.append(assembly.transitive_content_srcs)
 
         # We take all the exports of each dependency and add them
         # to the direct refs.
@@ -337,6 +343,7 @@ def collect_compile_info(name, deps, targeting_pack, exports, strict_deps):
         depset(direct = direct_compile_data, transitive = transitive_compile_data),
         framework_files,
         exports_files,
+        depset(direct = direct_content_srcs, transitive = transitive_content_srcs),
     )
 
 def collect_transitive_runfiles(ctx, assembly_runtime_info, deps):

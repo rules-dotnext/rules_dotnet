@@ -1,0 +1,24 @@
+{
+  "invocation_id": "5983dc5a-67cb-4272-ac9e-29bb5bba82b6",
+  "command": "test",
+  "overall_result": "FAILURE",
+  "actions_executed": 2,
+  "actions_created": 4318,
+  "cache_hits": 164,
+  "cache_misses": 2,
+  "cache_rate_pct": 98.8,
+  "tests_passed": 164,
+  "tests_failed": 1,
+  "tests_skipped": 0,
+  "tests_timed_out": 0,
+  "critical_path_ms": 0,
+  "failures": [
+    {
+      "target": "//dotnet/private/tests/publish/framework_dependent:framework_dependent_test",
+      "reason": "test failed"
+    }
+  ],
+  "total_targets": 365,
+  "targets_passed": 365,
+  "targets_failed": 0
+}

@@ -60,6 +60,8 @@ def _empty_providers(name):
             transitive_analyzers_fsharp = depset(),
             transitive_analyzers_vb = depset(),
             transitive_compile_data = depset(),
+            content_srcs = [],
+            transitive_content_srcs = depset(),
         ),
         DotnetAssemblyRuntimeInfo(
             name = name,
