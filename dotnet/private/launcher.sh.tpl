@@ -49,4 +49,27 @@ fi
 
 DOTNET_EXEC="$(rlocation TEMPLATED_dotnet)"
 ASSEMBLY="$(rlocation TEMPLATED_executable)"
+
+# Coverage support: when Bazel sets COVERAGE_DIR (via `bazel coverage`),
+# invoke coverlet.console to instrument and collect LCOV data.
+# TEMPLATED_coverlet_console is substituted by expand_template in _create_launcher():
+#   - For test rules: the rlocation path of the coverlet dotnet_tool launcher
+#   - For binary rules: "NONE"
+if [ -n "${COVERAGE_DIR:-}" ] && [ "TEMPLATED_coverlet_console" != "NONE" ]; then
+  COVERLET="$(rlocation TEMPLATED_coverlet_console)"
+  if [ -x "$COVERLET" ] || [ -f "$COVERLET" ]; then
+    "$COVERLET" "$(dirname "$ASSEMBLY")" \
+      --target "$DOTNET_EXEC" \
+      --targetargs "exec $ASSEMBLY $*" \
+      --output "${COVERAGE_OUTPUT_FILE}" \
+      --format lcov
+    exit $?
+  fi
+fi
+
+# Test sharding: signal shard awareness to Bazel
+if [ -n "${TEST_SHARD_STATUS_FILE:-}" ]; then
+  touch "${TEST_SHARD_STATUS_FILE}"
+fi
+
 exec "$DOTNET_EXEC" exec "$ASSEMBLY" "$@"

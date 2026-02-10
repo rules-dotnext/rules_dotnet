@@ -47,9 +47,9 @@ exit /b 0
 :: End of rlocation
 
 set RUNFILES_MANIFEST_ONLY=1
-set DOTNET_MULTILEVEL_LOOKUP="false"
-set DOTNET_NOLOGO="1"
-set DOTNET_CLI_TELEMETRY_OPTOUT="1"
+set DOTNET_MULTILEVEL_LOOKUP=false
+set DOTNET_NOLOGO=1
+set DOTNET_CLI_TELEMETRY_OPTOUT=1
 
 set dotnet_executable="TEMPLATED_dotnet"
 call :rlocation "TEMPLATED_dotnet" dotnet_executable
@@ -67,7 +67,28 @@ if defined args (
   set args=!args:"=\"!
 )
 
-rem Change to the directory containing the DLL so that appsettings.json etc. are found
-for %%F in ("!run_script!") do cd /d "%%~dpF"
+rem NOTE: Unlike the Linux sh launcher, we do NOT cd to the assembly directory.
+rem The sh launcher runs from the execroot/sandbox working directory, and the
+rem runtimeconfig.json probing paths are relative to that. Changing the working
+rem directory breaks: (1) deps.json assembly resolution via probing paths, and
+rem (2) relative output paths when the binary is used as a tool.
+
+rem Test sharding: signal shard awareness to Bazel
+if defined TEST_SHARD_STATUS_FILE (
+  type nul > "!TEST_SHARD_STATUS_FILE!"
+)
+
+rem Coverage support: when Bazel sets COVERAGE_DIR, use coverlet.console
+rem TEMPLATED_coverlet_console is substituted by expand_template:
+rem   - For test rules: the rlocation path of the coverlet dotnet_tool launcher
+rem   - For binary rules: "NONE"
+if defined COVERAGE_DIR (
+  if "TEMPLATED_coverlet_console" neq "NONE" (
+    call :rlocation "TEMPLATED_coverlet_console" coverlet_console
+    for %%F in ("!run_script!") do set run_script_dir=%%~dpF
+    "!coverlet_console!" "!run_script_dir!" --target "!dotnet_executable!" --targetargs "exec !run_script! !args!" --output "!COVERAGE_OUTPUT_FILE!" --format lcov
+    exit /b !ERRORLEVEL!
+  )
+)
 
 "!dotnet_executable!" exec "!run_script!" !args!

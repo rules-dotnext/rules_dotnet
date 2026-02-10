@@ -80,30 +80,36 @@ def _collect_native_dlls(assembly_runtime_info, deps):
 
     return rid_result, unstructured
 
-def _create_launcher(ctx, runfiles, executable):
+def _create_launcher(ctx, runfiles, executable, coverlet_console = None):
     runtime = get_toolchain(ctx).runtime
     windows_constraint = ctx.attr._windows_constraint[platform_common.ConstraintValueInfo]
 
+    coverlet_path = "NONE"
+    if coverlet_console:
+        coverlet_path = to_rlocation_path(ctx, coverlet_console.files_to_run.executable)
+        runfiles.append(coverlet_console.files_to_run.executable)
+        runfiles.extend(coverlet_console[DefaultInfo].default_runfiles.files.to_list())
+
     launcher = ctx.actions.declare_file("{}.{}".format(executable.basename, "bat" if ctx.target_platform_has_constraint(windows_constraint) else "sh"), sibling = executable)
+
+    substitutions = {
+        "TEMPLATED_dotnet": to_rlocation_path(ctx, runtime.files_to_run.executable),
+        "TEMPLATED_executable": to_rlocation_path(ctx, executable),
+        "TEMPLATED_coverlet_console": coverlet_path,
+    }
 
     if ctx.target_platform_has_constraint(windows_constraint):
         ctx.actions.expand_template(
             template = ctx.file._launcher_bat,
             output = launcher,
-            substitutions = {
-                "TEMPLATED_dotnet": to_rlocation_path(ctx, runtime.files_to_run.executable),
-                "TEMPLATED_executable": to_rlocation_path(ctx, executable),
-            },
+            substitutions = substitutions,
             is_executable = True,
         )
     else:
         ctx.actions.expand_template(
             template = ctx.file._launcher_sh,
             output = launcher,
-            substitutions = {
-                "TEMPLATED_dotnet": to_rlocation_path(ctx, runtime.files_to_run.executable),
-                "TEMPLATED_executable": to_rlocation_path(ctx, executable),
-            },
+            substitutions = substitutions,
             is_executable = True,
         )
 
@@ -135,7 +141,8 @@ def build_binary(ctx, compile_action):
     default_info_files = [dll] + runtime_provider.xml_docs + runtime_provider.appsetting_files.to_list()
     additional_runfiles = []
 
-    launcher = _create_launcher(ctx, additional_runfiles, dll)
+    coverlet = getattr(ctx.attr, "_coverlet_console", None)
+    launcher = _create_launcher(ctx, additional_runfiles, dll, coverlet_console = coverlet)
 
     runtimeconfig = None
     depsjson = None

@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-12
 **Commit:** `582660c` (release/parity)
-**Target:** `//dotnet/private/tests/...` — 365 targets, 165 test targets
+**Target:** `//dotnet/private/tests/...` — 166 test targets (18 runtime, 33 integration, 115 analysis); 165 execute on Linux x86_64
 **Bazel:** 8.3.0 via Bazelisk 1.25.0
 **Host:** RHEL 9.6 x86_64 (ip-172-31-23-232.us-west-1.compute.internal)
 **BuildBuddy:** Cloud SaaS — BES streaming. Remote cache enabled only for invocation 4.

@@ -36,24 +36,24 @@ def _dotnet_tool_impl(ctx):
 
     windows_constraint = ctx.attr._windows_constraint[platform_common.ConstraintValueInfo]
     launcher = ctx.actions.declare_file("{}.{}".format(ctx.label.name, "bat" if ctx.target_platform_has_constraint(windows_constraint) else "sh"))
+    substitutions = {
+        "TEMPLATED_dotnet": to_rlocation_path(ctx, runtime.files_to_run.executable),
+        "TEMPLATED_executable": executable,
+        "TEMPLATED_coverlet_console": "NONE",
+    }
+
     if ctx.target_platform_has_constraint(windows_constraint):
         ctx.actions.expand_template(
             template = ctx.file._launcher_bat,
             output = launcher,
-            substitutions = {
-                "TEMPLATED_dotnet": to_rlocation_path(ctx, runtime.files_to_run.executable),
-                "TEMPLATED_executable": executable,
-            },
+            substitutions = substitutions,
             is_executable = True,
         )
     else:
         ctx.actions.expand_template(
             template = ctx.file._launcher_sh,
             output = launcher,
-            substitutions = {
-                "TEMPLATED_dotnet": to_rlocation_path(ctx, runtime.files_to_run.executable),
-                "TEMPLATED_executable": executable,
-            },
+            substitutions = substitutions,
             is_executable = True,
         )
 

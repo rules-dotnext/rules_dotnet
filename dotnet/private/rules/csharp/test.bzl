@@ -90,6 +90,11 @@ _CSHARP_TEST_ATTRS = dicts.add(
             executable = True,
             cfg = "exec",
         ),
+        "_coverlet_console": attr.label(
+            default = "@dotnet.coverlet//coverlet.console/tools:coverlet",
+            executable = True,
+            cfg = "exec",
+        ),
     },
 )
 

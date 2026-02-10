@@ -2,32 +2,56 @@
 priority: P1
 category: missing-feature
 discovered_in: Spectre.Console (Phase 2)
+status: implemented
+implementation_note: Already implemented; reclassified from gap to parity. Analysis test added.
 ---
 
 # AdditionalFiles Support for Source Generators
 
-## Description
+## Status: Implemented (was already in codebase)
+
+### Evidence
+
+This feature was filed as a gap but is **already fully implemented**:
+
+1. **`attrs.bzl:250-256`** — `additionalfiles` attribute defined in
+   `CSHARP_COMMON_ATTRS` with `allow_files = True`
+2. **`csharp_assembly.bzl:632`** — Files passed to compiler as
+   `/additionalfile:%s` format flag
+3. **`csharp_assembly.bzl:666`** — `additionalfiles` included in direct
+   action inputs for dependency tracking
+
+Available on: `csharp_library`, `csharp_binary`, `csharp_test`,
+`csharp_nunit_test` (all rules using `CSHARP_COMMON_ATTRS`).
+
+### Verification
+
+Analysis test added: `//dotnet/private/tests/additionalfiles`
+- `csharp_additionalfile_flag_test` — verifies `/additionalfile:` flag in
+  CSharpCompile action args when `additionalfiles` attribute is set
+- `csharp_no_additionalfile_flag_test` — verifies flag is absent when
+  attribute is not set
+- Both tests pass (167/167 total)
+
+### Usage
+
+```starlark
+csharp_library(
+    name = "my_lib",
+    srcs = ["Lib.cs"],
+    additionalfiles = [":config.json"],
+    target_frameworks = ["net8.0"],
+    deps = ["@nuget//some.source.generator"],
+)
+```
+
+## Original Description
 
 Roslyn source generators can receive input data via `AdditionalFiles`, which are
-files passed to the compiler with `/additionalfile:path` flags. MSBuild projects
-use `<AdditionalFiles Include="Data/config.json" />` to configure this.
+files passed to the compiler with `/additionalfile:path` flags.
 
-rules_dotnet has no equivalent. Source generators that depend on AdditionalFiles
-(like Spectre.Console's color/emoji/spinner generators) will compile but produce
-no output.
+## Why This Was Misclassified
 
-## Impact
-
-Source generators that use AdditionalFiles are very common in the .NET ecosystem.
-Without this, many real-world projects cannot use their source generators under
-Bazel.
-
-## Proposed Fix
-
-Add an `additional_files` attribute to `csharp_library`, `csharp_binary`, and
-`csharp_test` rules. Each file in the list gets passed to the compiler via
-`/additionalfile:{path}`.
-
-## Estimated Effort
-
-Easy — single attribute addition and compiler flag wiring.
+The gap was filed based on Spectre.Console's source generators not producing
+output. The `additionalfiles` attribute exists but the specific AdditionalFiles
+for Spectre.Console were not configured in the BUILD file.

@@ -5,6 +5,9 @@ genrule(
     srcs = [":csharpier_input.cs"],
     outs = ["csharpier_actual.cs"],
     cmd = "$(location @paket.rules_dotnet_nuget_tool_tests//csharpier/tools:csharpier) format --no-cache --write-stdout $(location :csharpier_input.cs) > $@",
+    # genrule runs cmd through bash; on Windows the tool resolves to a .bat launcher
+    # that bash cannot execute directly. Linux-only is sufficient for this format test.
+    target_compatible_with = ["@platforms//os:linux"],
     tools = [
         "@paket.rules_dotnet_nuget_tool_tests//csharpier/tools:csharpier",
     ],
@@ -14,6 +17,7 @@ diff_test(
     name = "diff_test_main",
     file1 = ":csharpier_actual.cs",
     file2 = ":csharpier_expected.cs",
+    target_compatible_with = ["@platforms//os:linux"],
 )
 
 genrule(
@@ -21,6 +25,7 @@ genrule(
     srcs = [],
     outs = ["paket_actual"],
     cmd = "$(location @paket.rules_dotnet_nuget_tool_tests//paket/tools:paket) --help > $@",
+    target_compatible_with = ["@platforms//os:linux"],
     tools = [
         "@paket.rules_dotnet_nuget_tool_tests//paket/tools:paket",
     ],
@@ -30,4 +35,5 @@ diff_test(
     name = "diff_test_paket",
     file1 = ":paket_expected",
     file2 = ":paket_actual",
+    target_compatible_with = ["@platforms//os:linux"],
 )

@@ -79,6 +79,9 @@ def csharp_native_deps_tests():
     native_deps_populates_native_field_test(
         name = "native_deps_populates_native_field_test",
         target_under_test = ":csharp_with_native_deps",
+        # cc_library(linkstatic=False) only produces dynamic_library on Linux;
+        # macOS XCode toolchain doesn't populate LibraryToLink.dynamic_library.
+        target_compatible_with = ["@platforms//os:linux"],
     )
 
     csharp_library(

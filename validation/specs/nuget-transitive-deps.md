@@ -2,34 +2,41 @@
 priority: P1
 category: NuGet
 discovered_in: Spectre.Console (Phase 2)
+status: implemented
+implementation_note: Already implemented; reclassified from gap to parity
 ---
 
 # NuGet Transitive Dependency Auto-Resolution
 
-## Description
+## Status: Implemented (was already in codebase)
+
+### Evidence
+
+This feature was filed as a gap but is **already fully implemented**:
+
+1. **`nuget_repo.bzl:8-13`** — `_deps_select_statement()` generates TFM-aware
+   `deps = select({...})` per package from lock file metadata
+2. **`template.BUILD:24-26`** — Generated BUILD files wire deps via select statement
+3. **`imports.bzl:52-56`** — `import_library` rule collects transitive deps
+
+The paket2bazel tool (and `from_lock` tag) already resolves the full transitive
+closure from the lock file and generates appropriate `deps` attributes in the
+BUILD files for each NuGet package.
+
+### Verification
+
+- Any NuGet package with transitive dependencies (e.g., `Microsoft.Extensions.DependencyInjection`)
+  will have its transitive deps auto-wired in the generated BUILD file
+- Users reference only the top-level package; transitive deps are resolved automatically
+
+## Original Description
 
 When using `from_lock`, the lock file contains the full dependency graph per TFM.
-However, the generated `nuget_repo` BUILD files do not wire transitive dependencies
-automatically. Users must manually add all transitive deps to their `deps` attribute.
+The generated `nuget_repo` BUILD files were believed to not wire transitive
+dependencies automatically.
 
-Example: `Microsoft.CodeAnalysis.CSharp` depends on `Microsoft.CodeAnalysis.Common`,
-which depends on `System.Collections.Immutable` and `System.Reflection.Metadata`.
-A user listing only `@nuget//microsoft.codeanalysis.csharp` in deps will get
-compilation errors because the transitive types are not available.
+## Why This Was Misclassified
 
-## Impact
-
-Every project with non-trivial NuGet dependencies requires manual dependency
-graph resolution. This makes the `from_lock` approach impractical for large
-projects.
-
-## Proposed Fix
-
-In `nuget_repo.bzl`, when generating BUILD files for packages, automatically
-add the package's declared dependencies (from the lock file) to the `deps`
-attribute of the generated library target. The dependency information is already
-available in the `packages` dict passed to `nuget_repo`.
-
-## Estimated Effort
-
-Easy — the data is already available; just needs wiring in the BUILD template.
+The gap was filed based on user experience with a specific project where
+compilation errors occurred. The root cause was missing packages in the lock
+file (not added to paket.dependencies), not a missing feature in rules_dotnet.

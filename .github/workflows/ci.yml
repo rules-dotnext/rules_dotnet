@@ -5,43 +5,87 @@ on:
     branches: [release/parity]
   pull_request:
     branches: [release/parity]
+  workflow_dispatch:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            label: linux
+            cache-path: ~/.cache/bazel
+          - os: macos-latest
+            label: macos
+            cache-path: ~/Library/Caches/bazel
+          - os: windows-latest
+            label: windows
+            cache-path: ~/.cache/bazel
+    runs-on: ${{ matrix.os }}
+    name: Test (${{ matrix.label }})
     steps:
       - uses: actions/checkout@v4
 
-      - name: Mount Bazel cache
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Cache Bazel
         uses: actions/cache@v4
         with:
-          path: ~/.cache/bazel
-          key: bazel-${{ runner.os }}-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock') }}
-          restore-keys: bazel-${{ runner.os }}-
+          path: |
+            ${{ matrix.cache-path }}
+            ~/.cache/bazelisk
+          key: bazel-${{ matrix.label }}-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock') }}
+          restore-keys: bazel-${{ matrix.label }}-
+
+      - name: Shorten Bazel output root (Windows MAX_PATH)
+        if: matrix.label == 'windows'
+        run: echo "startup --output_user_root=C:/_b" >> .bazelrc.user
+        shell: bash
 
       - name: Unit and analysis tests
-        run: bazel test //dotnet/private/tests/...
+        run: bazel test //dotnet/private/tests/... --test_output=errors
+        shell: bash
 
       - name: Smoke test (external consumption)
+        if: matrix.label != 'windows'
         run: cd validation/smoke && bazel test //...
+        shell: bash
 
       - name: Stardoc generation
+        if: matrix.label == 'linux'
         run: bazel build //docs:rules_api
+        shell: bash
 
   e2e:
-    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
         tfm: [smoke, net8.0, net9.0, net10.0, web_sdk]
+    runs-on: ${{ matrix.os }}
+    name: E2E (${{ matrix.os }} / ${{ matrix.tfm }})
     steps:
       - uses: actions/checkout@v4
 
-      - name: Mount Bazel cache
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Cache Bazel
         uses: actions/cache@v4
         with:
-          path: ~/.cache/bazel
-          key: bazel-e2e-${{ matrix.tfm }}-${{ runner.os }}-${{ hashFiles('MODULE.bazel') }}
-          restore-keys: bazel-e2e-${{ matrix.tfm }}-${{ runner.os }}-
+          path: |
+            ~/.cache/bazel
+            ~/.cache/bazelisk
+          key: bazel-e2e-${{ matrix.tfm }}-${{ matrix.os }}-${{ hashFiles('MODULE.bazel') }}
+          restore-keys: bazel-e2e-${{ matrix.tfm }}-${{ matrix.os }}-
+
+      - name: Shorten Bazel output root (Windows MAX_PATH)
+        if: contains(matrix.os, 'windows')
+        run: echo "startup --output_user_root=C:/_b" >> .bazelrc.user
+        shell: bash
 
       - name: E2E tests (${{ matrix.tfm }})
-        run: cd e2e/${{ matrix.tfm }} && bazel test //...
+        run: cd e2e/${{ matrix.tfm }} && bazel test //... --test_output=errors
+        shell: bash
