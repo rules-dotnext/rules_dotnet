@@ -85,9 +85,20 @@ rem   - For binary rules: "NONE"
 if defined COVERAGE_DIR (
   if "TEMPLATED_coverlet_console" neq "NONE" (
     call :rlocation "TEMPLATED_coverlet_console" coverlet_console
+    rem Coverlet instruments DLLs in-place; Bazel outputs are read-only.
+    rem Copy assembly + PDB to a writable temp directory.
+    set COV_DIR=%TEMP%\coverlet_%RANDOM%
+    mkdir "!COV_DIR!"
     for %%F in ("!run_script!") do set run_script_dir=%%~dpF
-    "!coverlet_console!" "!run_script_dir!" --target "!dotnet_executable!" --targetargs "exec !run_script! !args!" --output "!COVERAGE_OUTPUT_FILE!" --format lcov
-    exit /b !ERRORLEVEL!
+    copy /Y "!run_script_dir!*.dll" "!COV_DIR!" >nul 2>&1
+    copy /Y "!run_script_dir!*.pdb" "!COV_DIR!" >nul 2>&1
+    copy /Y "!run_script_dir!*.deps.json" "!COV_DIR!" >nul 2>&1
+    copy /Y "!run_script_dir!*.runtimeconfig.json" "!COV_DIR!" >nul 2>&1
+    for %%F in ("!run_script!") do set COV_ASSEMBLY=!COV_DIR!\%%~nxF
+    "!coverlet_console!" "!COV_ASSEMBLY!" --target "!dotnet_executable!" --targetargs "exec !COV_ASSEMBLY! !args!" --include-test-assembly --exclude-assemblies-without-sources None --output "!COVERAGE_OUTPUT_FILE!" --format lcov
+    set COV_EXIT=!ERRORLEVEL!
+    rmdir /s /q "!COV_DIR!" >nul 2>&1
+    exit /b !COV_EXIT!
   )
 )
 

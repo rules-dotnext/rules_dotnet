@@ -320,7 +320,7 @@
   "moduleExtensions": {
     "//dotnet:extensions.bzl%dotnet": {
       "general": {
-        "bzlTransitiveDigest": "WwITslAIQ51ZP5d08p1Lw2FqROdQI1b2twxN31HSVNU=",
+        "bzlTransitiveDigest": "jZutVn/3Wx7VATfEYT84Q9+bod/cJjsqREw6qU9rz5s=",
         "usagesDigest": "hX0VEPcIQLWYwrNtvNzz+8urphWBHfUWqRSdyDi/9eU=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},

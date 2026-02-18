@@ -57,3 +57,4 @@ NuGet tool, following the same pattern as `apphost_packs`, `runtime_packs`, and
 - `dotnet/private/rules/fsharp/test.bzl` — `_coverlet_console` attr
 - `dotnet/private/rules/common/binary.bzl` — `_create_launcher()` coverlet substitution
 - `dotnet/private/launcher.sh.tpl` — coverage invocation with proper guard
+- `dotnet/private/launcher.bat.tpl` — coverage invocation (Windows parity)

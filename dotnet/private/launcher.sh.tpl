@@ -58,9 +58,21 @@ ASSEMBLY="$(rlocation TEMPLATED_executable)"
 if [ -n "${COVERAGE_DIR:-}" ] && [ "TEMPLATED_coverlet_console" != "NONE" ]; then
   COVERLET="$(rlocation TEMPLATED_coverlet_console)"
   if [ -x "$COVERLET" ] || [ -f "$COVERLET" ]; then
-    "$COVERLET" "$(dirname "$ASSEMBLY")" \
+    # Coverlet instruments DLLs in-place, so we need a writable copy.
+    # Bazel outputs are read-only; resolve symlinks and copy to temp dir.
+    REAL_ASSEMBLY="$(readlink -f "$ASSEMBLY")"
+    REAL_DIR="$(dirname "$REAL_ASSEMBLY")"
+    COV_DIR="$(mktemp -d)"
+    trap "rm -rf '$COV_DIR'" EXIT
+    cp "$REAL_DIR"/*.dll "$REAL_DIR"/*.pdb "$COV_DIR/" 2>/dev/null || true
+    cp "$REAL_DIR"/*.deps.json "$REAL_DIR"/*.runtimeconfig.json "$COV_DIR/" 2>/dev/null || true
+    chmod u+w "$COV_DIR"/*
+    COV_ASSEMBLY="$COV_DIR/$(basename "$ASSEMBLY")"
+    "$COVERLET" "$COV_ASSEMBLY" \
       --target "$DOTNET_EXEC" \
-      --targetargs "exec $ASSEMBLY $*" \
+      --targetargs "exec $COV_ASSEMBLY $*" \
+      --include-test-assembly \
+      --exclude-assemblies-without-sources None \
       --output "${COVERAGE_OUTPUT_FILE}" \
       --format lcov
     exit $?

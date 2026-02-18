@@ -20,6 +20,7 @@ implemented_in: feat/close-parity-gaps
 - Bazelisk setup via `bazelbuild/setup-bazelisk@v3` on all platforms
 
 **launcher.bat.tpl (Windows parity):**
+- Removed `cd /d "%%~dpF"` that changed working directory to assembly dir — this broke deps.json probing paths and relative output paths for tools. The sh launcher never changes working directory; the bat launcher now matches.
 - Added coverage support (COVERAGE_DIR + coverlet.console) matching launcher.sh.tpl
 - Added TEST_SHARD_STATUS_FILE support matching launcher.sh.tpl
 
@@ -36,6 +37,7 @@ implemented_in: feat/close-parity-gaps
 - CI workflow triggers on push/PR to release/parity
 - All 3 platforms execute test suite independently
 - Windows MAX_PATH handled via shortened output root
+- [CI run](https://github.com/clolin/rules-dotnet-plus/actions/runs/23012231191): 18/18 jobs green — Linux 167/167, macOS 164/167, Windows 164/167, E2E 15/15
 
 ## Original Description
 

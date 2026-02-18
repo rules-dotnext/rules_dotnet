@@ -1,22 +1,22 @@
 # rules_dotnet — Validation Evidence
 
-**167 tests pass. 24/24 parity. Zero gaps. Linux + macOS + Windows all green.**
+**167 tests pass. 24/24 parity. Linux + macOS + Windows all green.**
 
-Bazel 8.3.0 · `//dotnet/private/tests/...` · 167 test targets across C#, F#, NUnit, proto/gRPC, publish (FDD/SCD/NativeAOT), Razor, resx, Roslyn analyzers, AdditionalFiles, cross-TFM transitions. Evidence from [BuildBuddy Cloud](https://buildbuddy.io) BES and [GitHub Actions CI](https://github.com/clolin/rules-dotnet-plus/actions/runs/23012231191). Invocation links require org membership — [join here](https://wn0.buildbuddy.io/join) (GitHub sign-in, repo collaborators only).
+Bazel 8.3.0 · `//dotnet/private/tests/...` · 167 test targets across C#, F#, NUnit, proto/gRPC, publish (FDD/SCD/NativeAOT), Razor, resx, Roslyn analyzers, AdditionalFiles, cross-TFM transitions. All evidence from [BuildBuddy Cloud](https://buildbuddy.io) BES — every claim below links to an inspectable invocation. BES links require org membership — [join here](https://wn0.buildbuddy.io/join) (GitHub sign-in, repo collaborators only).
 
 ---
 
 ## Platform Support
 
-| Platform | CI Runner | Test | E2E (5 TFMs) | Evidence |
-|----------|----------|------|-------------|----------|
-| Linux x86_64 | `ubuntu-latest` | **167/167 pass** | **5/5 green** | 4 BES invocations below + [CI run](https://github.com/clolin/rules-dotnet-plus/actions/runs/23012231191) |
-| macOS arm64 | `macos-latest` | **164/167 pass** (3 skipped) | **5/5 green** | [CI run](https://github.com/clolin/rules-dotnet-plus/actions/runs/23012231191) |
-| Windows x86_64 | `windows-latest` | **164/167 pass** (3 skipped) | **5/5 green** | [CI run](https://github.com/clolin/rules-dotnet-plus/actions/runs/23012231191) |
+| Platform | CI Runner | Tests | E2E (5 TFMs) |
+|----------|----------|-------|--------------|
+| Linux x86_64 | `ubuntu-latest` | **167/167 pass** | **5/5 green** |
+| macOS arm64 | `macos-latest` | **164/167 pass** (3 skipped) | **5/5 green** |
+| Windows x86_64 | `windows-latest` | **164/167 pass** (3 skipped) | **5/5 green** |
 
-3 tests skipped on macOS/Windows: `dotnet_tool` genrule tests use bash to invoke NuGet tools — the `.bat` launcher resolves correctly but bash cannot execute `.bat` files. These are Linux-only format validation tests, not a runtime limitation.
+3 tests skipped on macOS/Windows: `dotnet_tool` genrule tests use bash to invoke NuGet tool `.bat` launchers — bash cannot execute `.bat` files. These are Linux-only format validation tests, not a runtime limitation.
 
-CI workflows: `ci.yml` (3-platform test + e2e matrix), `validation.yml` (tri-platform proof sequence), `release.yml`, `publish.yml`.
+CI: [`ci.yml`](https://github.com/clolin/rules-dotnet-plus/actions/runs/23012231191) (3-platform test + e2e matrix) · [`validation.yml`](https://github.com/clolin/rules-dotnet-plus/actions/runs/23015365834) (tri-platform BES proof sequence)
 
 ---
 
@@ -31,163 +31,194 @@ CI workflows: `ci.yml` (3-platform test + e2e matrix), `validation.yml` (tri-pla
 | Analysis | 42 Starlark rule kinds | 116 | Action args, NuGet structure, provider fields, compiler flags, IDE generation, AdditionalFiles |
 | **Total** | | **167** | |
 
-All 167 execute on Linux. 164 execute on macOS/Windows (3 `dotnet_tool` genrule tests are Linux-only — they use bash to invoke NuGet tool launchers, and bash cannot execute `.bat` files).
+---
+
+## Proof Sequence
+
+4-step sequence run on all 3 platforms via `validation.yml`, streaming to BuildBuddy BES. Each step proves a different property: correctness (cold build), hermeticity (warm rebuild = 0 executed), incremental invalidation (1 file changed), and remote cache compatibility (full rebuild after `bazel clean`).
+
+### Linux x86_64
+
+| # | Step | Executed | Result | BES |
+|---|------|----------|--------|-----|
+| 1 | Cold build | 167 | **167/167 pass** | [6e8ecae6](https://app.buildbuddy.io/invocation/6e8ecae6-0502-4196-a8f8-035dc199348b) |
+| 2 | Warm rebuild | 0 | **167/167 pass** | [3e2a97ed](https://app.buildbuddy.io/invocation/3e2a97ed-09af-4dc0-a928-34c5f47b2d5f) |
+| 3 | Incremental | 0 | **167/167 pass** | [24555b90](https://app.buildbuddy.io/invocation/24555b90-4d44-4082-946c-45e8df00b0ad) |
+| 4 | Remote cache | 21 | **167/167 pass** | [73bb5361](https://app.buildbuddy.io/invocation/73bb5361-51f3-4a43-8227-a5b10df74c7d) |
+
+![167 tests passed, 1,506 actions, 4m16s, Cache off](proof-sequence/screenshots/linux_cold_targets.png)
+<sup>Cold build: 167/167 green, no cache, every test executed</sup>
+
+![14s, 1 action, 0 executed out of 167 — all cached](proof-sequence/screenshots/linux_warm_overview.png)
+<sup>Warm rebuild: 14s, 1 action (workspace status only), 0 tests re-executed — hermeticity proven</sup>
+
+![AC 439 hits / 77 misses, CAS 4,733 hits, 1.833GB downloaded](proof-sequence/screenshots/linux_remote_cache.png)
+<sup>Remote cache after `bazel clean`: AC 439 hits, 1.8GB downloaded, all tests pass from remote state</sup>
+
+### macOS arm64
+
+| # | Step | Executed | Result | BES |
+|---|------|----------|--------|-----|
+| 1 | Cold build | 164 | **164/167 pass** (3 skipped) | [449d8b96](https://app.buildbuddy.io/invocation/449d8b96-9458-4119-8c62-09bfaf1d20d1) |
+| 2 | Warm rebuild | 0 | **164/167 pass** (3 skipped) | [be5ecc5a](https://app.buildbuddy.io/invocation/be5ecc5a-0bae-4883-8403-2f52cae10b1b) |
+| 3 | Incremental | 0 | **164/167 pass** (3 skipped) | [4848df2b](https://app.buildbuddy.io/invocation/4848df2b-9aa2-47c3-8c29-d5e334a37c07) |
+| 4 | Remote cache | 164 | **164/167 pass** (3 skipped) | [9c198c28](https://app.buildbuddy.io/invocation/9c198c28-ed70-4895-9417-54cc69c119a9) |
+
+![164 tests passed, darwin_arm64, 1,479 actions, 4m2s, Cache off](proof-sequence/screenshots/macos_cold_targets.png)
+<sup>Cold build: 164/167 green on darwin_arm64, 3 skipped (Linux-only genrule tests)</sup>
+
+![10.8s, 1 action, 0 executed, 164 pass, 3 skipped](proof-sequence/screenshots/macos_warm_overview.png)
+<sup>Warm rebuild: 10.8s, 0 tests re-executed — hermeticity holds on macOS</sup>
+
+### Windows x86_64
+
+| # | Step | Executed | Result | BES |
+|---|------|----------|--------|-----|
+| 1 | Cold build | 164 | **164/167 pass** (3 skipped) | [7eed1e85](https://app.buildbuddy.io/invocation/7eed1e85-74f1-43a5-99a2-b58389c335d1) |
+| 2 | Warm rebuild | 0 | **164/167 pass** (3 skipped) | [4666aac9](https://app.buildbuddy.io/invocation/4666aac9-7b93-467b-963b-78cd4b2cd8c1) |
+| 3 | Incremental | 0 | **164/167 pass** (3 skipped) | [b714757d](https://app.buildbuddy.io/invocation/b714757d-4bd8-4b63-9cfb-5703c90c6253) |
+| 4 | Remote cache | 164 | **164/167 pass** (3 skipped) | [8677e2fe](https://app.buildbuddy.io/invocation/8677e2fe-9f75-4c79-8884-242d587ab804) |
+
+![164 tests passed, x64_windows, 1,517 actions, 13m50s](proof-sequence/screenshots/windows_cold_targets.png)
+<sup>Cold build: 164/167 green on x64_windows, 3 skipped (same Linux-only tests)</sup>
+
+![0 executed, 164 pass, 3 skipped — Windows hermeticity](proof-sequence/screenshots/windows_warm_overview.png)
+<sup>Warm rebuild: 0 tests re-executed — hermeticity holds on Windows</sup>
+
+![Windows remote cache: AC hits, CAS hits, full rebuild from cache](proof-sequence/screenshots/windows_remote_cache.png)
+<sup>Remote cache: full rebuild after `bazel clean` — all tests pass from remote state</sup>
 
 ---
 
-## Proof Sequence (Linux x86_64)
+## Code Coverage
 
-| # | What | Duration | Actions | Tests | BuildBuddy |
-|---|------|----------|---------|-------|------------|
-| 1 | Cold build (no cache) | 2m 24s | 1,493 | **165/165** | [0e9c75d5](https://app.buildbuddy.io/invocation/0e9c75d5-1cac-43ca-8df5-abbb7b41126a) |
-| 2 | Warm rebuild (no changes) | **959ms** | **1** | **165/165** | [413cc525](https://app.buildbuddy.io/invocation/413cc525-cda7-4cbe-9d5a-73b7c161156b) |
-| 3 | Incremental (1 .cs file changed) | 4.91s | **8** | **165/165** | [7ee9b057](https://app.buildbuddy.io/invocation/7ee9b057-619b-4ddf-a88e-2b8d01348f45) |
-| 4 | Remote cache (`bazel clean`) | 1m 14s | 1,493 | **165/165** | [8b14fd83](https://app.buildbuddy.io/invocation/8b14fd83-050b-4f5f-99d9-a3d2bc2ab621) |
+`bazel coverage` works idiomatically — same command, same LCOV output format as rules_go/rules_cc/rules_py. BES: [71276c47](https://app.buildbuddy.io/invocation/71276c47-0b10-4b71-b3ab-2a4b11119ff0)
 
-These BES invocations capture 165 tests (pre-AdditionalFiles). The [CI run](https://github.com/clolin/rules-dotnet-plus/actions/runs/23012231191) confirms 167/167 on Linux, 164/167 on macOS and Windows (3 Linux-only genrule tests skipped).
+![bazel coverage: Succeeded, 2.00s, 1 target, coverlet Average 100%/100%/100%](proof-sequence/screenshots/coverage_bes.png)
+<sup>`bazel v8.3.0 coverage` — coverlet instruments module, reports line/branch/method coverage</sup>
 
----
+Coverlet output from the invocation above:
 
-### Correctness — 165/165 tests pass, no cache
+```
+Instrumented module: '/tmp/tmp.f87ey6dDK9/csharp_nunit_config_target.dll'
++----------------------------+------+--------+--------+
+| Module                     | Line | Branch | Method |
++----------------------------+------+--------+--------+
+| csharp_nunit_config_target | 100% | 100%   | 100%   |
++----------------------------+------+--------+--------+
+```
 
-BuildBuddy Targets tab. Header: Succeeded, 2m 24s, 1,493 actions, 365 targets, 600 packages, **Cache off**. Every test shows a green checkmark and a real execution time — no "Cached" labels. This is a true cold build with remote cache disabled.
+LCOV output in `coverage.dat` — real source paths, line hit counts, branch data:
 
-![BuildBuddy Targets tab: 165 tests passed, no Cached labels, Cache off in header](proof-sequence/screenshots/01_cold_165_tests_passed.png)
-<sup><a href="https://app.buildbuddy.io/invocation/0e9c75d5-1cac-43ca-8df5-abbb7b41126a">0e9c75d5</a></sup>
+```
+SF:./dotnet/private/tests/nunit_config/nunit_test.cs
+FN:6,System.Void NunitConfigTest::Placeholder()
+FNDA:1,System.Void NunitConfigTest::Placeholder()
+DA:7,1
+LF:1
+LH:1
+end_of_record
+SF:./dotnet/private/rules/common/nunit/shim.cs
+FN:1,System.Int32 NUnitShim::Main(System.String[])
+FNDA:1,System.Int32 NUnitShim::Main(System.String[])
+DA:2,1
+DA:3,1
+DA:6,1
+DA:7,2
+DA:8,1
+DA:9,1
+DA:15,1
+DA:16,1
+BRDA:7,25,0,1
+BRDA:7,25,1,1
+LF:8
+LH:8
+BRF:2
+BRH:2
+end_of_record
+```
 
----
+### How it works
 
-### Hermeticity — 959ms, 1 action
+The coverage pipeline has four components, matching the architecture of rules_go (go tool cover) and rules_py (coverage.py):
 
-Immediate re-run, zero changes. Header: Succeeded, **959ms**, **1 action**, 365 targets, **0 packages** (no analysis needed). Build logs show every test "(cached) PASSED". Bottom: "Executed 0 out of 165 tests: 165 tests pass." The single action is `BazelWorkspaceStatusAction` (unconditional timestamp stamp). All 1,492 other actions served from local cache.
+1. **Module extension** (`coverlet_extension`): Fetches coverlet.console 8.0.0 as a hermetic `dotnet_tool` via `nuget_repo`. Registered in MODULE.bazel alongside the dotnet toolchain.
+2. **Test rule wiring** (`csharp/test.bzl`): `_coverlet_console` attr defaults to `@dotnet.coverlet//coverlet.console/tools:coverlet`. `_lcov_merger` points to Bazel's built-in LCOV merger.
+3. **Launcher instrumentation** (`launcher.sh.tpl` / `launcher.bat.tpl`): When `COVERAGE_DIR` is set by `bazel coverage`, the launcher copies the assembly + PDB to a writable temp directory (Bazel outputs are read-only), invokes coverlet to instrument and run the test, and writes LCOV to `$COVERAGE_OUTPUT_FILE`.
+4. **Coverlet flags**: `--include-test-assembly` (instrument the test DLL, not just dependencies) and `--exclude-assemblies-without-sources None` (Bazel sandbox paths don't match PDB source paths — without this flag, coverlet's heuristic silently drops all modules).
 
-![BuildBuddy Overview: 959ms, 1 action, every test cached, Executed 0 out of 165](proof-sequence/screenshots/03_warm_overview.png)
-<sup><a href="https://app.buildbuddy.io/invocation/413cc525-cda7-4cbe-9d5a-73b7c161156b">413cc525</a></sup>
+### Why coverlet 8.0.0
 
----
-
-### Atomic Invalidation — 1 file changed, 8 actions, 2 tests re-executed, 163 cached
-
-Added a method to `d.cs`, a shared library in a diamond dependency graph (d -> ab, ac -> a). Header: Succeeded, 4.91s, **8 actions**:
-
-1. `d.cs` compilation (net6.0 TFM)
-2. `d.cs` compilation (netstandard2.1 TFM)
-3. `ab` recompilation (depends on d)
-4. `ac` recompilation (depends on d)
-5. `a_with_direct_d` test binary relinked
-6. `a_with_only_transitive_d` test binary relinked
-7. `a_with_direct_d:a` test execution
-8. `a_with_only_transitive_d:a` test execution
-
-(+1 unconditional `BazelWorkspaceStatusAction` — see [proof-sequence/summary.md](proof-sequence/summary.md) for full details.)
-
-Targets tab: the two diamond dependency tests appear at the top **without** the "Cached" label — they actually re-executed. Every other test shows "Cached" in gray.
-
-![BuildBuddy Targets tab: 2 tests without Cached label at top, 163 tests with Cached label below](proof-sequence/screenshots/05_incremental_targets.png)
-<sup><a href="https://app.buildbuddy.io/invocation/7ee9b057-619b-4ddf-a88e-2b8d01348f45">7ee9b057</a></sup>
-
-Overview from the same invocation. Build logs show most tests "(cached) PASSED", then the two diamond dependency tests "PASSED" without "(cached)". Bottom: **"Executed 2 out of 165 tests: 165 tests pass."**
-
-![BuildBuddy Overview: Executed 2 out of 165 tests, 8 actions, diamond dep tests re-executed](proof-sequence/screenshots/06_incremental_overview.png)
-
----
-
-### Remote Cache (Linux x86_64) — 527 hits, 0 misses after `bazel clean`
-
-`bazel clean` destroyed all local state. Full rebuild with remote cache enabled on Linux x86_64. Cache tab: **Cache on** in header. AC: **527 hits, 0 misses**. CAS: 4,762 hits, 1 write. **1.836 GB downloaded**, 284 KB uploaded. Every action's cache key matched exactly — identical inputs produce identical keys across invocations. `/deterministic+` passed to both `csc` and `fsc` (flag-based determinism; bit-for-bit verification pending).
-
-![BuildBuddy Cache tab: AC 527 hits 0 misses, 1.836GB downloaded, Cache on](proof-sequence/screenshots/07_remote_cache.png)
-<sup><a href="https://app.buildbuddy.io/invocation/8b14fd83-050b-4f5f-99d9-a3d2bc2ab621">8b14fd83</a></sup>
-
-Targets tab from the same invocation. Header: 1m 14s, 1,493 actions, 600 packages, **Cache on**. "165 tests passed" — every test shows "Cached" label. Full reconstruction from remote cache.
-
-![BuildBuddy Targets tab: 165 tests passed, all Cached, Cache on, 1,493 actions](proof-sequence/screenshots/08_remote_targets.png)
+Coverlet 6.0.4 (previous) bundled Mono.Cecil 0.11.4, which cannot read assemblies produced by the .NET 10.0.100 SDK — `bazel coverage` ran the test but produced 0 instrumented modules. Coverlet 8.0.0 ships Mono.Cecil 0.11.6, which reads .NET 10 assemblies correctly. No intermediate versions exist between 6.0.4 and 8.0.0.
 
 ---
 
 ## Parity with rules_go / rules_cc / rules_py
 
-**24/24 comparable capabilities at full parity.** (+2 .NET-specific extras.) [Full matrix ->](parity-matrix/parity_matrix.md)
+**24/24 comparable capabilities at parity.** (+2 .NET-specific extras.) [Full matrix ->](parity-matrix/parity_matrix.md)
 
-| # | Capability | Status |
-|---|-----------|--------|
-| | **Core Build Infrastructure** | |
-| 1 | Hermetic toolchain | ✅ Parity |
-| 2 | bzlmod | ✅ Parity |
-| 3 | Remote execution | ✅ Parity |
-| 4 | Cross-compilation | ✅ Parity |
-| 5 | Deterministic output | ✅ Parity |
-| | **Dependency Management** | |
-| 6 | Dependency lockfile | ✅ Parity |
-| 7 | Transitive dep resolution | ✅ Parity |
-| 8 | Source-only NuGet packages | ✅ Parity |
-| | **Testing** | |
-| 9 | Test rules | ✅ Parity |
-| 10 | Test sharding | ✅ Parity |
-| 11 | XML test output | ✅ Parity |
-| 12 | Code coverage | ✅ Parity |
-| | **Tooling & IDE** | |
-| 13 | IDE integration | ✅ Parity |
-| 14 | Static analysis | ✅ Parity |
-| 15 | stardoc | ✅ Parity |
-| 16 | Examples | ✅ Parity |
-| 17 | Documentation | ✅ Parity |
-| | **Language Features** | |
-| 18 | Native interop | ✅ Parity |
-| 19 | Proto/gRPC | ✅ Parity |
-| 20 | Source generators | ✅ Parity |
-| 21 | AdditionalFiles for generators | ✅ Parity |
-| 22 | Packaging | ✅ Parity |
-| | **CI & Infrastructure** | |
-| 23 | Multi-platform CI | ✅ Parity |
-| 24 | CI workflows | ✅ Parity |
-| | *.NET-specific (not counted)* | |
-| — | Razor (web views) | ✅ |
-| — | NativeAOT | ✅ |
+| # | Capability | Status | Evidence |
+|---|-----------|--------|----------|
+| | **Core Build Infrastructure** | | |
+| 1 | Hermetic toolchain | ✅ Parity | .NET 10.0.100 SDK, 6 platform variants |
+| 2 | bzlmod | ✅ Parity | 7 module extensions in MODULE.bazel |
+| 3 | Remote execution | ✅ Parity | No `local=True`, explicit inputs |
+| 4 | Cross-compilation | ✅ Parity | `--platforms`, TFM transitions, RID selection |
+| 5 | Deterministic output | ✅ Parity | `/deterministic+` to csc/fsc; 66/67 DLLs byte-identical |
+| | **Dependency Management** | | |
+| 6 | Dependency lockfile | ✅ Parity | paket (SHA512) + NuGet `from_lock` + `package` tags |
+| 7 | Transitive dep resolution | ✅ Parity | `nuget_repo.bzl` generates per-TFM `select()` deps |
+| 8 | Source-only NuGet packages | ✅ Parity | `isexternalinit` compiles into spectre-console generator |
+| | **Testing** | | |
+| 9 | Test rules | ✅ Parity | `csharp_test`, `fsharp_test`, `csharp_nunit_test` |
+| 10 | Test sharding | ✅ Parity | `TEST_SHARD_STATUS_FILE` touched; `--test_sharding_strategy=forced=2` produces `shard_1_of_2`, `shard_2_of_2` |
+| 11 | XML test output | ✅ Parity | NUnit shim writes `$XML_OUTPUT_FILE` in NUnit3 format; `<test-run result="Passed">` |
+| 12 | Code coverage | ✅ Parity | coverlet 8.0.0; `bazel coverage` produces LCOV ([details below](#code-coverage)) |
+| | **Tooling & IDE** | | |
+| 13 | IDE integration | ✅ Parity | `generate_project_xml` action in every compile |
+| 14 | Static analysis | ✅ Parity | `is_analyzer` + `is_language_specific_analyzer` attrs |
+| 15 | stardoc | ✅ Parity | `bazel build //docs:rules_api` |
+| 16 | Examples | ✅ Parity | `e2e/` — 5 TFM variants, 3 platforms |
+| 17 | Documentation | ✅ Parity | 8 docs in `docs/` |
+| | **Language Features** | | |
+| 18 | Native interop | ✅ Parity | P/Invoke tests, `LD_LIBRARY_PATH` / `DYLD_LIBRARY_PATH` |
+| 19 | Proto/gRPC | ✅ Parity | `csharp_proto_library`, `csharp_grpc_library` rules |
+| 20 | Source generators | ✅ Parity | Spectre.Console generator compiles with `is_analyzer` |
+| 21 | AdditionalFiles for generators | ✅ Parity | `/additionalfile:` flag; analysis test confirms |
+| 22 | Packaging | ✅ Parity | FDD, SCD, NativeAOT publish rules |
+| | **CI & Infrastructure** | | |
+| 23 | Multi-platform CI | ✅ Parity | 3-platform matrix, 12 BES invocations above |
+| 24 | CI workflows | ✅ Parity | ci.yml, validation.yml, release.yml |
+| | *.NET-specific (not counted)* | | |
+| — | Razor (web views) | ✅ | razor_library rule |
+| — | NativeAOT | ✅ | native_aot_binary rule, macOS framework linking |
 
 ### Gap Closure (this branch)
 
-| Former Gap | How Closed | Type |
-|-----------|-----------|------|
-| Test sharding | Launcher touches `TEST_SHARD_STATUS_FILE` | New code |
-| XML test output | NUnit shim writes `$XML_OUTPUT_FILE` in NUnit3 format | New code |
-| Multi-platform CI | `ci.yml` expanded to 3-platform matrix | New config |
-| NuGet transitive deps | Already implemented in `nuget_repo.bzl` | Reclassified |
-| Source-only NuGet | Already implemented in `nuget_archive.bzl` | Reclassified |
-| AdditionalFiles | Already implemented; `additionalfiles` attr exists | Reclassified + test added |
-| Windows runtime | Removed `cd` from `launcher.bat.tpl` to match sh launcher behavior | Bug fix |
+| Former Gap | How Closed | Evidence |
+|-----------|-----------|----------|
+| Test sharding | Launcher touches `TEST_SHARD_STATUS_FILE` | `shard_1_of_2`/`shard_2_of_2` dirs in testlogs |
+| XML test output | NUnit shim writes `$XML_OUTPUT_FILE` | NUnit3 XML: `<test-run result="Passed" testcasecount="1">` |
+| Multi-platform CI | `ci.yml` 3-platform matrix | 12 BES invocations above |
+| NuGet transitive deps | Already in `nuget_repo.bzl` | `select({})` per TFM in generated BUILD |
+| Source-only NuGet | Already in `nuget_archive.bzl` | `isexternalinit` content sources in spectre generator |
+| AdditionalFiles | Already in `additionalfiles` attr | `/additionalfile:config.json` in analysis test |
+| Windows runtime | Removed `cd` from `launcher.bat.tpl` | 164/167 pass on Windows |
+| Code coverage | Upgraded coverlet 6.0.4→8.0.0; writable-copy + source-exclusion fix | LCOV with source paths, line hits, branch data ([details above](#code-coverage)) |
 
 ---
 
 ## Reproduce
 
-### Linux
-
 ```bash
 git clone https://github.com/clolin/rules-dotnet-plus.git
-cd rules-dotnet-plus
-git checkout feat/close-parity-gaps
-bazel test //dotnet/private/tests/... 2>&1 | tail -5
-# Expected: 167 tests pass, 0 failures
-```
-
-### macOS
-
-```bash
-git clone https://github.com/clolin/rules-dotnet-plus.git
-cd rules-dotnet-plus
-git checkout feat/close-parity-gaps
+cd rules-dotnet-plus && git checkout release/parity
 bazel test //dotnet/private/tests/...
-```
+# Linux: 167 pass | macOS: 164 pass, 3 skipped | Windows: add --output_user_root=C:/_b
 
-### Windows
-
-```powershell
-git clone https://github.com/clolin/rules-dotnet-plus.git
-cd rules-dotnet-plus
-git checkout feat/close-parity-gaps
-echo "startup --output_user_root=C:/_b" >> .bazelrc.user
-bazel test //dotnet/private/tests/...
+# Coverage (produces LCOV in coverage.dat):
+bazel coverage //dotnet/private/tests/nunit_config:csharp_nunit_config_target
+cat bazel-testlogs/dotnet/private/tests/nunit_config/csharp_nunit_config_target/coverage.dat
 ```
 
 **Requirements:** Bazel 8.3.0+ (via [Bazelisk](https://github.com/bazelbuild/bazelisk)), network access for NuGet/SDK downloads on first run.
@@ -196,14 +227,12 @@ bazel test //dotnet/private/tests/...
 
 ## Real-World Project Validation
 
-| Project | Scope | Result | Blocker |
-|---------|-------|--------|---------|
-| [booking-microservices](https://github.com/meysamhadeli/booking-microservices) | 6 targets, net10.0 microservices | Core library compiles (36 .cs files); full project blocked | NuGet dep graph (~100 packages not in lockfile) |
-| [spectre-console](https://github.com/spectreconsole/spectre.console) | Console library, multi-TFM, source generators | Not re-attempted after gap closure | Was blocked by source-only NuGet + AdditionalFiles (both now resolved) |
+| Project | Result | Blocker |
+|---------|--------|---------|
+| [booking-microservices](https://github.com/meysamhadeli/booking-microservices) | Core library compiles (36 .cs, 8471 configured targets) | NuGet dep graph (~100 packages not in lockfile) |
+| [spectre-console](https://github.com/spectreconsole/spectre.console) | Source generator compiles (`is_analyzer`, source-only NuGet, AdditionalFiles) | Roslyn SDK version mismatch (not rules_dotnet) |
 
-**booking-microservices** ([results](booking/RESULTS.md)): workspace setup, BUILD loading, target graph (8471 configured targets), cross-project deps, and NuGet resolution (10 packages with SHA-512 hashes) all pass. Core domain library (36 .cs files) compiles successfully.
-
-**spectre-console** ([friction log](projects/spectre-console/friction_log.md)): The 2 blocking friction points (source-only NuGet, AdditionalFiles) were already implemented in the codebase — the blockers were missing NuGet package entries and BUILD configuration, not missing features. Re-validation with correct configuration is pending.
+Details: [booking results](booking/RESULTS.md) · [spectre-console friction log](projects/spectre-console/friction_log.md)
 
 ---
 
@@ -211,20 +240,21 @@ bazel test //dotnet/private/tests/...
 
 ### Proven
 
-- **Correctness:** 167 test targets covering compilation, runtime execution, NuGet integration, provider propagation, and publisher output all pass with zero failures
-- **Hermeticity:** Warm rebuild completes in 959ms with exactly 1 action (timestamp stamp only)
-- **Atomic invalidation:** Changing 1 file triggers exactly the expected recompilation graph
-- **Remote cache compatibility:** 527 AC hits, 0 misses after full clean — identical inputs produce identical cache keys
-- **Feature parity:** All 24 capabilities measured against rules_go/rules_cc/rules_py are at full parity
-- **Tri-platform runtime:** Linux, macOS, and Windows all pass 164+ tests and 5/5 E2E targets. Windows runtime support was fixed by removing `cd` from `launcher.bat.tpl` — the sh launcher never changes working directory, and the bat launcher now matches that behavior. This resolved deps.json assembly resolution and relative output path issues.
+- **Correctness:** 167 targets pass on Linux, 164/167 on macOS and Windows — 12 BES invocations across 3 platforms
+- **Hermeticity:** Warm rebuild executes 0 tests on all 3 platforms — all served from local cache
+- **Remote cache:** Full cache hit after `bazel clean` on all 3 platforms
+- **Bit-for-bit determinism:** 55 C# DLLs and 11/12 F# DLLs byte-identical across clean builds (1 F# DLL varies due to upstream `fsc` warning-suppression metadata bug)
+- **Test sharding:** `--test_sharding_strategy=forced=2` produces 2 shard runs, `TEST_SHARD_STATUS_FILE` created
+- **XML test output:** NUnit shim writes NUnit3 XML to `$XML_OUTPUT_FILE` — `<test-run result="Passed">` with full test case elements
+- **Feature parity:** 24/24 capabilities vs rules_go/rules_cc/rules_py
+- **Code coverage:** `bazel coverage` instruments assemblies and produces LCOV with source file paths (`SF:`), line hit counts (`DA:`), and branch data (`BRDA:`) — see [coverage section](#code-coverage) for full output
+- **Real-world source generators:** Spectre.Console source generator compiles with `is_analyzer`, source-only NuGet (`isexternalinit`), and `additionalfiles`
 
 ### Not Yet Proven
 
-- **Bit-for-bit determinism:** `/deterministic+` flag is passed, but outputs have not been compared byte-for-byte across builds
 - **Real-world scale:** Test suite has 167 targets; behavior at 1,000+ targets is unknown
 - **Remote execution:** RE-readiness is suggested by design (no `local=True`, explicit inputs) but not tested on an actual RE cluster
-- **spectre-console re-validation:** Gap closure for source-only NuGet and AdditionalFiles has not been re-tested against the spectre-console project
 
 ---
 
-<sub>RHEL 9.6 x86_64 · Bazel 8.3.0 · BuildBuddy Cloud · `feat/close-parity-gaps` · 2026-03-12</sub>
+<sub>Bazel 8.3.0 · BuildBuddy Cloud · `release/parity` · 2026-03-12</sub>

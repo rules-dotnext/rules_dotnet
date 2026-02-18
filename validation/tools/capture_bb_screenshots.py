@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
-"""Capture targeted BuildBuddy screenshots for proof evidence.
+"""Capture targeted BuildBuddy screenshots for tri-platform proof evidence.
 
 Uses authenticated playwright sessions via bb_cookies.json.
-Each screenshot captures a specific tab that proves a specific
-property (correctness, hermeticity, determinism, remote cache).
-
-Only captures the minimum set of screenshots needed — each one
-must prove something distinct. No redundant views.
+Each screenshot captures a specific tab proving a specific property.
 
 Usage:
     python3.12 capture_bb_screenshots.py
@@ -21,6 +17,28 @@ from playwright.sync_api import sync_playwright
 ROOT = Path(__file__).resolve().parent.parent.parent
 COOKIES_FILE = ROOT / "bb_cookies.json"
 SCREENSHOT_DIR = ROOT / "validation" / "proof-sequence" / "screenshots"
+
+# Tri-platform BES invocations from validation.yml run 23015365834
+INVOCATIONS = {
+    "linux": {
+        "cold":    "6e8ecae6-0502-4196-a8f8-035dc199348b",
+        "warm":    "3e2a97ed-09af-4dc0-a928-34c5f47b2d5f",
+        "incr":    "24555b90-4d44-4082-946c-45e8df00b0ad",
+        "remote":  "73bb5361-51f3-4a43-8227-a5b10df74c7d",
+    },
+    "macos": {
+        "cold":    "449d8b96-9458-4119-8c62-09bfaf1d20d1",
+        "warm":    "be5ecc5a-0bae-4883-8403-2f52cae10b1b",
+        "incr":    "4848df2b-9aa2-47c3-8c29-d5e334a37c07",
+        "remote":  "9c198c28-ed70-4895-9417-54cc69c119a9",
+    },
+    "windows": {
+        "cold":    "7eed1e85-74f1-43a5-99a2-b58389c335d1",
+        "warm":    "4666aac9-7b93-467b-963b-78cd4b2cd8c1",
+        "incr":    "b714757d-4bd8-4b63-9cfb-5703c90c6253",
+        "remote":  "8677e2fe-9f75-4c79-8884-242d587ab804",
+    },
+}
 
 
 def load_cookies():
@@ -66,26 +84,24 @@ def main():
 
     cookies = load_cookies()
 
-    # Post-fix invocations: 165/165 tests pass, zero failures
-    COLD = "e297c5fb-d14e-4699-ac8d-e09adf24e023"
-    WARM = "2470f621-6a46-4f75-b430-a827892f2896"
-    REMOTE = "b1a42431-938d-4370-ba74-48fd4c6923ba"
-
-    # Each entry: (invocation_id, tab, filename, what_it_proves)
-    shots = [
-        (COLD,   "Targets", "01_165_tests_passed_zero_failures.png",
-         "All 165 tests green — proves correctness"),
-        (COLD,   "Cache",   "02_cold_build_cache_baseline_523hits_4misses.png",
-         "AC 523/4 — establishes remote cache baseline"),
-        (WARM,   "ALL",     "03_warm_rebuild_954ms_1action_hermeticity.png",
-         "954ms, 1 action — proves hermeticity"),
-        (WARM,   "Cache",   "04_warm_rebuild_zero_cache_zero_transfer.png",
-         "0/0 AC, 0B transfer — confirms local cache sufficiency"),
-        (REMOTE, "Cache",   "05_remote_cache_527hits_zero_misses.png",
-         "527/0 AC, 1.836GB — proves remote cache portability"),
-        (REMOTE, "ALL",     "06_remote_cache_165tests_pass_after_clean.png",
-         "165 pass after clean — proves reproducibility from remote"),
-    ]
+    # Key screenshots per platform — one per proof property.
+    # Cold build (Targets tab): proves correctness — shows test count + pass/fail
+    # Warm rebuild (overview): proves hermeticity — shows 0 executed
+    # Remote cache (Cache tab): proves cache compatibility — shows hit/miss ratio
+    #
+    # Incremental is proven by the BES link (0 executed on warm, N on incr);
+    # a screenshot adds little over the table data.
+    shots = []
+    for platform in ["linux", "macos", "windows"]:
+        inv = INVOCATIONS[platform]
+        shots.extend([
+            (inv["cold"],   "Targets", f"{platform}_cold_targets.png",
+             f"{platform}: cold build — all tests pass"),
+            (inv["warm"],   "ALL",     f"{platform}_warm_overview.png",
+             f"{platform}: warm rebuild — 0 executed, hermeticity"),
+            (inv["remote"], "Cache",   f"{platform}_remote_cache.png",
+             f"{platform}: remote cache — hit/miss ratio"),
+        ])
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
@@ -102,7 +118,7 @@ def main():
         browser.close()
 
     count = len(list(SCREENSHOT_DIR.glob("*.png")))
-    print(f"\nDone — {count} evidence screenshots in {SCREENSHOT_DIR}/")
+    print(f"\nDone — {count} screenshots in {SCREENSHOT_DIR}/")
 
 
 if __name__ == "__main__":

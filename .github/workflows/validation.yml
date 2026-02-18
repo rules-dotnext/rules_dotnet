@@ -11,14 +11,29 @@ on:
 permissions:
   contents: read
 
+env:
+  BES_FLAGS: >-
+    --bes_results_url=https://app.buildbuddy.io/invocation/
+    --bes_backend=grpcs://remote.buildbuddy.io
+    --remote_header=x-buildbuddy-api-key=${{ secrets.BUILDBUDDY_API_KEY }}
+
 jobs:
   proof-sequence:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            label: linux
+            cache-path: ~/.cache/bazel
+          - os: macos-latest
+            label: macos
+            cache-path: ~/Library/Caches/bazel
+          - os: windows-latest
+            label: windows
+            cache-path: ~/.cache/bazel
     runs-on: ${{ matrix.os }}
-    name: Proof (${{ matrix.os }})
+    name: Proof (${{ matrix.label }})
 
     steps:
       - uses: actions/checkout@v4
@@ -30,49 +45,54 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.cache/bazel
+            ${{ matrix.cache-path }}
             ~/.cache/bazelisk
-          key: bazel-${{ matrix.os }}-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock') }}
-          restore-keys: bazel-${{ matrix.os }}-
+          key: bazel-proof-${{ matrix.label }}-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock') }}
+          restore-keys: bazel-proof-${{ matrix.label }}-
 
-      - name: Create BEP output directory
-        run: mkdir -p validation/proof-sequence
+      - name: Shorten Bazel output root (Windows MAX_PATH)
+        if: matrix.label == 'windows'
+        run: echo "startup --output_user_root=C:/_b" >> .bazelrc.user
+        shell: bash
 
-      # Invocation 1: Cold build
+      # Invocation 1: Cold build (no cache)
       - name: "Invocation 1: Cold build"
         run: |
           bazel clean
           bazel test ${{ github.event.inputs.target }} \
-            --build_event_json_file=validation/proof-sequence/01_cold_${{ matrix.os }}.bep.json \
-            --profile=validation/proof-sequence/01_cold_${{ matrix.os }}.profile.gz \
+            ${{ env.BES_FLAGS }} \
+            --noremote_accept_cached \
+            --test_output=errors \
             || true
+        shell: bash
 
       # Invocation 2: Warm rebuild (hermeticity proof)
       - name: "Invocation 2: Warm rebuild"
         run: |
           bazel test ${{ github.event.inputs.target }} \
-            --build_event_json_file=validation/proof-sequence/02_warm_${{ matrix.os }}.bep.json \
+            ${{ env.BES_FLAGS }} \
+            --test_output=errors \
             || true
+        shell: bash
 
-      # Invocation 3: Incremental (touch one file)
+      # Invocation 3: Incremental (touch one file in diamond dep graph)
       - name: "Invocation 3: Incremental build"
         run: |
           echo "// validation marker $(date)" >> dotnet/private/tests/appsettings/Main.cs
           bazel test ${{ github.event.inputs.target }} \
-            --build_event_json_file=validation/proof-sequence/03_incremental_${{ matrix.os }}.bep.json \
+            ${{ env.BES_FLAGS }} \
+            --test_output=errors \
             || true
           git checkout dotnet/private/tests/appsettings/Main.cs
+        shell: bash
 
-      - name: Analyze BEP files
+      # Invocation 4: Remote cache (clean + rebuild from remote cache)
+      - name: "Invocation 4: Remote cache rebuild"
         run: |
-          for f in validation/proof-sequence/*.bep.json; do
-            echo ""
-            python3 validation/tools/analyze_bep.py "$f"
-          done
-
-      - name: Upload BEP artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: bep-${{ matrix.os }}
-          path: validation/proof-sequence/
-          retention-days: 90
+          bazel clean
+          bazel test ${{ github.event.inputs.target }} \
+            ${{ env.BES_FLAGS }} \
+            --remote_cache=grpcs://remote.buildbuddy.io \
+            --test_output=errors \
+            || true
+        shell: bash

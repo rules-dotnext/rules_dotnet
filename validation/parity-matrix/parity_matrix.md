@@ -1,7 +1,7 @@
 # Feature Parity Matrix: rules_dotnet vs rules_go / rules_cc / rules_py
 
 **Date:** 2026-03-12
-**Branch:** `release/parity` → `feat/close-parity-gaps`
+**Branch:** `release/parity`
 
 ## Legend
 
@@ -33,7 +33,7 @@
 | Test rules | ✅ | ✅ | ✅ | ✅ | **Parity** | csharp_test, fsharp_test, csharp_nunit_test (macro) |
 | Test sharding | ✅ | ✅ | ✅ | ✅ | **Parity** | Launcher touches `TEST_SHARD_STATUS_FILE`; `shard_count` attr supported |
 | XML test output | ✅ | ✅ | ✅ | ✅ | **Parity** | NUnit shim writes `$XML_OUTPUT_FILE` in NUnit3 format; BES tools parse natively |
-| Code coverage | ✅ | ✅ | ✅ | ✅ | **Parity** | coverlet.console via module extension; launcher invokes when `COVERAGE_DIR` set |
+| Code coverage | ✅ | ✅ | ✅ | ✅ | **Parity** | coverlet 8.0.0 module extension; `bazel coverage` produces LCOV via writable-copy instrumentation |
 
 ## Tooling & IDE
 
@@ -88,7 +88,9 @@ all measured capabilities. This includes:
 |-----------|-----------|
 | Test sharding | Launcher now touches `TEST_SHARD_STATUS_FILE` |
 | XML test output | NUnit shim writes `$XML_OUTPUT_FILE` in NUnit3 format |
-| Multi-platform CI | ci.yml expanded to 3-platform matrix |
+| Multi-platform CI | ci.yml expanded to 3-platform matrix; all 3 platforms green |
+| Windows runtime | Removed `cd` from `launcher.bat.tpl` to match sh launcher — fixes deps.json resolution |
 | NuGet transitive deps | Already implemented (`nuget_repo.bzl` generates deps) — reclassified |
 | Source-only NuGet | Already implemented (`nuget_archive.bzl` processes contentFiles) — reclassified |
 | AdditionalFiles | Already implemented (`additionalfiles` attr exists) — reclassified; analysis test added |
+| Code coverage | Upgraded coverlet 6.0.4→8.0.0 (Mono.Cecil 0.11.6); writable-copy instrumentation; `--exclude-assemblies-without-sources None` for sandboxed builds |

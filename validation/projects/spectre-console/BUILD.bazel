@@ -20,6 +20,7 @@ csharp_library(
         "@nuget//system.text.json",
         "@nuget//system.collections.immutable",
         "@nuget//system.reflection.metadata",
+        "@nuget//system.memory",
         "@nuget//isexternalinit",
     ],
 )
@@ -33,7 +34,7 @@ csharp_library(
     target_frameworks = ["net8.0"],
     version = "1.0.0",
     defines = ["TRACE", "WCWIDTH", "WCWIDTH_VISIBILITY_INTERNAL"],
-    data = ["src/src/Spectre.Console.Ansi/Data/colors.json"],
+    additionalfiles = ["src/src/Spectre.Console.Ansi/Data/colors.json"],
     deps = [
         ":spectre_console_source_generator",
     ],
