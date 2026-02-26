@@ -62,6 +62,7 @@ bazel_dep(name = "bazel_skylib_gazelle_plugin", version = "1.7.1", dev_dependenc
 bazel_dep(name = "rules_cc", version = "0.1.2")
 
 bazel_dep(name = "stardoc", version = "0.7.1", dev_dependency = True)
+bazel_dep(name = "rules_python", version = "1.0.0", dev_dependency = True)
 bazel_dep(name = "rules_testing", version = "0.8.0", dev_dependency = True)
 bazel_dep(name = "bazel_ci_rules", version = "1.0.0", dev_dependency = True)
 bazel_dep(name = "dotnet_test_resources_other_repo", version = "", dev_dependency = True)
@@ -81,3 +82,13 @@ use_repo(internal_dev_deps, "buildkite_config")
 
 rules_dotnet_nuget_tool_tests_extension = use_extension("@rules_dotnet//dotnet:paket.rules_dotnet_nuget_tool_tests_extension.bzl", "rules_dotnet_nuget_tool_tests_extension", dev_dependency = True)
 use_repo(rules_dotnet_nuget_tool_tests_extension, "paket.rules_dotnet_nuget_tool_tests")
+
+# Hermetic Python toolchain for dev tools (rules_pkg build_tar).
+# rules_python is already a transitive dep; this registration ensures
+# py_binary actions use a Bazel-managed interpreter on any executor.
+python = use_extension("@rules_python//python/extensions:python.bzl", "python", dev_dependency = True)
+python.toolchain(
+    is_default = True,
+    python_version = "3.11",
+)
+use_repo(python, "python_3_11")

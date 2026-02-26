@@ -43,16 +43,6 @@ DotnetAssemblyRuntimeInfo = provider(
     },
 )
 
-DotnetDepVariantInfo = provider(
-    doc = "A wrapper provider for a dependency. The dependency can be a project " +
-          "dependency, in which case the `assembly_runtime_info` will be populated" +
-          "or a NuGet dependency, in which case `assembly_runtime_info` and `nuget_info` will be populated.",
-    fields = {
-        "label": "Label: The label of the dependency",
-        "assembly_runtime_info": "DotnetAssemblyRuntimeInfo: The DotnetAssemblyRuntimeInfo provider of a dependency",
-        "nuget_info": "NuGetInfo: The NuGet info of a dependency",
-    },
-)
 
 NuGetInfo = provider(
     doc = "Information about a NuGet package.",

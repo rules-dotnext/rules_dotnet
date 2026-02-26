@@ -153,6 +153,86 @@ Coverlet 6.0.4 (previous) bundled Mono.Cecil 0.11.4, which cannot read assemblie
 
 ---
 
+## Remote Execution
+
+`bazel test //dotnet/private/tests/... --config=remote` dispatches all compilation and test actions to BuildBuddy Cloud RE workers. **167/167 tests pass** with zero local fallbacks. The `build:remote` config provides all system-level dependencies hermetically via `container-image`, so remote workers need no .NET prerequisites. Cold-cache invocation (no cache hits — every action executed remotely): BES: [b699ef1b](https://app.buildbuddy.io/invocation/b699ef1b-efc9-4d16-b88a-c0d293cad268)
+
+![Succeeded, 1m 36s, 368 targets, 1,511 actions, 604 packages, 0 fetches, Remote execution on](proof-sequence/screenshots/re_linux_overview.png)
+<sup>Succeeded in 1m 36s — 167/167 pass, 1,511 actions, Remote execution on, 0 fetches</sup>
+
+![Remotely executed actions (516 completed), executor host IDs visible](proof-sequence/screenshots/re_linux_execution.png)
+<sup>EXECUTIONS tab: 516 actions executed on remote workers — executor host IDs confirm off-host execution</sup>
+
+![Timing profile showing actions distributed across remote executor lanes](proof-sequence/screenshots/re_linux_timing.png)
+<sup>TIMING tab: actions distributed across remote executor lanes — parallel remote execution</sup>
+
+Process summary (cold cache — no cache hits, every action forced to execute remotely):
+
+```
+INFO: 1511 processes: 995 internal, 516 remote.
+Executed 167 out of 167 tests: 167 tests pass.
+```
+
+**516 remote, 0 local, 0 cache** — all non-internal actions execute on remote workers. This is the strongest possible RE proof: no cached results, no local fallback, pure remote execution.
+
+### Hermeticity — network and filesystem isolation
+
+Empirically verified via `bazel aquery` across all 167 test targets:
+
+| Property | Verification | Result |
+|----------|-------------|--------|
+| `local=True` / `no-remote` | `aquery` scan of all actions | **0 found** — every action is remote-eligible |
+| Host environment leakage | `--incompatible_strict_action_env` | **Enabled** — `PATH=/bin:/usr/bin:/usr/local/bin` only |
+| `DOTNET_CLI_HOME` | Action env inspection | **`external/+dotnet+dotnet_x86_64-unknown-linux-gnu`** — toolchain path, not host |
+| SDK file declarations | Action input analysis | All SDK files (dotnet, csc, fsc, targeting packs) are **explicit inputs** via toolchain |
+| Network during build | Cold-cache RE (0 fetches) | **0 fetches** during action execution — all dependencies pre-resolved via repo rules |
+| Deterministic output | Compiler flags | `-pathmap:$PWD=.` eliminates host-specific paths from PDBs/binaries |
+| Python toolchain | `bootstrap_impl=script` | Hermetic interpreter — `build_tar` uses Bazel-managed Python, not `/usr/bin/env python3` |
+| System library deps | `container-image` exec property | **`runtime-deps:8.0`** in `.bazelrc` — glibc/libstdc++ provided hermetically, no host dependency |
+| Binary format detection | cross_publish `test.sh` | POSIX `od(1)` for ELF/PE/Mach-O parsing — no `file` command dependency |
+
+The cold-cache proof (`--remote_accept_cached=false`) is the definitive hermeticity test: every action must execute from scratch on a remote worker with only its declared inputs. **516 actions, 0 failures, 0 local fallbacks** — no action depends on undeclared host state.
+
+### Multi-platform validation (independent from CI)
+
+In addition to the CI proof sequence, independent runs on dedicated EC2 instances confirm platform behavior:
+
+| Platform | Instance | Tests | BES |
+|----------|----------|-------|-----|
+| macOS x86_64 (Intel) | EC2 mac1.metal, macOS 14.8.4 | **164/167 pass** (3 skipped) | [8d2aefa7](https://app.buildbuddy.io/invocation/8d2aefa7-f226-4b71-91e7-51d38e0bee1f) |
+| Windows x86_64 | EC2 m5.xlarge, Windows Server 2022 | **164/167 pass** (3 skipped) | [c725db92](https://app.buildbuddy.io/invocation/c725db92-1ebf-4b45-bf78-80c0d427c507) |
+
+3 skipped tests on both platforms are `target_compatible_with = ["@platforms//os:linux"]` (dotnet_tool genrule tests, native_deps field test) — correctly filtered by Bazel's platform constraint system.
+
+### Configuration
+
+Users enable RE by adding `--config=remote` to any Bazel command. Authentication is the only user-specific configuration:
+
+```bash
+# .bazelrc (already included)
+build:remote --remote_executor=grpcs://remote.buildbuddy.io
+build:remote --remote_cache=grpcs://remote.buildbuddy.io
+build:remote --jobs=50
+build:remote --remote_timeout=600
+build:remote --remote_default_exec_properties=container-image=docker://mcr.microsoft.com/dotnet/runtime-deps:8.0
+build:remote --@rules_python//python/config_settings:bootstrap_impl=script
+
+# .bazelrc.user (gitignored — user provides their own API key)
+build:remote --remote_header=x-buildbuddy-api-key=YOUR_KEY
+```
+
+The `runtime-deps:8.0` container provides glibc 2.35+ and GLIBCXX_3.4.30 — required by .NET 10's native host libraries (`libhostpolicy.so`, `libcoreclr.so`). The `bootstrap_impl=script` flag ensures `rules_pkg` tools use Bazel's hermetic Python, not `/usr/bin/env python3`. Both are declared in `.bazelrc` so every `--config=remote` invocation gets them automatically.
+
+Reproduce:
+
+```bash
+# Add your BuildBuddy API key to .bazelrc.user, then:
+bazel test //dotnet/private/tests/... --config=remote
+# Expected: 167/167 pass, 0 local actions
+```
+
+---
+
 ## Parity with rules_go / rules_cc / rules_py
 
 **24/24 comparable capabilities at parity.** (+2 .NET-specific extras.) [Full matrix ->](parity-matrix/parity_matrix.md)
@@ -162,7 +242,7 @@ Coverlet 6.0.4 (previous) bundled Mono.Cecil 0.11.4, which cannot read assemblie
 | | **Core Build Infrastructure** | | |
 | 1 | Hermetic toolchain | ✅ Parity | .NET 10.0.100 SDK, 6 platform variants |
 | 2 | bzlmod | ✅ Parity | 7 module extensions in MODULE.bazel |
-| 3 | Remote execution | ✅ Parity | No `local=True`, explicit inputs |
+| 3 | Remote execution | ✅ Parity | 167/167 pass on BuildBuddy RE; 516 remote actions, 0 local ([details below](#remote-execution)) |
 | 4 | Cross-compilation | ✅ Parity | `--platforms`, TFM transitions, RID selection |
 | 5 | Deterministic output | ✅ Parity | `/deterministic+` to csc/fsc; 66/67 DLLs byte-identical |
 | | **Dependency Management** | | |
@@ -219,6 +299,9 @@ bazel test //dotnet/private/tests/...
 # Coverage (produces LCOV in coverage.dat):
 bazel coverage //dotnet/private/tests/nunit_config:csharp_nunit_config_target
 cat bazel-testlogs/dotnet/private/tests/nunit_config/csharp_nunit_config_target/coverage.dat
+
+# Remote execution (add your BuildBuddy API key to .bazelrc.user first):
+bazel test //dotnet/private/tests/... --config=remote
 ```
 
 **Requirements:** Bazel 8.3.0+ (via [Bazelisk](https://github.com/bazelbuild/bazelisk)), network access for NuGet/SDK downloads on first run.
@@ -246,6 +329,7 @@ Details: [booking results](booking/RESULTS.md) · [spectre-console friction log]
 - **Bit-for-bit determinism:** 55 C# DLLs and 11/12 F# DLLs byte-identical across clean builds (1 F# DLL varies due to upstream `fsc` warning-suppression metadata bug)
 - **Test sharding:** `--test_sharding_strategy=forced=2` produces 2 shard runs, `TEST_SHARD_STATUS_FILE` created
 - **XML test output:** NUnit shim writes NUnit3 XML to `$XML_OUTPUT_FILE` — `<test-run result="Passed">` with full test case elements
+- **Remote execution:** 167/167 pass on BuildBuddy Cloud RE — 516 remote actions, 0 local, 0 cache ([details](#remote-execution))
 - **Feature parity:** 24/24 capabilities vs rules_go/rules_cc/rules_py
 - **Code coverage:** `bazel coverage` instruments assemblies and produces LCOV with source file paths (`SF:`), line hit counts (`DA:`), and branch data (`BRDA:`) — see [coverage section](#code-coverage) for full output
 - **Real-world source generators:** Spectre.Console source generator compiles with `is_analyzer`, source-only NuGet (`isexternalinit`), and `additionalfiles`
@@ -253,7 +337,6 @@ Details: [booking results](booking/RESULTS.md) · [spectre-console friction log]
 ### Not Yet Proven
 
 - **Real-world scale:** Test suite has 167 targets; behavior at 1,000+ targets is unknown
-- **Remote execution:** RE-readiness is suggested by design (no `local=True`, explicit inputs) but not tested on an actual RE cluster
 
 ---
 

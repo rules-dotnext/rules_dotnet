@@ -3,12 +3,14 @@
 ## Proto/gRPC
 
 Generate C# code from `.proto` files and compile into .NET assemblies.
+Proto rules live in a separate load path from the core rules because they
+depend on `@protobuf`, which is an optional dependency -- projects that do not
+use proto/gRPC never pull it in.
 
 ```starlark
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 load("@rules_dotnet//dotnet:defs.bzl", "csharp_binary")
-load("@rules_dotnet//dotnet/private/rules/proto:csharp_proto_library.bzl", "csharp_proto_library")
-load("@rules_dotnet//dotnet/private/rules/proto:csharp_grpc_library.bzl", "csharp_grpc_library")
+load("@rules_dotnet//dotnet:proto.bzl", "csharp_proto_library", "csharp_grpc_library")
 
 proto_library(
     name = "greeter_proto",
@@ -191,6 +193,20 @@ csharp_binary(
 
 Shared libraries (`.so`, `.dylib`, `.dll`) from `cc_library` targets are
 extracted and placed where the .NET runtime's P/Invoke loader can find them.
+The C# side uses `[DllImport]` to reference the native library by name:
+
+```csharp
+using System.Runtime.InteropServices;
+
+public static class NativeMath
+{
+    // The library name matches the cc_library output (without prefix/extension).
+    // The runtime resolves libnative_math.so / native_math.dylib / native_math.dll
+    // automatically from the publish directory.
+    [DllImport("native_math")]
+    public static extern int Add(int a, int b);
+}
+```
 
 ---
 
@@ -241,6 +257,82 @@ csharp_library(
 )
 ```
 
-TFM transitions are central to rules_dotnet. Each entry in `target_frameworks`
-creates a separate build configuration. Downstream targets select the
-appropriate TFM automatically based on compatibility.
+### How TFM transitions work
+
+TFM transitions are the mechanism that makes multi-targeting work without any
+manual wiring from the user. Every rule that accepts a `deps` attribute applies
+a Bazel configuration transition on those dependencies. When the transition
+fires, it inspects the dependency's `target_frameworks` list and selects the
+best match for the consumer's TFM.
+
+The selection algorithm:
+
+1. If the dependency lists the exact TFM the consumer requests, use it.
+2. Otherwise, walk the .NET compatibility chain and select the highest
+   compatible TFM the dependency supports.
+3. If no compatible TFM exists, the build fails with a clear error.
+
+For example, a `csharp_binary` targeting `net9.0` that depends on a library
+with `target_frameworks = ["net8.0", "net9.0"]` gets the `net9.0` variant.
+If that library only listed `["net8.0", "netstandard2.0"]`, the transition
+would select `net8.0` as the closest compatible framework.
+
+This is the same architectural pattern as `--platforms` transitions in
+rules_go and rules_cc: the build graph fans out into per-configuration
+sub-graphs automatically. Users never pass flags or write `select()` to
+route TFMs -- just list every TFM the library should support in
+`target_frameworks` and the transition handles the rest.
+
+---
+
+## Remote execution
+
+All rules_dotnet build actions are compatible with remote execution out of the
+box. Every action declares explicit SDK inputs, uses a strict action
+environment (`--incompatible_strict_action_env`), and none are marked
+`local=True`. The result is full RE compatibility with no per-rule opt-in
+required.
+
+### Configuration
+
+Remote execution is configured in `.bazelrc` under the `build:remote` config
+stanza. The shipped configuration targets BuildBuddy Cloud, but any
+Bazel-compatible RE service works:
+
+```
+# .bazelrc (already present in this repository)
+build:remote --remote_executor=grpcs://remote.buildbuddy.io
+build:remote --remote_cache=grpcs://remote.buildbuddy.io
+build:remote --jobs=50
+build:remote --remote_timeout=600
+build:remote --remote_default_exec_properties=container-image=docker://mcr.microsoft.com/dotnet/runtime-deps:8.0
+build:remote --@rules_python//python/config_settings:bootstrap_impl=script
+```
+
+The `runtime-deps:8.0` container image is declared as the execution platform
+image. It provides the glibc 2.27+ and GLIBCXX 3.4.22+ that .NET SDK native
+binaries (`libhostpolicy.so`, `libcoreclr.so`) require, so remote workers
+need no host-level .NET prerequisites.
+
+The `bootstrap_impl=script` setting ensures that Python-based tools (e.g.,
+`rules_pkg` build_tar) bootstrap hermetically instead of depending on
+`/usr/bin/env python3` on the remote executor.
+
+### Usage
+
+Authentication is user-specific. Add your API key to `.bazelrc.user` (which is
+gitignored):
+
+```
+# .bazelrc.user
+build:remote --remote_header=x-buildbuddy-api-key=YOUR_KEY
+```
+
+Then pass `--config=remote`:
+
+```sh
+bazel test //... --config=remote
+```
+
+All tests, builds, and publish actions execute remotely with full cache
+sharing across the team.

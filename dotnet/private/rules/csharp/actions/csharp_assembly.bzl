@@ -552,7 +552,6 @@ def _compile(
     # Our goal is to match msbuild as much as reasonable
     # https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-options/listed-alphabetically
     args = actions.args()
-    args.add("/unsafe-")
     if (allow_unsafe_blocks):
         args.add("/unsafe+")
     else:

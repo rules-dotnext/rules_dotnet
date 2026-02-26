@@ -193,7 +193,21 @@ csharp_library(
 )
 ```
 
+### Runfiles and file access
+
+In MSBuild, `File.ReadAllText("data.json")` resolves relative to the executable
+directory. In Bazel, data files live in the runfiles tree. Use `data = ["data.json"]`
+in your BUILD rule, then access files via the `RUNFILES_DIR` environment variable
+or the runfiles library at `@rules_dotnet//tools/runfiles`.
+
+```csharp
+// Bazel sets RUNFILES_DIR; files declared in `data` are available there
+var runfilesDir = Environment.GetEnvironmentVariable("RUNFILES_DIR");
+var path = Path.Combine(runfilesDir, "my_workspace", "path", "to", "data.json");
+```
+
 ### Remote execution
 
-Supported out of the box. Remote runners need `libicu` installed. Add to your
-RBE container if missing.
+Supported out of the box. The `build:remote` config in `.bazelrc` specifies a
+`container-image` that provides all system dependencies -- including `libicu` --
+hermetically. No manual installation on remote workers is required.

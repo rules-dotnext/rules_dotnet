@@ -14,7 +14,7 @@
 |-----------|---------|---------|---------|-------------|--------|-------|
 | Hermetic toolchain | ✅ | ✅ | ✅ | ✅ | **Parity** | .NET 8/9/10; SDK hashes for linux/macOS/Windows × x64/arm64 |
 | bzlmod | ✅ | ✅ | ✅ | ✅ | **Parity** | bzlmod-only (no WORKSPACE); 6 module extensions |
-| Remote execution | ✅ | ✅ | ✅ | ✅ | **Parity** | No `local=True`, `--incompatible_strict_action_env`, explicit inputs |
+| Remote execution | ✅ | ✅ | ✅ | ✅ | **Parity** | 167/167 pass on BuildBuddy RE (516 remote actions, 0 local); hermetic container, Python toolchain, POSIX binary detection |
 | Cross-compilation | ✅ | ✅ | partial | ✅ | **Parity** | `--platforms`, TFM transitions, RID selection |
 | Deterministic output | ✅ | ✅ | N/A | ✅ | **Parity** | `/deterministic+` passed to csc and fsc |
 

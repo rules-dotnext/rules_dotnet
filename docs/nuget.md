@@ -3,6 +3,14 @@
 rules_dotnet provides three approaches for managing NuGet dependencies, from
 simplest to most flexible.
 
+## Choosing an approach
+
+- **Paket** (Approach 1): Best if you already use Paket, or want a mature lock file format with SHA-512 integrity verification built in. This is the most battle-tested path.
+- **NuGet module extension** (Approach 2): Best for new projects starting with `packages.lock.json` from `dotnet restore --use-lock-file`. Native bzlmod integration without external tools.
+- **Direct nuget_repo** (Approach 3): For advanced users who need programmatic control over package resolution. Typically used by rule authors, not end users.
+
+Most users should start with Approach 1 (Paket) or Approach 2 (NuGet lock file).
+
 ## Approach 1: Paket (recommended for most projects)
 
 [Paket](https://fsprojects.github.io/Paket/) generates a deterministic lock
@@ -30,10 +38,9 @@ bazel run @rules_dotnet//tools/paket2bazel -- \
   --output-folder $(pwd)/deps
 ```
 
-4. Load the generated file in `MODULE.bazel` (or `WORKSPACE`):
+4. Load the generated file in `MODULE.bazel`:
 
 ```starlark
-# WORKSPACE approach
 load("//deps:paket.bzl", "paket")
 paket()
 ```

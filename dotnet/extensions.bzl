@@ -31,17 +31,6 @@ _ANALYSIS_ATTRS = {
     ),
 }
 
-def _analysis_config_repo_impl(ctx):
-    """Repository rule that stores the analysis config label for documentation purposes."""
-    ctx.file("BUILD.bazel", "")
-    ctx.file("defs.bzl", 'ANALYSIS_CONFIG = "%s"\n' % ctx.attr.config)
-
-_analysis_config_repo = repository_rule(
-    implementation = _analysis_config_repo_impl,
-    attrs = {
-        "config": attr.string(mandatory = True),
-    },
-)
 
 def _toolchain_extension(module_ctx):
     registrations = {}
@@ -78,11 +67,6 @@ def _toolchain_extension(module_ctx):
             register = False,
         )
 
-    if analysis_config:
-        _analysis_config_repo(
-            name = "dotnet_analysis_config",
-            config = analysis_config,
-        )
 
 dotnet = module_extension(
     implementation = _toolchain_extension,

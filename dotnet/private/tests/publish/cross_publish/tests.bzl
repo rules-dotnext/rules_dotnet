@@ -46,9 +46,4 @@ def tests():
             data = [
                 ":cross_publish_{}".format(rid),
             ],
-            target_compatible_with = select({
-                # Disable on remote runners because the `file` binary does not exist on the RBE runners
-                "@bazel_tools//tools/cpp:gcc": ["@platforms//:incompatible"],
-                "//conditions:default": [],
-            }),
         )

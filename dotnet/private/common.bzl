@@ -9,9 +9,7 @@ load(
     "//dotnet/private:providers.bzl",
     "DotnetAssemblyCompileInfo",
     "DotnetAssemblyRuntimeInfo",
-    "DotnetDepVariantInfo",
     "DotnetTargetingPackInfo",
-    "NuGetInfo",
 )
 load("//dotnet/private:semver.bzl", "semver")
 load("//dotnet/private/sdk:rids.bzl", "RUNTIME_GRAPH")
@@ -431,21 +429,6 @@ def get_nuget_relative_path(file):
     # So we remove the first two parts of the path to get the path within the nuget package.
     return "/".join(file.path.split("/")[2:])
 
-def transform_deps(deps):
-    """Transforms a [Target] into [DotnetDepVariantInfo].
-
-    This helper function is used to transform ctx.attr.deps into
-    [DotnetDepVariantInfo].
-    Args:
-        deps (list of Targets): Dependencies coming from ctx.attr.deps
-    Returns:
-        list of DotnetDepVariantInfos.
-    """
-    return [DotnetDepVariantInfo(
-        label = dep.label,
-        assembly_runtime_info = dep[DotnetAssemblyRuntimeInfo] if DotnetAssemblyRuntimeInfo in dep else None,
-        nuget_info = dep[NuGetInfo] if NuGetInfo in dep else None,
-    ) for dep in deps]
 
 def generate_warning_args(
         args,

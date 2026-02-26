@@ -17,6 +17,21 @@ common --lockfile_mode=update
 # Verbose failure output
 common --verbose_failures
 
+# Remote execution — activate with --config=remote
+# Authentication is user-specific; set in .bazelrc.user:
+#   build:remote --remote_header=x-buildbuddy-api-key=YOUR_KEY
+build:remote --remote_executor=grpcs://remote.buildbuddy.io
+build:remote --remote_cache=grpcs://remote.buildbuddy.io
+build:remote --jobs=50
+build:remote --remote_timeout=600
+# .NET SDK native binaries (libhostpolicy.so, libcoreclr.so) require glibc 2.27+
+# and GLIBCXX_3.4.22+. The runtime-deps image provides these uniformly so RE
+# workers don't need host-level .NET prerequisites.
+build:remote --remote_default_exec_properties=container-image=docker://mcr.microsoft.com/dotnet/runtime-deps:8.0
+# Use hermetic Python bootstrap for py_binary tools (e.g. rules_pkg build_tar)
+# so they don't depend on /usr/bin/env python3 on the remote executor.
+build:remote --@rules_python//python/config_settings:bootstrap_impl=script
+
 # Load any settings specific to the current user.
 # .bazelrc.user should appear in .gitignore so that settings are not shared with team members
 # This needs to be last statement in this

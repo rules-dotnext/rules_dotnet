@@ -1,88 +1,44 @@
-# Getting started
+# Documentation
 
-## Design
+## Guides
 
-### Dependency resolution
+| Guide | Description |
+|-------|-------------|
+| **[Getting Started](getting-started.md)** | Install Bazel, set up MODULE.bazel, build your first library, binary, and test |
+| **[NuGet Dependencies](nuget.md)** | Three approaches: Paket, NuGet lock files, direct package declarations. Private feeds, authentication, custom sources |
+| **[Testing](testing.md)** | Test rules, NUnit integration, code coverage with coverlet, test sharding, XML output |
+| **[Publishing](publishing.md)** | Framework-dependent and self-contained deployment, NativeAOT compilation, NuGet packaging |
+| **[Advanced Topics](advanced.md)** | Proto/gRPC, Razor, Roslyn analyzers, IDE integration, native interop, multi-targeting, remote execution |
+| **[Migration from MSBuild](migration.md)** | Step-by-step migration with .csproj attribute mapping table |
 
-These rules try their best to follow the conventions that are used in the
-project files that MSBuild uses. MSBuild is not used behind the scenes
-but the compilers and tools that are part of the .Net toolchain are
-used directly instead.
+## Reference
 
-The biggest change compared to MSBuild out of the box is that by default
-these rules do not propagate transitive dependencies to compilation actions.
-This is similar to setting `<DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>`
-in MSBuild.
+| Reference | Description |
+|-----------|-------------|
+| **[Rules](rules.md)** | All rules, attributes, and defaults |
+| **[Providers](providers.md)** | Public provider API for writing custom rules |
+| **[Examples](../e2e/)** | Working projects for net8.0, net9.0, net10.0 |
 
-This behaviour can be overridden by using the following flag when invoking bazel:
-```
---@rules_dotnet//dotnet/settings:strict_deps=false
-```
-You can add this flag to your `.bazelrc` file to make it the default.
+## Design Decisions
 
-### Debug/Release configurations
-These rules follow the Bazel idiomatic way of handling compilation modes by reading the `--compilation_mode` flag.
-If the flag is set to either `dbg` or `fastbuild` the rules will compile with relase optimizations disabled.
-If the flag is set to `opt` the rules will compile with the release optimizations enabled.
+### Strict dependencies by default
 
-By default Bazel sets the compilation mode to `fastbuild`.
+Transitive dependencies are not propagated to compilation actions. This matches `<DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>` in MSBuild. If target A depends on B, and B depends on C, then A cannot use types from C without declaring a direct dependency on C.
 
-If you want to e.g. enable optimizations in CI you can add `common --compilation_mode=opt` to your CI `.bazelrc` file.
+Override with `--@rules_dotnet//dotnet/settings:strict_deps=false` or use the `exports` attribute on libraries to re-export specific dependencies.
 
-## Unsupported workloads
+### Debug / Release configuration
 
-The following workloads are not supported by these rules at this given time:
+These rules read `--compilation_mode` (the standard Bazel flag):
 
-- VisualBasic
-- Razor
-- Blazor/WebAssembly
-- Workloads that require Mono
+| `--compilation_mode` | .NET behavior |
+|---------------------|---------------|
+| `fastbuild` (default) | Debug: optimizations off, full PDBs |
+| `dbg` | Debug: optimizations off, full PDBs |
+| `opt` | Release: optimizations on, portable PDBs |
 
-Contributions to add the missing workloads are welcomed and the maintainers
-will do their best to guide if needed.
+Set `common --compilation_mode=opt` in your CI `.bazelrc` for release builds.
 
-## Usage
+### Hermetic toolchain
 
-### Installation
-
-The minimal supported Bazel version is 7.0.0 and bzlmod has to enabled.
-
-From the release you wish to use: https://github.com/bazel-contrib/rules_dotnet/releases copy the WORKSPACE snippet into your WORKSPACE file.
-
-If you are using Windows you need to make sure that symlinks and runfiles are enabled.
-You can do that by adding the following snippet to your `.bazelrc` file:
-
-```
-startup --windows_enable_symlinks
-build --enable_runfiles
-```
-
-More information on these flags can be found here:
-
-[--windows_enable_symlinks](https://docs.bazel.build/versions/main/command-line-reference.html#flag--windows_enable_symlinks)
-
-[--enable_runfiles](https://docs.bazel.build/versions/main/command-line-reference.html#flag--enable_runfiles)
-
-Various examples of how each rule can be used are in the [examples](../examples) folder.
-
-## IDE Support
-
-Currently the rules do not support IDE support out of the box so for
-proper IDE support the MSBuild project files need to be manually maintained.
-
-## NuGet packages
-
-NuGet packages are fully supported by the rules in two ways
-
-### NuGet packages with Paket
-
-[Paket](https://fsprojects.github.io/Paket/) is a great choice for managing dependencies in .Net
-and one of the reasons for Paket being a great fit with Bazel is that it supports a lock file
-out of the box.
-
-See the [paket2bazel](../tools/paket2bazel/README.md) docs for instructions on how to set Paket up with Bazel.
-
-## Remote execution
-
-The rules support remote execution out of the box. The remote runners do need to have the required .Net
-system dependencies installed though. A common missing system dependency in existing RBE images is `libicu`.
+The .NET SDK is downloaded as a Bazel repository rule — no system-level .NET installation required. The SDK version is pinned in MODULE.bazel via `dotnet.toolchain(dotnet_version = "...")`. All compiler and runtime binaries are explicit action inputs, enabling correct caching, reproducible builds, and remote execution.

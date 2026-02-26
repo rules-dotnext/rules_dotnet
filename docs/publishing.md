@@ -23,10 +23,6 @@ publish_binary(
 )
 ```
 
-Output: `myapp_publish/publish/<rid>/` containing the apphost executable,
-`myapp.dll`, `myapp.deps.json`, `myapp.runtimeconfig.json`, and all
-dependency DLLs.
-
 ### Self-contained publish
 
 Bundles the .NET runtime so no host installation is required:
@@ -56,6 +52,28 @@ publish_binary(
 ```
 
 Equivalent to `dotnet publish -p:PublishSingleFile=true`.
+
+### Output location
+
+After `bazel build`, the published artifacts are at:
+
+```
+bazel-bin/<package>/<name>_publish/publish/<rid>/
+```
+
+`<rid>` is the .NET runtime identifier (e.g., `linux-x64`, `osx-arm64`,
+`win-x64`). If `runtime_identifier` is not set explicitly, the host
+platform's RID is used automatically.
+
+The directory contains the apphost executable, `<name>.dll`,
+`<name>.deps.json`, `<name>.runtimeconfig.json`, and all dependency DLLs.
+For self-contained publishes, the full .NET runtime is included alongside.
+
+```sh
+bazel build //app:myapp_publish
+ls bazel-bin/app/myapp_publish_publish/publish/linux-x64/
+# myapp  myapp.dll  myapp.deps.json  myapp.runtimeconfig.json  ...
+```
 
 ### Attributes
 
@@ -120,8 +138,14 @@ native_aot_binary(
 )
 ```
 
-Requires a C/C++ toolchain (uses `cc_common` for linking). The
-`native_aot_pack` provides the ILC compiler and static runtime libraries.
+NativeAOT compilation uses `cc_common` for linking, which requires a C/C++
+toolchain on the execution platform. This is already satisfied because
+rules_cc is a dependency of rules_dotnet. The `native_aot_pack` provides the
+ILC (IL-to-native) compiler and static runtime libraries.
+
+The output is a single native executable -- no .NET runtime, no DLLs, no
+`runtimeconfig.json`. The binary runs without any .NET installation on the
+target machine.
 
 | Attribute | Default | Description |
 |-----------|---------|-------------|
@@ -158,6 +182,14 @@ dotnet_pack(
     license_expression = "MIT",
     include_symbols = True,
 )
+```
+
+The output `.nupkg` is at `bazel-bin/<package>/<name>.nupkg`. Push it to a
+NuGet feed directly:
+
+```sh
+bazel build //src:mylib_nupkg
+dotnet nuget push bazel-bin/src/mylib_nupkg.nupkg --source https://api.nuget.org/v3/index.json --api-key YOUR_KEY
 ```
 
 | Attribute | Default | Description |

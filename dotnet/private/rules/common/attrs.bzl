@@ -195,12 +195,7 @@ BINARY_COMMON_ATTRS = {
         default = "Major",
         values = ["Minor", "Major", "LatestPatch", "LatestMinor", "LatestMajor", "Disable"],
     ),
-    "winexe": attr.bool(
-        doc = "If true, output a winexe-style executable, otherwise" +
-              "output a console-style executable.",
-        default = False,
-    ),
-    "appsetting_files": attr.label_list(
+"appsetting_files": attr.label_list(
         doc = "A list of appsettings files to include in the output directory.",
         allow_files = True,
         default = [],

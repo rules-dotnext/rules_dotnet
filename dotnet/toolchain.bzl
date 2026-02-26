@@ -17,11 +17,7 @@ May be empty if the csharp_compiler_path points to a locally installed tool bina
         "fsharp_compiler_files": """Files required in runfiles to make the F# compiler executable available.
 
 May be empty if the fsharp_compiler_path points to a locally installed tool binary.""",
-        "apphost_path": "Path to the apphost executable",
-        "apphost_files": """Files required in runfiles to make the apphost executable available.
-
-May be empty if the apphost_path points to a locally installed tool binary.""",
-        "sdk_version": "Version of the dotnet SDK",
+"sdk_version": "Version of the dotnet SDK",
         "runtime_version": "Version of the dotnet runtime",
         "runtime_tfm": "The target framework moniker for the current SDK",
         "csharp_default_version": "Default version of the C# language",
