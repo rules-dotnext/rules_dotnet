@@ -1,48 +1,39 @@
 # paket2bazel
 
-`paket2bazel` is a tool for parsing [Paket](https://fsprojects.github.io/Paket/) dependencies files
+`paket2bazel` is a tool for parsing [Paket](https://fsprojects.github.io/Paket/) dependencies files.
 
 Paket fits well with Bazel because it generates a `paket.lock` file that can be used
 to deterministically generate Bazel targets for NuGet packages.
 
 ## How to use
 
-First you need to set up your paket.dependencies and paket.lock file. See the [Paket docs](https://fsprojects.github.io/Paket/) on how to get started with Paket.
+First you need to set up your `paket.dependencies` and `paket.lock` file. See the [Paket docs](https://fsprojects.github.io/Paket/) on how to get started with Paket.
 
-Next you will have to add the following to your `WORKSPACE` file:
-
-```python
-load("@rules_dotnet//dotnet:paket2bazel_dependencies.bzl", "paket2bazel_dependencies")
-
-paket2bazel_dependencies()
-```
-
-Then you needs to run `paket2bazel` to generate the `paket.bzl` file which will be
-loaded in your `WORKSPACE` file.
+Then run `paket2bazel` to generate a `.bzl` file with NuGet repository rules:
 
 ```sh
-bazel run @rules_dotnet//tools/paket2bazel -- --dependencies-file $(pwd)/paket.dependencies  --output-folder $(pwd)/deps
+bazel run @rules_dotnet//tools/paket2bazel -- \
+    --dependencies-file $(pwd)/paket.dependencies \
+    --output-folder $(pwd)/deps
 ```
 
-Next you need to add the following to your `WORKSPACE` file
+Load the generated extension in your `MODULE.bazel`:
 
-```python
-load("//OUTPUT_FOLDER:paket.bzl", "paket")
-paket()
+```starlark
+paket_main = use_extension("//:deps/paket.main_extension.bzl", "paket_main_extension")
+use_repo(paket_main, "paket.main")
 ```
 
-Once you have this set up you can reference each package with the following format:
+Once set up, reference each package by its lowercased name:
 
-If you only have the main Paket group in `paket.dependencies` file:
-
-```
-@main.package.name//:lib
+```starlark
+deps = ["@paket.main//newtonsoft.json"]
 ```
 
 If you are using groups in your `paket.dependencies` file:
 
-```
-@groupname.package.name//:lib
+```starlark
+deps = ["@paket.groupname//package.name"]
 ```
 
-Full examples can be seen in the `examples/paket` directory in this repository.
+A full example can be seen in the `examples/paket` directory in this repository.

@@ -18,10 +18,10 @@ common --lockfile_mode=update
 common --verbose_failures
 
 # Remote execution — activate with --config=remote
-# Authentication is user-specific; set in .bazelrc.user:
-#   build:remote --remote_header=x-buildbuddy-api-key=YOUR_KEY
-build:remote --remote_executor=grpcs://remote.buildbuddy.io
-build:remote --remote_cache=grpcs://remote.buildbuddy.io
+# Set your endpoint and credentials in .bazelrc.user:
+#   build:remote --remote_executor=grpcs://your-remote-executor:port
+#   build:remote --remote_cache=grpcs://your-remote-cache:port
+#   build:remote --remote_header=<auth-header>=<value>
 build:remote --jobs=50
 build:remote --remote_timeout=600
 # .NET SDK native binaries (libhostpolicy.so, libcoreclr.so) require glibc 2.27+

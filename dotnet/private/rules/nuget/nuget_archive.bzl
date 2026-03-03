@@ -696,12 +696,16 @@ def tfm_filegroup(name, default_to_empty, tfms):
     cor = []
     tfm_rids = {}
 
-    if default_to_empty:
-        native.filegroup(
-            name = "%s_default" % (name),
-            srcs = [],
-            visibility = ["//visibility:public"],
-        )
+    # Always create the default target. Both the simple path and the
+    # multi-family (std+net/cor) path reference :{name}_default as the
+    # terminal //conditions:default fallback. Without it, analysis fails
+    # for configurations where no TFM config_setting matches — e.g. when
+    # a label_flag default is resolved before a TFM transition fires.
+    native.filegroup(
+        name = "%s_default" % (name),
+        srcs = [],
+        visibility = ["//visibility:public"],
+    )
 
     for (tfm, value) in tfms.items():
         native.filegroup(

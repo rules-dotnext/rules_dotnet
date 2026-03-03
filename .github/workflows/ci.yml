@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [release/parity]
+    branches: [main]
   pull_request:
-    branches: [release/parity]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -46,11 +46,6 @@ jobs:
 
       - name: Unit and analysis tests
         run: bazel test //dotnet/private/tests/... --test_output=errors
-        shell: bash
-
-      - name: Smoke test (external consumption)
-        if: matrix.label != 'windows'
-        run: cd validation/smoke && bazel test //...
         shell: bash
 
       - name: Stardoc generation

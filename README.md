@@ -157,14 +157,12 @@ Coverage uses [coverlet](https://github.com/coverlet-coverage/coverlet) for inst
 
 All actions are remote-execution compatible. Zero `local=True`, all SDK files declared as explicit inputs, strict action environment enabled.
 
-```bash
-# .bazelrc — already includes BuildBuddy Cloud config
-build:remote --remote_executor=grpcs://remote.buildbuddy.io
-build:remote --remote_cache=grpcs://remote.buildbuddy.io
-build:remote --remote_default_exec_properties=container-image=docker://mcr.microsoft.com/dotnet/runtime-deps:8.0
+Configure your RE endpoint in `.bazelrc.user` (gitignored):
 
-# .bazelrc.user (gitignored)
-build:remote --remote_header=x-buildbuddy-api-key=YOUR_KEY
+```
+build:remote --remote_executor=grpcs://your-remote-executor:port
+build:remote --remote_cache=grpcs://your-remote-cache:port
+build:remote --remote_header=<auth-header>=<value>
 ```
 
 ```bash

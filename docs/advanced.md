@@ -296,13 +296,13 @@ required.
 ### Configuration
 
 Remote execution is configured in `.bazelrc` under the `build:remote` config
-stanza. The shipped configuration targets BuildBuddy Cloud, but any
-Bazel-compatible RE service works:
+stanza. Any Bazel-compatible RE service works (BuildBuddy, EngFlow, Buildfarm,
+etc.).
+
+The `.bazelrc` ships with vendor-neutral defaults:
 
 ```
 # .bazelrc (already present in this repository)
-build:remote --remote_executor=grpcs://remote.buildbuddy.io
-build:remote --remote_cache=grpcs://remote.buildbuddy.io
 build:remote --jobs=50
 build:remote --remote_timeout=600
 build:remote --remote_default_exec_properties=container-image=docker://mcr.microsoft.com/dotnet/runtime-deps:8.0
@@ -320,12 +320,13 @@ The `bootstrap_impl=script` setting ensures that Python-based tools (e.g.,
 
 ### Usage
 
-Authentication is user-specific. Add your API key to `.bazelrc.user` (which is
-gitignored):
+Set your RE endpoint and credentials in `.bazelrc.user` (which is gitignored):
 
 ```
 # .bazelrc.user
-build:remote --remote_header=x-buildbuddy-api-key=YOUR_KEY
+build:remote --remote_executor=grpcs://your-remote-executor:port
+build:remote --remote_cache=grpcs://your-remote-cache:port
+build:remote --remote_header=<auth-header>=<value>
 ```
 
 Then pass `--config=remote`:

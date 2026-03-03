@@ -23,7 +23,7 @@ jobs:
     with:
       tag_name: ${{ inputs.tag_name }}
       # GitHub repository which is a fork of the upstream where the Pull Request will be opened.
-      registry_fork: bazel-contrib/bazel-central-registry
+      registry_fork: rules-dotnext/bazel-central-registry
       draft: false
     permissions:
       attestations: write

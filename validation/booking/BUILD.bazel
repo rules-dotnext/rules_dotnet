@@ -1,2 +1,0 @@
-# Root BUILD file for booking-microservices validation workspace.
-# Actual targets are in sub-packages under src/.

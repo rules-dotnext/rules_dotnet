@@ -218,8 +218,9 @@ if (xmlOutputFile != null)
 ```
 
 No user configuration is needed. CI systems that parse Bazel test XML --
-BuildBuddy, Buildkite, GitHub Actions, Jenkins -- automatically pick up
-individual test case results, timings, and failure messages from this output.
+GitHub Actions, Buildkite, Jenkins, and BES-compatible services -- automatically
+pick up individual test case results, timings, and failure messages from this
+output.
 
 ## Test attributes reference
 

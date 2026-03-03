@@ -1,15 +1,15 @@
 {
-    "homepage": "https://github.com/bazel-contrib/rules_dotnet",
+    "homepage": "https://github.com/rules-dotnext/rules_dotnet",
     "maintainers": [
         {
-            "name": "Daníel Poul Purkhús",
-            "email": "purkhusid@gmail.com",
-            "github": "purkhusid",
-            "github_user_id": 5622403
+            "name": "rules-dotnext",
+            "email": "rulesdotnext@yahoo.com",
+            "github": "rules-dotnext",
+            "github_user_id": 268022605
         }
     ],
     "repository": [
-        "github:bazel-contrib/rules_dotnet"
+        "github:rules-dotnext/rules_dotnet"
     ],
     "versions": [],
     "yanked_versions": {}
