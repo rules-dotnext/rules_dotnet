@@ -6,7 +6,10 @@ load("//dotnet/private/tests:utils.bzl", "action_args_test")
 # buildifier: disable=unnamed-macro
 # buildifier: disable=function-docstring
 def test_framework_preprocessor_defines():
-    # TODO: Also test .NET Framework. Currently blocked by https://github.com/bazel-contrib/rules_dotnet/issues/477
+    # .NET Framework (net48) preprocessor defines are not tested here.
+    # net48 compilation requires the Windows-only reference assemblies
+    # (targeting pack), which the standard CI toolchain does not provide.
+    # Tracked in: https://github.com/bazel-contrib/rules_dotnet/issues/477
 
     csharp_library(
         name = "lib_netstd",

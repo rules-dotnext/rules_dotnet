@@ -1,6 +1,10 @@
 *.swp
 *~
+*.pyc
 bazel-*
+.DS_Store
+.env
+__pycache__/
 .vscode
 bin
 obj

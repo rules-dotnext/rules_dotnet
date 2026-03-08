@@ -1,5 +1,5 @@
 """
-Rules for compatability resolution of dependencies for .NET frameworks.
+Rules for compatibility resolution of dependencies for .NET frameworks.
 """
 
 load("@bazel_skylib//lib:sets.bzl", "sets")
@@ -153,8 +153,19 @@ def is_standard_framework(tfm):
     return tfm.startswith("netstandard")
 
 def is_core_framework(tfm):
-    # TODO: Make this work with future versions
-    return tfm.startswith("netcoreapp") or tfm.startswith("net5.0") or tfm.startswith("net6.0") or tfm.startswith("net7.0") or tfm.startswith("net8.0") or tfm.startswith("net9.0") or tfm.startswith("net10.0")
+    if tfm.startswith("netcoreapp"):
+        return True
+
+    # Match netN.0 where N >= 5 (net5.0, net6.0, ..., net10.0, net11.0, etc.)
+    if tfm.startswith("net") and "." in tfm:
+        version_part = tfm[3:]  # strip "net"
+        dot_idx = version_part.find(".")
+        if dot_idx > 0:
+            major_str = version_part[:dot_idx]
+            if major_str.isdigit() and int(major_str) >= 5:
+                return True
+
+    return False
 
 def is_greater_or_equal_framework(tfm1, tfm2):
     """Returns true if tfm1 is greater or equal to tfm2
@@ -355,7 +366,7 @@ def collect_transitive_runfiles(ctx, assembly_runtime_info, deps):
     Returns:
         A runfiles object that includes the transitive dependencies of the target
     """
-    runfiles = ctx.runfiles(files = assembly_runtime_info.data + assembly_runtime_info.native + assembly_runtime_info.xml_docs + assembly_runtime_info.libs + assembly_runtime_info.resource_assemblies)
+    runfiles = ctx.runfiles(files = assembly_runtime_info.data + assembly_runtime_info.native + assembly_runtime_info.xml_docs + assembly_runtime_info.libs + assembly_runtime_info.pdbs + assembly_runtime_info.resource_assemblies)
 
     transitive_runfiles = []
     for dep in deps:

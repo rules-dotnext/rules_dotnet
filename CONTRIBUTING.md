@@ -4,8 +4,16 @@ Want to contribute? Great! First, read this page!
 
 ## Formatting
 
-Starlark files should be formatted by
-[buildifier](https://github.com/bazelbuild/buildtools/tree/master/buildifier).
+Starlark files should be formatted by buildifier.
+We suggest using a pre-commit hook to automate this.
+First [install pre-commit](https://pre-commit.com/#installation),
+then run
+
+```shell
+pre-commit install
+```
+
+Otherwise later tooling on CI may yell at you about formatting/linting violations.
 
 ## Updating BUILD files
 
@@ -15,20 +23,25 @@ Run `bazel run //:gazelle` to keep them up-to-date.
 
 ## Using this as a development dependency of other rules
 
-To override the released version of rules_dotnet with a local checkout,
-add a `local_path_override` to the consuming module's `MODULE.bazel`:
+You'll commonly find that you develop in another WORKSPACE, such as
+some other ruleset that depends on rules_dotnet, or in a nested
+WORKSPACE in the integration_tests folder.
 
-```starlark
-local_path_override(
-    module_name = "rules_dotnet",
-    path = "/path/to/your/rules_dotnet",
-)
+To always tell Bazel to use this directory rather than some release
+artifact or a version fetched from the internet, run this from this
+directory:
+
+```sh
+OVERRIDE="--override_repository=rules_dotnet=$(pwd)/rules_dotnet"
+echo "common $OVERRIDE" >> ~/.bazelrc
 ```
+
+This means that any usage of `@rules_dotnet` on your system will point to this folder.
 
 ## Running tests
 
 To run and build all tests simply run `bazel test //...`
-To build and test all examples run `cd examples && bazel test //...`
+To build and test all lexamples run `cd examples && bazel test //...`
 
 ## Releasing
 

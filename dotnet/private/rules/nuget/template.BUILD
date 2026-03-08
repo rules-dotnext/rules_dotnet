@@ -14,6 +14,7 @@ import_library(
     library_name = "{ID}",
     libs = ["@{PREFIX}.{ID_LOWER}.v{VERSION}//:libs"],
     native = ["@{PREFIX}.{ID_LOWER}.v{VERSION}//:native"],
+    pdbs = ["@{PREFIX}.{ID_LOWER}.v{VERSION}//:pdbs"],
     nupkg = "@{PREFIX}.{ID_LOWER}.v{VERSION}//:{ID_LOWER}.{VERSION}.nupkg",
     refs = ["@{PREFIX}.{ID_LOWER}.v{VERSION}//:refs"],
     resource_assemblies = ["@{PREFIX}.{ID_LOWER}.v{VERSION}//:resource_assemblies"],

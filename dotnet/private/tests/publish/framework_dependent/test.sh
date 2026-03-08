@@ -13,8 +13,10 @@ export RUNFILES_MANIFEST_ONLY=""
 # dotnet installation that is located there to run the
 # binary.
 TOOLCHAIN_LOCATION=$(dirname "$1")
-# TODO: Figure out why this is needed. Should the DOTNET_BIN make variable
-# not work?
+# Framework-dependent apps need DOTNET_ROOT to locate the .NET runtime.
+# $(DOTNET_BIN) gives us the path to the dotnet binary inside the external
+# toolchain repo; we derive DOTNET_ROOT by stripping the "external/" prefix
+# and prepending "../" to navigate from the runfiles root to the SDK.
 DOTNET_ROOT="../${TOOLCHAIN_LOCATION#'external/'}/"
 export DOTNET_ROOT
 ls -la ./../_main/dotnet/private/tests/publish

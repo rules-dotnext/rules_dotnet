@@ -5,10 +5,10 @@
 1. **Install Bazel 8.0+** and create a `MODULE.bazel`:
 
 ```starlark
-bazel_dep(name = "rules_dotnet", version = "0.17.0")
+bazel_dep(name = "rules_dotnet", version = "0.0.0")  # Replace with latest release version
 
 dotnet = use_extension("@rules_dotnet//dotnet:extensions.bzl", "dotnet")
-dotnet.toolchain(dotnet_version = "8.0.400")
+dotnet.toolchain(dotnet_version = "9.0.200")
 use_repo(dotnet, "dotnet_toolchains")
 register_toolchains("@dotnet_toolchains//:all")
 ```
@@ -17,7 +17,7 @@ register_toolchains("@dotnet_toolchains//:all")
 
 ```
 startup --windows_enable_symlinks
-build --enable_runfiles
+common --enable_runfiles
 ```
 
 3. **Migrate NuGet dependencies** (see below).

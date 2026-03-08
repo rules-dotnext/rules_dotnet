@@ -1,6 +1,6 @@
 # rules_dotnet Providers
 
-All providers are public API. Load from `@rules_dotnet//dotnet/private:providers.bzl`.
+All providers are public API. Load from `@rules_dotnet//dotnet:defs.bzl` or `@rules_dotnet//dotnet/private:providers.bzl`.
 
 ---
 
@@ -28,6 +28,8 @@ Compilation metadata for a .NET assembly.
 | `transitive_analyzers_csharp` | `depset[File]` | Transitive C# analyzers. Only used when strict deps are off. |
 | `transitive_analyzers_fsharp` | `depset[File]` | Transitive F# analyzers. Only used when strict deps are off. |
 | `transitive_analyzers_vb` | `depset[File]` | Transitive VB analyzers. Only used when strict deps are off. |
+| `content_srcs` | `list[File]` | Source files from source-only NuGet packages to inject into consuming compilations. |
+| `transitive_content_srcs` | `depset[File]` | Transitive content source files from source-only NuGet packages. |
 
 ---
 
@@ -103,3 +105,74 @@ Workspace-wide Roslyn analyzer configuration. Produced by `dotnet_analysis_confi
 | `warnings_not_as_errors` | `list[string]` | Diagnostic IDs exempt from error promotion. |
 | `suppressed_diagnostics` | `list[string]` | Diagnostic IDs suppressed via `/nowarn:`. |
 | `warning_level` | `int` | Warning level (0-5), or -1 for unset. |
+
+---
+
+## DotnetTargetingPackInfo
+
+Information about a .NET targeting pack (e.g., `Microsoft.NETCore.App.Ref`).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `assembly_runtime_infos` | `list[DotnetAssemblyRuntimeInfo]` | Runtime infos for assemblies in the targeting pack. |
+| `assembly_compile_infos` | `list[DotnetAssemblyCompileInfo]` | Compile infos for assemblies in the targeting pack. |
+| `nuget_infos` | `list[NuGetInfo]` | NuGet metadata for the targeting pack assemblies. |
+
+---
+
+## DotnetRuntimePackInfo
+
+Information about a .NET runtime pack (used for self-contained publishing).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `runtime_identifier` | `string` | The RID (e.g., `"linux-x64"`). |
+| `assembly_runtime_infos` | `list[DotnetAssemblyRuntimeInfo]` | Runtime infos for assemblies in the runtime pack. |
+| `nuget_infos` | `list[NuGetInfo]` | NuGet metadata for the runtime pack assemblies. |
+
+---
+
+## DotnetApphostPackInfo
+
+Information about a .NET apphost pack (the native executable launcher).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `apphost` | `File` | The apphost executable file. |
+
+---
+
+## DotnetNativeAotPackInfo
+
+Information about a .NET NativeAOT compiler pack (ILC and supporting libraries).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ilc` | `File` | The ILC (IL Compiler) executable. |
+| `runtime_identifier` | `string` | The RID this pack targets. |
+| `mibc_files` | `list[File]` | Profile-guided optimization data files. |
+| `sdk_libs` | `list[File]` | Static runtime libraries for linking (`.a` / `.lib`). |
+| `framework_libs` | `list[File]` | Framework static libraries. |
+| `reference_assemblies` | `list[File]` | Reference assemblies needed by ILC. |
+
+---
+
+## RazorFilesInfo
+
+Information about preprocessed Razor files.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `razor_files` | `depset[File]` | The `.razor` and `.cshtml` source files. |
+| `analyzer_config_template` | `File` | The generated `.editorconfig` template. |
+| `assembly_info` | `File` | Generated `RazorAssemblyInfo.cs`. |
+
+---
+
+## DotnetToolInfo
+
+Provider for .NET tool packages, mapping target frameworks to tool filegroups.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `files_by_tfm` | `dict[string, Target]` | Mapping of TFMs to tool filegroup targets. |

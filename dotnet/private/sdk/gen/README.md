@@ -4,8 +4,8 @@ This program generates the Bazel targets required for rules_dotnet to work with 
 It does the following:
 
 1. Updates the available .Net SDK versions so that the end user of rules_dotnet can choose the SDK version they want to use.
-2. Updates the avilable runtime identifiers (RIDs) so that the end user of rules_dotnet can choose the RID they want to when publishing.
-3. Updates and creates the Bazel targest for the targeting/runtime/apphost packs that are fetched by rules_dotnet when building.
+2. Updates the available runtime identifiers (RIDs) so that the end user of rules_dotnet can choose the RID they want to when publishing.
+3. Updates and creates the Bazel targets for the targeting/runtime/apphost packs that are fetched by rules_dotnet when building.
 
 ## Usage
 

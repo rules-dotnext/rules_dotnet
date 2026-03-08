@@ -172,6 +172,13 @@ def _process_group_with_tfm(groups, group_name, file):
     if is_in_subdirectory:
         return
 
+    if file.endswith(".pdb"):
+        pdbs_group = groups["pdbs"]
+        if not pdbs_group.get(tfm):
+            pdbs_group[tfm] = []
+        pdbs_group[tfm].append(file)
+        return
+
     if not file.endswith(".dll"):
         return
 
@@ -537,6 +544,8 @@ def _nuget_archive_impl(ctx):
         "content_srcs": {},
         # Format: lib/<TFM>/<assembly>.dll
         "lib": {},
+        # Format: lib/<TFM>/<assembly>.pdb
+        "pdbs": {},
         # Resource assemblies: https://learn.microsoft.com/en-us/nuget/create-packages/creating-localized-packages
         # Format: lib/<TFM>/<locale>/<assembly>.resources.<dll|xml>
         "resource_assemblies": {},
@@ -648,6 +657,7 @@ load("@rules_dotnet//dotnet/private/rules/nuget:nuget_archive.bzl", "tfm_filegro
 """ + "\n".join([
         _create_framework_select("libs", libs, False) or "filegroup(name = \"libs\", srcs = [])",
         _create_framework_select("refs", refs, False) or "filegroup(name = \"refs\", srcs = [])",
+        _create_framework_select("pdbs", groups["pdbs"], True) or "filegroup(name = \"pdbs\", srcs = [])",
         # Packages can have runtime DLLs foa a TFM and resource assemblies
         # for the same TFM but there is no guarantee that if one TFM has resource assemblies that all TFMs have resource assemblies.
         # So we need to have an empty filegroup as a default case for resource assemblies

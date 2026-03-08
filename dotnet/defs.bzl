@@ -5,11 +5,24 @@ Users should not load files under "/dotnet"
 
 load(
     "//dotnet/private:providers.bzl",
+    _DotnetApphostPackInfo = "DotnetApphostPackInfo",
+    _DotnetAssemblyCompileInfo = "DotnetAssemblyCompileInfo",
+    _DotnetAssemblyRuntimeInfo = "DotnetAssemblyRuntimeInfo",
+    _DotnetBinaryInfo = "DotnetBinaryInfo",
+    _DotnetNativeAotPackInfo = "DotnetNativeAotPackInfo",
+    _DotnetRuntimePackInfo = "DotnetRuntimePackInfo",
+    _DotnetTargetingPackInfo = "DotnetTargetingPackInfo",
     _FSharpSourceInfo = "FSharpSourceInfo",
+    _NuGetInfo = "NuGetInfo",
+    _RazorFilesInfo = "RazorFilesInfo",
 )
 load(
     "//dotnet/private/rules/analysis:dotnet_analysis_config.bzl",
     _dotnet_analysis_config = "dotnet_analysis_config",
+)
+load(
+    "//dotnet/private/rules/analysis:providers.bzl",
+    _DotnetAnalysisConfigInfo = "DotnetAnalysisConfigInfo",
 )
 load(
     "//dotnet/private/rules/csharp:binary.bzl",
@@ -53,6 +66,7 @@ load(
 )
 load(
     "//dotnet/private/rules/nuget:dotnet_tool.bzl",
+    _DotnetToolInfo = "DotnetToolInfo",
     _dotnet_tool = "dotnet_tool",
 )
 load(
@@ -111,6 +125,17 @@ dotnet_analysis_config = _dotnet_analysis_config
 parse_nuget_lock_file = _parse_nuget_lock_file
 dotnet_tool = _dotnet_tool
 FSharpSourceInfo = _FSharpSourceInfo
+DotnetAssemblyCompileInfo = _DotnetAssemblyCompileInfo
+DotnetAssemblyRuntimeInfo = _DotnetAssemblyRuntimeInfo
+NuGetInfo = _NuGetInfo
+DotnetBinaryInfo = _DotnetBinaryInfo
+DotnetTargetingPackInfo = _DotnetTargetingPackInfo
+DotnetRuntimePackInfo = _DotnetRuntimePackInfo
+DotnetApphostPackInfo = _DotnetApphostPackInfo
+DotnetNativeAotPackInfo = _DotnetNativeAotPackInfo
+RazorFilesInfo = _RazorFilesInfo
+DotnetAnalysisConfigInfo = _DotnetAnalysisConfigInfo
+DotnetToolInfo = _DotnetToolInfo
 resx_resource = _resx_resource
 dotnet_pack = _dotnet_pack
 native_aot_binary = _native_aot_binary

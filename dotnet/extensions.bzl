@@ -22,19 +22,8 @@ _ATTRS = {
     ),
 }
 
-# Analysis tag class for global analyzer config
-_ANALYSIS_ATTRS = {
-    "config": attr.string(
-        doc = "Label of a dotnet_analysis_config target to apply globally. " +
-              "Set via .bazelrc: build --@rules_dotnet//dotnet/private/rules/analysis:analysis_config=<label>",
-        mandatory = True,
-    ),
-}
-
-
 def _toolchain_extension(module_ctx):
     registrations = {}
-    analysis_config = None
 
     for mod in module_ctx.modules:
         for toolchain in mod.tags.toolchain:
@@ -54,12 +43,6 @@ def _toolchain_extension(module_ctx):
             else:
                 registrations[toolchain.name] = toolchain.dotnet_version
 
-        # Collect analysis config
-        for analysis in mod.tags.analysis:
-            if analysis_config != None:
-                fail("Multiple dotnet.analysis() declarations found. Only one is allowed.")
-            analysis_config = analysis.config
-
     for name, dotnet_version in registrations.items():
         dotnet_register_toolchains(
             name = name,
@@ -72,8 +55,6 @@ dotnet = module_extension(
     implementation = _toolchain_extension,
     tag_classes = {
         "toolchain": tag_class(attrs = _ATTRS),
-        # Global analysis configuration
-        "analysis": tag_class(attrs = _ANALYSIS_ATTRS),
     },
 )
 

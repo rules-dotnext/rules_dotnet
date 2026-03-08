@@ -46,10 +46,12 @@ use_repo(coverlet_extension, "dotnet.coverlet")
 bazel_dep(name = "bazel_skylib", version = "1.7.1")
 bazel_dep(name = "platforms", version = "1.0.0")
 
-# spec-proto-grpc: Required for proto/gRPC rules (ProtoInfo provider)
-bazel_dep(name = "protobuf", version = "29.3")
-bazel_dep(name = "rules_proto", version = "7.1.0")
-bazel_dep(name = "grpc", version = "1.71.0")
+# Proto/gRPC: Only needed for development and testing of proto rules.
+# Users who want proto/gRPC must add protobuf, rules_proto, and grpc
+# to their own MODULE.bazel. See docs/advanced.md for details.
+bazel_dep(name = "protobuf", version = "29.3", dev_dependency = True)
+bazel_dep(name = "rules_proto", version = "7.1.0", dev_dependency = True)
+bazel_dep(name = "grpc", version = "1.71.0", dev_dependency = True)
 bazel_dep(name = "bazel_lib", version = "3.0.0")
 bazel_dep(name = "rules_shell", version = "0.5.0")
 

@@ -6,7 +6,7 @@ rem Usage of rlocation function:
 rem        call :rlocation <runfile_path> <abs_path>
 rem        The rlocation function maps the given <runfile_path> to its absolute
 rem        path and stores the result in a variable named <abs_path>.
-rem        This function fails if the <runfile_path> doesn't exist in mainifest
+rem        This function fails if the <runfile_path> doesn't exist in manifest
 rem        file.
 :: Start of rlocation
 goto :rlocation_end

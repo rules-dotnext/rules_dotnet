@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [develop/parity]
   pull_request:
-    branches: [main]
+    branches: [develop/parity]
   workflow_dispatch:
 
 jobs:
@@ -44,10 +44,21 @@ jobs:
         run: echo "startup --output_user_root=C:/_b" >> .bazelrc.user
         shell: bash
 
+      - name: Build all targets
+        if: matrix.label == 'linux'
+        run: bazel build //... --keep_going
+        shell: bash
+
       - name: Unit and analysis tests
         run: bazel test //dotnet/private/tests/... --test_output=errors
         shell: bash
 
+      - name: Smoke test (external consumption)
+        if: matrix.label != 'windows'
+        run: cd validation/smoke && bazel test //...
+        shell: bash
+
+      # Stardoc output is platform-independent; running on one OS is sufficient.
       - name: Stardoc generation
         if: matrix.label == 'linux'
         run: bazel build //docs:rules_api

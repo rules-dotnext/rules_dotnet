@@ -180,6 +180,11 @@ $ genhtml bazel-out/_coverage/_coverage_report.dat -o coverage_html
 The output is standard LCOV and works with any tool that consumes it: `genhtml`,
 VS Code Coverage Gutters, Codecov, Coveralls, and others.
 
+**Remote execution:** `bazel coverage` works with `--config=remote`. Coverlet
+instruments the assembly, runs the test on the remote worker, and writes LCOV
+to `$COVERAGE_OUTPUT_FILE`. Bazel transports the coverage data back to the
+client automatically.
+
 ## Test sharding
 
 Bazel's test sharding splits test execution across parallel processes. The
@@ -218,9 +223,8 @@ if (xmlOutputFile != null)
 ```
 
 No user configuration is needed. CI systems that parse Bazel test XML --
-GitHub Actions, Buildkite, Jenkins, and BES-compatible services -- automatically
-pick up individual test case results, timings, and failure messages from this
-output.
+BuildBuddy, Buildkite, GitHub Actions, Jenkins -- automatically pick up
+individual test case results, timings, and failure messages from this output.
 
 ## Test attributes reference
 

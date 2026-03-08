@@ -19,7 +19,7 @@ Bazel rules for .NET. Hermetic toolchain, remote execution, remote caching, dete
 
 **MODULE.bazel**:
 ```starlark
-bazel_dep(name = "rules_dotnet", version = "0.17.0")
+bazel_dep(name = "rules_dotnet", version = "0.0.0")  # Replace with latest release version
 
 dotnet = use_extension("@rules_dotnet//dotnet:extensions.bzl", "dotnet")
 dotnet.toolchain(dotnet_version = "9.0.200")
@@ -82,6 +82,7 @@ The .NET SDK is downloaded automatically. No system-level .NET installation requ
 |------|-------------|
 | `publish_binary` | Framework-dependent or self-contained deployment with `deps.json` and runtime config |
 | `native_aot_binary` | Compile to a native executable via NativeAOT — no .NET runtime required at run time |
+| `publish_library` | Publish a library with transitive DLLs into a flat directory |
 | `dotnet_pack` | Create a `.nupkg` NuGet package |
 
 ### Proto / gRPC
@@ -98,6 +99,7 @@ The .NET SDK is downloaded automatically. No system-level .NET installation requ
 | `resx_resource` | Compile `.resx` resource files for embedding |
 | `razor_library` | Compile Razor views (`.cshtml`) |
 | `dotnet_analysis_config` | Workspace-wide Roslyn analyzer configuration |
+| `dotnet_tool` | Run a pre-built .NET CLI tool hermetically via Bazel |
 | `dotnet_project` | Generate `.csproj` for IDE integration (OmniSharp, Rider, VS Code) |
 
 ## NuGet Dependencies
@@ -106,9 +108,8 @@ Two approaches, depending on your existing workflow:
 
 **Paket** (recommended if you have `paket.lock`):
 ```starlark
-# MODULE.bazel
-paket = use_extension("@rules_dotnet//dotnet:paket.bzl", "paket")
-paket.from_lock(lock = "//:paket.lock")
+# After running paket2bazel to generate deps/paket.main_extension.bzl:
+paket = use_extension("//:deps/paket.main_extension.bzl", "paket_main_extension")
 use_repo(paket, "paket.main")
 ```
 
@@ -116,8 +117,12 @@ use_repo(paket, "paket.main")
 ```starlark
 # MODULE.bazel
 nuget = use_extension("@rules_dotnet//dotnet:extensions.bzl", "nuget")
-nuget.from_lock(lock = "//:packages.lock.json")
-use_repo(nuget, "nuget.main")
+nuget.from_lock(
+    name = "nuget",
+    lock_file = "//:packages.lock.json",
+    sources = ["https://api.nuget.org/v3/index.json"],
+)
+use_repo(nuget, "nuget")
 ```
 
 Then reference packages in BUILD files:
@@ -132,53 +137,6 @@ csharp_library(
 
 See [NuGet dependency management](docs/nuget.md) for private feeds, authentication, and direct package declarations.
 
-## Testing and Coverage
-
-All test rules implement Bazel's test protocol: sharding, XML output, and coverage work out of the box.
-
-```bash
-# Run tests
-bazel test //...
-
-# Run with coverage (produces LCOV)
-bazel coverage //my:test
-cat bazel-testlogs/my/test/coverage.dat
-
-# Shard large test suites
-bazel test //my:test --test_sharding_strategy=forced=4
-
-# XML test output for CI integration
-# Automatically written to $XML_OUTPUT_FILE by NUnit tests
-```
-
-Coverage uses [coverlet](https://github.com/coverlet-coverage/coverlet) for instrumentation. `bazel coverage` produces standard LCOV output compatible with any coverage viewer.
-
-## Remote Execution
-
-All actions are remote-execution compatible. Zero `local=True`, all SDK files declared as explicit inputs, strict action environment enabled.
-
-Configure your RE endpoint in `.bazelrc.user` (gitignored):
-
-```
-build:remote --remote_executor=grpcs://your-remote-executor:port
-build:remote --remote_cache=grpcs://your-remote-cache:port
-build:remote --remote_header=<auth-header>=<value>
-```
-
-```bash
-bazel test //... --config=remote
-```
-
-## Platform Support
-
-| Platform | Status |
-|----------|--------|
-| Linux x86_64 | Fully supported |
-| macOS arm64 / x86_64 | Fully supported |
-| Windows x86_64 | Fully supported |
-
-Cross-compilation via `--platforms` and TFM transitions. Runtime identifier (RID) selection for platform-specific native libraries.
-
 ## Documentation
 
 - **[Getting Started](docs/getting-started.md)** — setup, first library, first binary, first test
@@ -188,7 +146,10 @@ Cross-compilation via `--platforms` and TFM transitions. Runtime identifier (RID
 - **[Publishing](docs/publishing.md)** — framework-dependent, self-contained, NativeAOT, NuGet packaging
 - **[Advanced Topics](docs/advanced.md)** — proto/gRPC, Razor, analyzers, IDE integration, native interop, multi-targeting, remote execution
 - **[Migration from MSBuild](docs/migration.md)** — step-by-step guide with .csproj attribute mapping
+- **[Gazelle](docs/gazelle.md)** — automatic BUILD file generation from .csproj/.fsproj
+- **[Architecture](docs/architecture.md)** — TFM transitions, publish pipeline, NuGet resolution, provider dataflow
 - **[Providers](docs/providers.md)** — public provider API for custom rules
+- **[Build Settings](docs/build-settings.md)** — strict deps, analysis config, NUnit defaults
 - **[Examples](e2e/)** — working projects across TFMs
 
 ## Requirements
@@ -200,4 +161,4 @@ Cross-compilation via `--platforms` and TFM transitions. Runtime identifier (RID
 
 ## License
 
-Apache 2.0 — see [LICENSE](LICENSE).
+Apache 2.0 — see [LICENSE](LICENSE.txt).

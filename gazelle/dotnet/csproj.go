@@ -109,17 +109,25 @@ type msbuildEmbeddedRes struct {
 	Include string `xml:"Include,attr"`
 }
 
-// testFrameworkPackages maps NuGet package names to test framework identifiers.
-var testFrameworkPackages = map[string]string{
-	"NUnit":                         "nunit",
-	"NUnit3TestAdapter":             "nunit",
-	"nunit":                         "nunit",
-	"xunit":                         "xunit",
-	"xunit.core":                    "xunit",
-	"xunit.runner.visualstudio":     "xunit",
-	"Microsoft.NET.Test.Sdk":        "mstest",
-	"MSTest.TestAdapter":            "mstest",
-	"MSTest.TestFramework":          "mstest",
+// testFrameworkEntry pairs a NuGet package name with the test framework it
+// indicates. Entries are ordered by detection priority: NUnit > xUnit > MSTest.
+// The first matching package wins, ensuring deterministic results regardless of
+// map iteration order in PackageReferences.
+type testFrameworkEntry struct {
+	packageName string
+	framework   string
+}
+
+var testFrameworkPriority = []testFrameworkEntry{
+	{"NUnit", "nunit"},
+	{"NUnit3TestAdapter", "nunit"},
+	{"nunit", "nunit"},
+	{"xunit", "xunit"},
+	{"xunit.core", "xunit"},
+	{"xunit.runner.visualstudio", "xunit"},
+	{"Microsoft.NET.Test.Sdk", "mstest"},
+	{"MSTest.TestAdapter", "mstest"},
+	{"MSTest.TestFramework", "mstest"},
 }
 
 // nunitInjectedPackages are package names injected by the csharp_nunit_test
@@ -214,11 +222,11 @@ func parseProjectFileData(data []byte, path string) (*ProjectFile, error) {
 		}
 	}
 
-	// Detect test framework
-	for pkgName, framework := range testFrameworkPackages {
-		if _, ok := pf.PackageReferences[pkgName]; ok {
+	// Detect test framework using priority order (NUnit > xUnit > MSTest).
+	for _, entry := range testFrameworkPriority {
+		if _, ok := pf.PackageReferences[entry.packageName]; ok {
 			pf.IsTestProject = true
-			pf.TestFramework = framework
+			pf.TestFramework = entry.framework
 			break
 		}
 	}

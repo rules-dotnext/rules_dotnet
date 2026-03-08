@@ -10,6 +10,7 @@
 | **[Publishing](publishing.md)** | Framework-dependent and self-contained deployment, NativeAOT compilation, NuGet packaging |
 | **[Advanced Topics](advanced.md)** | Proto/gRPC, Razor, Roslyn analyzers, IDE integration, native interop, multi-targeting, remote execution |
 | **[Migration from MSBuild](migration.md)** | Step-by-step migration with .csproj attribute mapping table |
+| **[Gazelle](gazelle.md)** | Automatic BUILD file generation from .csproj/.fsproj |
 
 ## Reference
 
@@ -17,9 +18,13 @@
 |-----------|-------------|
 | **[Rules](rules.md)** | All rules, attributes, and defaults |
 | **[Providers](providers.md)** | Public provider API for writing custom rules |
+| **[Build Settings](build-settings.md)** | User-facing build settings: strict deps, analysis config, NUnit labels |
+| **[Architecture](architecture.md)** | Internals: TFM transitions, publish pipeline, NuGet resolution, provider flow |
 | **[Examples](../e2e/)** | Working projects for net8.0, net9.0, net10.0 |
 
 ## Design Decisions
+
+See also: [Getting Started](getting-started.md) and [Advanced Topics](advanced.md) for more detail on these topics.
 
 ### Strict dependencies by default
 

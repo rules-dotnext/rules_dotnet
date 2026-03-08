@@ -24,8 +24,10 @@ go_library(
 go_test(
     name = "dotnet_test",
     srcs = [
+        "config_test.go",
         "csproj_test.go",
         "generate_test.go",
+        "resolve_test.go",
     ],
     data = glob(["testdata/**"]),
     embed = [":dotnet"],

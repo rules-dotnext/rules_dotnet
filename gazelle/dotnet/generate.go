@@ -14,6 +14,9 @@ import (
 // corresponding Bazel rules.
 func (dl *dotnetLang) GenerateRules(args language.GenerateArgs) language.GenerateResult {
 	cfg := getDotnetConfig(args.Config)
+	if cfg != nil && !cfg.extensionEnabled {
+		return language.GenerateResult{}
+	}
 	var gen []*rule.Rule
 	var empty []*rule.Rule
 	var imports []interface{}

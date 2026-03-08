@@ -1,0 +1,14 @@
+load("@bazel_lib//:bzl_library.bzl", "bzl_library")
+load(":dotnet_pack_tests.bzl", "dotnet_pack_tests")
+
+dotnet_pack_tests()
+
+bzl_library(
+    name = "dotnet_pack_tests",
+    srcs = ["dotnet_pack_tests.bzl"],
+    visibility = ["//dotnet:__subpackages__"],
+    deps = [
+        "//dotnet:defs",
+        "@bazel_skylib//lib:unittest",
+    ],
+)

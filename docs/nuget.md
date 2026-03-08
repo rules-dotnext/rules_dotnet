@@ -22,7 +22,7 @@ file that `paket2bazel` converts into Bazel repository rules.
 
 ```
 source https://api.nuget.org/v3/index.json
-framework: net8.0
+framework: net9.0
 
 nuget Newtonsoft.Json ~> 13.0
 nuget NUnit ~> 3.14
@@ -38,11 +38,11 @@ bazel run @rules_dotnet//tools/paket2bazel -- \
   --output-folder $(pwd)/deps
 ```
 
-4. Load the generated file in `MODULE.bazel`:
+4. Load the generated extension in `MODULE.bazel`:
 
 ```starlark
-load("//deps:paket.bzl", "paket")
-paket()
+paket = use_extension("//:deps/paket.main_extension.bzl", "paket_main_extension")
+use_repo(paket, "paket.main")
 ```
 
 5. Reference packages in BUILD files:
@@ -51,15 +51,15 @@ paket()
 csharp_library(
     name = "mylib",
     srcs = ["Lib.cs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = [
-        "@nuget//newtonsoft.json",
+        "@paket.main//newtonsoft.json",
     ],
 )
 ```
 
-Package labels follow the format `@<group>.<package.name>//:lib` (lowercased).
-If you only have the default `main` group, it is `@nuget//package.name`.
+Package labels follow the format `@paket.<group>//package.name` (lowercased).
+If you only have the default `main` group, it is `@paket.main//package.name`.
 
 ---
 
@@ -119,9 +119,9 @@ nuget.package(
     version = "13.0.3",
     sha512 = "sha512-HhRXKLzEjLFmSJcSALOJfK...",
     sources = ["https://api.nuget.org/v3/index.json"],
-    tfms = ["net8.0"],
+    tfms = ["net9.0"],
     deps = {
-        "net8.0": [],
+        "net9.0": [],
     },
 )
 ```
@@ -253,13 +253,17 @@ Requirements: `curl`, `jq`, `sha512sum`, `base64`.
 
 ## Package reference format
 
-All NuGet packages are referenced by their lowercased ID:
+All NuGet packages are referenced by their lowercased ID. The label prefix
+depends on which approach you use:
 
-| NuGet ID | Bazel label |
-|----------|-------------|
-| `Newtonsoft.Json` | `@nuget//newtonsoft.json` |
-| `Microsoft.Extensions.Logging` | `@nuget//microsoft.extensions.logging` |
-| `Google.Protobuf` | `@nuget//google.protobuf` |
+- **Paket** (Approach 1): `@paket.main//package.name` (the `paket.main` prefix comes from the `use_repo` name)
+- **NuGet module extension** (Approach 2): `@nuget//package.name` (the `nuget` prefix comes from the `name` parameter in `from_lock`)
+
+| NuGet ID | Paket label | NuGet extension label |
+|----------|-------------|----------------------|
+| `Newtonsoft.Json` | `@paket.main//newtonsoft.json` | `@nuget//newtonsoft.json` |
+| `Microsoft.Extensions.Logging` | `@paket.main//microsoft.extensions.logging` | `@nuget//microsoft.extensions.logging` |
+| `Google.Protobuf` | `@paket.main//google.protobuf` | `@nuget//google.protobuf` |
 
 Packages expose these targets: `:lib` (runtime), `:refs` (compile-time),
 `:analyzers` (Roslyn analyzers), `:native` (platform-specific native libraries).

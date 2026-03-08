@@ -17,7 +17,7 @@ These attributes are shared by all `csharp_*` and `fsharp_*` compilation rules (
 | `native_deps` | `label_list` | `[]` | Native `cc_library` targets for P/Invoke interop. |
 | `resources` | `label_list` | `[]` | Files to embed in the DLL as resources. |
 | `compile_data` | `label_list` | `[]` | Additional compile-time files. |
-| `target_frameworks` | `string_list` | **required** | TFMs to build (e.g. `["net8.0"]`). [Reference](https://docs.microsoft.com/en-us/dotnet/standard/frameworks). |
+| `target_frameworks` | `string_list` | **required** | TFMs to build (e.g. `["net9.0"]`). [Reference](https://docs.microsoft.com/en-us/dotnet/standard/frameworks). |
 | `out` | `string` | `""` | Output assembly filename (without extension). |
 | `version` | `string` | `""` | Assembly version. Generates `AssemblyVersion` attributes. Defaults to `1.0.0`. |
 | `defines` | `string_list` | `[]` | Preprocessor symbols. |
@@ -77,7 +77,7 @@ load("@rules_dotnet//dotnet:defs.bzl", "csharp_library")
 csharp_library(
     name = "mylib",
     srcs = ["Greeter.cs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = ["@nuget//newtonsoft.json"],
 )
 ```
@@ -100,7 +100,7 @@ load("@rules_dotnet//dotnet:defs.bzl", "csharp_binary")
 csharp_binary(
     name = "myapp",
     srcs = ["Program.cs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = [":mylib"],
 )
 ```
@@ -119,7 +119,7 @@ load("@rules_dotnet//dotnet:defs.bzl", "csharp_test")
 csharp_test(
     name = "mylib_test",
     srcs = ["GreeterTest.cs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = [":mylib"],
 )
 ```
@@ -146,7 +146,7 @@ load("@rules_dotnet//dotnet:defs.bzl", "csharp_nunit_test")
 csharp_nunit_test(
     name = "greeter_test",
     srcs = ["GreeterTest.cs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = [":mylib"],
 )
 ```
@@ -168,7 +168,7 @@ load("@rules_dotnet//dotnet:defs.bzl", "fsharp_library")
 fsharp_library(
     name = "myfslib",
     srcs = ["Library.fs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
 )
 ```
 
@@ -186,7 +186,7 @@ load("@rules_dotnet//dotnet:defs.bzl", "fsharp_binary")
 fsharp_binary(
     name = "myfsapp",
     srcs = ["Program.fs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
 )
 ```
 
@@ -204,7 +204,7 @@ load("@rules_dotnet//dotnet:defs.bzl", "fsharp_test")
 fsharp_test(
     name = "myfslib_test",
     srcs = ["LibraryTest.fs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = [":myfslib"],
 )
 ```
@@ -229,7 +229,7 @@ load("@rules_dotnet//dotnet:defs.bzl", "fsharp_nunit_test")
 fsharp_nunit_test(
     name = "myfs_nunit_test",
     srcs = ["Tests.fs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = [":myfslib"],
 )
 ```
@@ -245,7 +245,7 @@ Publish a .NET binary with all runtime dependencies. Produces an apphost executa
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
 | `binary` | `label` | **required** | The `csharp_binary` or `fsharp_binary` to publish. |
-| `target_framework` | `string` | **required** | TFM to publish (e.g. `"net8.0"`). |
+| `target_framework` | `string` | **required** | TFM to publish (e.g. `"net9.0"`). |
 | `self_contained` | `bool` | `False` | Bundle the .NET runtime. Requires a runtime pack. |
 | `runtime_identifier` | `string` | auto | RID (e.g. `"linux-x64"`). Auto-detected from runtime pack if unset. |
 | `roll_forward_behavior` | `string` | `"Minor"` | Runtime roll-forward policy. |
@@ -257,7 +257,7 @@ load("@rules_dotnet//dotnet:defs.bzl", "publish_binary")
 publish_binary(
     name = "myapp_publish",
     binary = ":myapp",
-    target_framework = "net8.0",
+    target_framework = "net9.0",
     self_contained = True,
     runtime_identifier = "linux-x64",
 )
@@ -280,7 +280,7 @@ load("@rules_dotnet//dotnet:defs.bzl", "publish_library")
 publish_library(
     name = "mylib_publish",
     library = ":mylib",
-    target_framework = "net8.0",
+    target_framework = "net9.0",
 )
 ```
 
@@ -293,7 +293,7 @@ Compile a .NET binary to a standalone native executable using NativeAOT (ILC). N
 | Name | Type | Default | Description |
 |------|------|---------|-------------|
 | `binary` | `label` | **required** | The .NET binary to AOT compile. |
-| `target_framework` | `string` | **required** | TFM (e.g. `"net8.0"`). |
+| `target_framework` | `string` | **required** | TFM (e.g. `"net9.0"`). |
 | `native_aot_pack` | `label` | **required** | NativeAOT compiler pack providing ILC and static libs. |
 | `optimization_mode` | `string` | `"speed"` | `"speed"` or `"size"`. |
 | `invariant_globalization` | `bool` | `False` | Use invariant globalization (removes ICU dependency). |
@@ -304,7 +304,7 @@ load("@rules_dotnet//dotnet:defs.bzl", "native_aot_binary")
 native_aot_binary(
     name = "myapp_native",
     binary = ":myapp",
-    target_framework = "net8.0",
+    target_framework = "net9.0",
     native_aot_pack = "@native_aot_pack_linux_x64//:pack",
     optimization_mode = "speed",
 )
@@ -338,7 +338,7 @@ load("@rules_dotnet//dotnet:defs.bzl", "dotnet_pack")
 dotnet_pack(
     name = "mylib_nupkg",
     library = ":mylib",
-    target_framework = "net8.0",
+    target_framework = "net9.0",
     package_version = "1.0.0",
     authors = "My Team",
     description = "My shared library",
@@ -375,7 +375,7 @@ proto_library(
 csharp_proto_library(
     name = "hello_csharp_proto",
     proto = ":hello_proto",
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = ["@nuget//google.protobuf"],
 )
 ```
@@ -401,11 +401,40 @@ load("@rules_dotnet//dotnet:proto.bzl", "csharp_grpc_library")
 csharp_grpc_library(
     name = "hello_csharp_grpc",
     proto = ":hello_proto",
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = [
         ":hello_csharp_proto",
         "@nuget//grpc.core.api",
     ],
+)
+```
+
+---
+
+### `csharp_proto_compiler`
+
+Configures a protoc-based C# code generator. Used as the `compiler` attribute of `csharp_proto_library` and `csharp_grpc_library`.
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `protoc` | `label` | **required** | The protoc compiler binary. |
+| `plugin` | `label` | `None` | Optional protoc plugin binary (e.g., `grpc_csharp_plugin`). |
+| `plugin_name` | `string` | `""` | Name for `--plugin=protoc-gen-NAME=path`. Required if plugin is set. |
+| `protoc_plugin_name` | `string` | `"csharp"` | Built-in protoc language plugin name (e.g., `"csharp"` for `--csharp_out`). |
+| `options` | `string_list` | `[]` | Extra options passed to the code generator. |
+| `suffixes` | `string_list` | **required** | File suffixes generated per `.proto` input. |
+| `deps` | `label_list` | `[]` | Implicit NuGet dependencies to propagate. |
+| `exclusions` | `string_list` | `["google/protobuf"]` | Proto path prefixes to skip. |
+
+```python
+load("@rules_dotnet//dotnet:proto.bzl", "csharp_proto_compiler")
+
+csharp_proto_compiler(
+    name = "my_proto_compiler",
+    protoc = "@protobuf//:protoc",
+    protoc_plugin_name = "csharp",
+    suffixes = [".cs"],
+    deps = ["@nuget//google.protobuf"],
 )
 ```
 
@@ -433,7 +462,7 @@ csharp_library(
     name = "mylib",
     srcs = ["Greeter.cs"],
     resources = [":strings_resources"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
 )
 ```
 
@@ -461,7 +490,7 @@ razor_library(
     name = "blazor_components",
     razor_srcs = ["Counter.razor", "Index.razor"],
     srcs = ["_Imports.cs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = [
         "@nuget//microsoft.aspnetcore.components.web",
         "@nuget//microsoft.net.sdk.razor.sourcegenerators",
@@ -512,7 +541,7 @@ Generate a `.csproj` for IDE support (OmniSharp, Rider). Run with `bazel run` to
 |------|------|---------|-------------|
 | `target` | `label` | **required** | The `csharp_binary` or `csharp_library` this project corresponds to. |
 | `srcs` | `label_list` | `[]` | Source files (should match the target's `srcs`). |
-| `target_framework` | `string` | **required** | TFM (e.g. `"net8.0"`). |
+| `target_framework` | `string` | **required** | TFM (e.g. `"net9.0"`). |
 | `project_sdk` | `string` | `"Microsoft.NET.Sdk"` | .NET project SDK. |
 | `output_type` | `string` | `"Library"` | `"Exe"` or `"Library"`. |
 | `root_namespace` | `string` | assembly name | Root namespace. |
@@ -528,7 +557,7 @@ dotnet_project(
     name = "mylib.project",
     target = ":mylib",
     srcs = ["Greeter.cs"],
-    target_framework = "net8.0",
+    target_framework = "net9.0",
 )
 # Then: bazel run //path:mylib.project
 ```
@@ -551,9 +580,112 @@ load("@rules_dotnet//dotnet:defs.bzl", "dotnet_tool")
 
 dotnet_tool(
     name = "my_tool",
-    target_frameworks = ["net8.0"],
-    entrypoint = {"net8.0": "MyTool.dll"},
-    runner = {"net8.0": "dotnet"},
+    target_frameworks = ["net9.0"],
+    entrypoint = {"net9.0": "MyTool.dll"},
+    runner = {"net9.0": "dotnet"},
     deps = "@nuget//my.tool",
 )
 ```
+
+---
+
+## NuGet Integration (Low-Level)
+
+These rules are used internally by the NuGet dependency system. Most users interact with them indirectly through `paket2bazel` or the `nuget` module extension.
+
+### `import_library`
+
+Creates a target for a NuGet package's assemblies for a specific target framework. Generated by `nuget_archive` / `nuget_repo`.
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `library_name` | `string` | **required** | Assembly name. |
+| `version` | `string` | `""` | Assembly version. |
+| `libs` | `label_list` | `[]` | Runtime DLLs. |
+| `refs` | `label_list` | `[]` | Compile-time reference DLLs. |
+| `native` | `label_list` | `[]` | Native runtime files. |
+| `pdbs` | `label_list` | `[]` | PDB debug symbol files. |
+| `analyzers` | `label_list` | `[]` | Common analyzer DLLs. |
+| `analyzers_csharp` | `label_list` | `[]` | C#-specific analyzer DLLs. |
+| `analyzers_fsharp` | `label_list` | `[]` | F#-specific analyzer DLLs. |
+| `analyzers_vb` | `label_list` | `[]` | VB-specific analyzer DLLs. |
+| `resource_assemblies` | `label_list` | `[]` | Satellite resource assemblies. |
+| `content_srcs` | `label_list` | `[]` | Source files from source-only NuGet packages. |
+| `deps` | `label_list` | `[]` | Other import_library targets this depends on. |
+| `data` | `label_list` | `[]` | Runtime data files. |
+| `targeting_pack_overrides` | `string_dict` | `{}` | Package override entries from targeting packs. |
+| `framework_list` | `string_dict` | `{}` | DLL version entries from targeting pack manifests. |
+| `sha512` | `string` | `""` | SHA-512 SRI hash of the `.nupkg`. |
+| `nupkg` | `label` | `None` | The `.nupkg` file. |
+| `source_url` | `string` | `""` | Download URL for auditing. |
+
+---
+
+### `import_dll`
+
+Import a single pre-built DLL as a dependency target. Useful for vendored assemblies not from NuGet.
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `dll` | `label` | **required** | The DLL file to import. |
+| `version` | `string` | `""` | Assembly version. |
+| `data` | `label_list` | `[]` | Runtime data files. |
+
+```python
+load("@rules_dotnet//dotnet:defs.bzl", "import_dll")
+
+import_dll(
+    name = "vendored_lib",
+    dll = "libs/VendoredLib.dll",
+)
+```
+
+---
+
+### `nuget_archive`
+
+Repository rule that downloads and extracts a NuGet package, generating a BUILD file with TFM-aware filegroups.
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `id` | `string` | **required** | NuGet package ID. |
+| `version` | `string` | **required** | Package version. |
+| `sources` | `string_list` | `[]` | NuGet feed URLs (V2 or V3). |
+| `sha512` | `string` | `""` | SHA-512 SRI hash for integrity verification. |
+| `netrc` | `label` | `None` | `.netrc` file for authenticated feeds. |
+| `url` | `string` | `""` | Direct download URL (bypasses source resolution). |
+| `allow_insecure` | `bool` | `False` | Allow plain HTTP sources. |
+
+---
+
+### `nuget_repo`
+
+Repository rule that creates a Bazel repository from a set of NuGet packages. Generates `import_library` targets with TFM transitions.
+
+| Name | Type | Default | Description |
+|------|------|---------|-------------|
+| `packages` | `string_list` | **required** | JSON-encoded package descriptors (from `paket2bazel` or `parse_nuget_lock_file`). |
+| `repo_name` | `string` | rule name | Repository name for cross-references. |
+| `targeting_pack_overrides` | `string_dict` | `{}` | Targeting pack override data. |
+| `framework_list` | `string_dict` | `{}` | Framework list data. |
+
+---
+
+### `parse_nuget_lock_file`
+
+Starlark function that parses a `packages.lock.json` file into the package list format expected by `nuget_repo`.
+
+```python
+load("@rules_dotnet//dotnet:defs.bzl", "parse_nuget_lock_file")
+
+packages = parse_nuget_lock_file(
+    lock_file_content = ctx.read(ctx.attr.lock_file),
+    sources = ["https://api.nuget.org/v3/index.json"],
+)
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `lock_file_content` | `string` | The raw JSON content of `packages.lock.json`. |
+| `sources` | `list[string]` | NuGet feed URLs for package resolution. |
+| `netrc` | `label` or `None` | Optional `.netrc` file for authentication. |

@@ -1,6 +1,6 @@
-# Targeting pack confligt with NuGet package
+# Targeting pack conflict with NuGet package
 
-This test checks that DLLs provided by a targeting pack that conflict with DLLs in a user provided by a NuGet package
+This test checks that DLLs provided by a targeting pack that conflict with DLLs provided by a NuGet package
 are resolved correctly. The rules are:
 
 * If the targeting pack version is higher or equal to the NuGet package version, the targeting pack DLL is used.

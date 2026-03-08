@@ -17,7 +17,7 @@ module(
     version = "0.0.0",
 )
 
-bazel_dep(name = "rules_dotnet", version = "0.17.0")
+bazel_dep(name = "rules_dotnet", version = "0.0.0")  # Replace with latest release version
 
 dotnet = use_extension("@rules_dotnet//dotnet:extensions.bzl", "dotnet")
 dotnet.toolchain(dotnet_version = "9.0.200")

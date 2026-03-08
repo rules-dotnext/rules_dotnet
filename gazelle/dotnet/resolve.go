@@ -69,9 +69,16 @@ func (dl *dotnetLang) Resolve(
 			continue
 		}
 
+		normalizedName := strings.ToLower(pkgName)
+
+		// Check for user-specified resolve override first.
+		if override, ok := cfg.resolveOverrides[normalizedName]; ok {
+			deps = append(deps, override)
+			continue
+		}
+
 		// Convert NuGet package name to Bazel label.
 		// rules_dotnet convention: @<repo>//<lowercase_package_name>
-		normalizedName := strings.ToLower(pkgName)
 		dep := fmt.Sprintf("@%s//%s", cfg.nugetRepoName, normalizedName)
 		deps = append(deps, dep)
 	}

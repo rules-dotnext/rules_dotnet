@@ -83,8 +83,7 @@ def _import_library(ctx):
         version = ctx.attr.version,
         libs = ctx.files.libs,
         resource_assemblies = ctx.files.resource_assemblies,
-        # TODO: PDBs from nuget packages should also be forwarded
-        pdbs = [],
+        pdbs = ctx.files.pdbs,
         xml_docs = [],
         native = ctx.files.native,
         data = ctx.files.data,
@@ -141,6 +140,11 @@ import_library = rule(
         "analyzers_vb": attr.label_list(
             doc = "Static VB analyzer DLLs",
             allow_files = True,  # [".dll"] currently does not work with empty file groups
+            allow_empty = True,
+        ),
+        "pdbs": attr.label_list(
+            doc = "PDB debug symbol files from the NuGet package",
+            allow_files = True,
             allow_empty = True,
         ),
         "refs": attr.label_list(

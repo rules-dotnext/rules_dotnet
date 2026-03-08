@@ -1,0 +1,13 @@
+load("@bazel_lib//:bzl_library.bzl", "bzl_library")
+load(":nuget_archive_tests.bzl", "nuget_archive_tests")
+
+nuget_archive_tests()
+
+bzl_library(
+    name = "nuget_archive_tests",
+    srcs = ["nuget_archive_tests.bzl"],
+    visibility = ["//dotnet:__subpackages__"],
+    deps = [
+        "@bazel_skylib//lib:unittest",
+    ],
+)

@@ -155,6 +155,12 @@ def _write_version_csharp(actions, label_name, dll_name, version):
 def _collect_analyzer_dependencies(deps):
     """Collect the runtime libraries of this analyzer. These will be passed to the compiler.
 
+    Only direct dependency libs are included. strict_deps does not apply here:
+    strict_deps controls which compile-time references the *compiled code* can
+    see, whereas these are runtime libraries the *analyzer itself* needs to load
+    inside the compiler process. Transitive resolution is handled by Bazel's
+    dependency graph — each dep already carries its own transitive closure.
+
     Args:
         deps: The list of dependencies of the analyzer.
 
@@ -165,8 +171,6 @@ def _collect_analyzer_dependencies(deps):
     dlls = []
     for dep in deps:
         runtime_info = dep[DotnetAssemblyRuntimeInfo]
-
-        # FIXME: Should this respect `not strict_deps`?
         dlls.extend(runtime_info.libs)
     return dlls
 
@@ -329,7 +333,9 @@ def AssemblyAction(
     if (is_analyzer or is_language_specific_analyzer) and target_framework != "netstandard2.0":
         fail("Analyzers must have `target_frameworks = [\"netstandard2.0\"]`.")
 
-    # TODO: Ensure that all the analyzer DLLs also target netstandard2.0.
+    # NB: The fail() above enforces that the analyzer itself targets netstandard2.0.
+    # Analyzer *dependencies* should also target netstandard2.0, but this is not
+    # validated here because it would require a provider carrying each dep's TFM.
     analyzer_dlls = _collect_analyzer_dependencies(deps) if (is_analyzer or is_language_specific_analyzer) else []
 
     defines = framework_preprocessor_symbols(target_framework) + defines

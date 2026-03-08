@@ -18,6 +18,10 @@ load(
     "AssemblyAction",
 )
 load(
+    "//dotnet/private/rules/proto:common.bzl",
+    "empty_providers",
+)
+load(
     "//dotnet/private/rules/proto:csharp_proto_compiler.bzl",
     "CSharpProtoCompilerInfo",
 )
@@ -38,47 +42,7 @@ load(
     "tfm_transition",
 )
 
-def _empty_providers(name):
-    """Return empty providers when there are no sources to compile."""
-    return [
-        DotnetAssemblyCompileInfo(
-            name = name,
-            version = "1.0.0",
-            project_sdk = "default",
-            refs = [],
-            irefs = [],
-            analyzers = [],
-            analyzers_csharp = [],
-            analyzers_fsharp = [],
-            analyzers_vb = [],
-            internals_visible_to = [],
-            compile_data = [],
-            exports = [],
-            transitive_refs = depset(),
-            transitive_analyzers = depset(),
-            transitive_analyzers_csharp = depset(),
-            transitive_analyzers_fsharp = depset(),
-            transitive_analyzers_vb = depset(),
-            transitive_compile_data = depset(),
-            content_srcs = [],
-            transitive_content_srcs = depset(),
-        ),
-        DotnetAssemblyRuntimeInfo(
-            name = name,
-            version = "1.0.0",
-            libs = [],
-            pdbs = [],
-            xml_docs = [],
-            native = [],
-            data = [],
-            resource_assemblies = [],
-            appsetting_files = depset(),
-            nuget_info = None,
-            deps = depset(),
-            direct_deps_depsjson_fragment = {},
-        ),
-        DefaultInfo(files = depset()),
-    ]
+_empty_providers = empty_providers  # alias for internal use
 
 def _csharp_grpc_library_impl(ctx):
     tfm = ctx.attr._target_framework[BuildSettingInfo].value

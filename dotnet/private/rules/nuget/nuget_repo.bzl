@@ -5,7 +5,7 @@ load("//dotnet/private/rules/nuget:nuget_archive.bzl", "nuget_archive")
 
 _GLOBAL_NUGET_PREFIX = "nuget"
 
-def _deps_select_statment(ctx, deps):
+def _deps_select_statement(ctx, deps):
     if len(deps) == 0:
         return "\"//conditions:default\": []"
 
@@ -64,7 +64,7 @@ def _nuget_repo_impl(ctx):
             "{ID}": id,
             "{ID_LOWER}": id.lower(),
             "{VERSION}": version,
-            "{DEPS}": _deps_select_statment(ctx, deps),
+            "{DEPS}": _deps_select_statement(ctx, deps),
             "{TARGETING_PACK_OVERRIDES}": json.encode({override.lower().split("|")[0]: override.lower().split("|")[1] for override in targeting_pack_overrides}),
             "{FRAMEWORK_LIST}": json.encode({override.lower().split("|")[0]: override.lower().split("|")[1] for override in framework_list}),
             "{TOOLS}": "\n\n".join(tool_targets),
@@ -122,9 +122,18 @@ _nuget_repo = repository_rule(
     },
 )
 
-# buildifier: disable=function-docstring
 def nuget_repo(name, packages):
-    # TODO: Add docs
+    """Create NuGet package repositories from a list of package specifications.
+
+    For each package, creates a nuget_archive repository rule that downloads
+    and extracts the .nupkg, and a hub repository with import_library targets
+    that provide the packages to downstream rules.
+
+    Args:
+        name: Name for the hub repository (e.g. "nuget" or "paket.main").
+        packages: List of package dicts, each with keys: id, version, sha512,
+            sources, deps, targeting_pack_overrides, framework_list.
+    """
     # scaffold individual nuget archives
     for package in packages:
         id = package["id"].lower()

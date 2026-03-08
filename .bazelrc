@@ -3,13 +3,13 @@ common --enable_runfiles
 common --incompatible_strict_action_env
 common --test_output=errors
 
-# Profiling flags
-common --noslim_profile
-common --experimental_profile_include_target_label
-common --experimental_profile_include_primary_output 
-common --experimental_collect_load_average_in_profiler
-common --experimental_collect_system_network_usage
-common --experimental_collect_worker_data_in_profiler
+# Profiling flags — activate with: bazel build //... --config=profile
+build:profile --noslim_profile
+build:profile --experimental_profile_include_target_label
+build:profile --experimental_profile_include_primary_output
+build:profile --experimental_collect_load_average_in_profiler
+build:profile --experimental_collect_system_network_usage
+build:profile --experimental_collect_worker_data_in_profiler
 
 # Enable bzlmod lockfile for reproducible builds (consistent with rules_go, Bazel guidance)
 common --lockfile_mode=update
@@ -43,5 +43,3 @@ try-import %workspace%/.bazelrc.user
 
 # Bazel 8 flags that will be flipped
 common --incompatible_disallow_empty_glob
-# Enable once our dependencies all support this
-# common --incompatible_auto_exec_groups

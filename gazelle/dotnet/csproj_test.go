@@ -73,10 +73,10 @@ func TestParseNUnitTestProject(t *testing.T) {
 	if !proj.IsTestProject {
 		t.Error("IsTestProject = false, want true")
 	}
-	if proj.TestFramework != "nunit" && proj.TestFramework != "mstest" {
-		// Both nunit and mstest packages are present; map iteration order
-		// is non-deterministic. Either detection is acceptable.
-		t.Errorf("TestFramework = %q, want nunit or mstest", proj.TestFramework)
+	// Both NUnit and MSTest packages are present. Priority order is
+	// NUnit > xUnit > MSTest, so NUnit must always win deterministically.
+	if proj.TestFramework != "nunit" {
+		t.Errorf("TestFramework = %q, want %q", proj.TestFramework, "nunit")
 	}
 }
 
@@ -253,6 +253,94 @@ func TestParsePackageAndProjectReferences(t *testing.T) {
 	}
 	if len(proj.ProjectReferences) != 1 || proj.ProjectReferences[0] != "../OtherLib/OtherLib.csproj" {
 		t.Errorf("ProjectReferences = %v, want [../OtherLib/OtherLib.csproj]", proj.ProjectReferences)
+	}
+}
+
+func TestParseNoTargetFramework(t *testing.T) {
+	data := []byte(`<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+</Project>`)
+
+	proj, err := parseProjectFileData(data, "NoTfm.csproj")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if len(proj.TargetFrameworks) != 0 {
+		t.Errorf("TargetFrameworks = %v, want empty", proj.TargetFrameworks)
+	}
+}
+
+func TestParseDuplicatePackageReferences(t *testing.T) {
+	// MSBuild last-one-wins for duplicate PackageReference entries
+	data := []byte(`<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+</Project>`)
+
+	proj, err := parseProjectFileData(data, "DupPkg.csproj")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if v := proj.PackageReferences["Newtonsoft.Json"]; v != "13.0.3" {
+		t.Errorf("PackageReferences[Newtonsoft.Json] = %q, want %q (last wins)", v, "13.0.3")
+	}
+}
+
+func TestParseMixedTestFrameworksPriorityOrder(t *testing.T) {
+	// Project references both xUnit and MSTest — xUnit should win
+	data := []byte(`<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MSTest.TestFramework" Version="3.1.0" />
+    <PackageReference Include="xunit" Version="2.6.2" />
+  </ItemGroup>
+</Project>`)
+
+	proj, err := parseProjectFileData(data, "MixedTest.csproj")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if !proj.IsTestProject {
+		t.Error("IsTestProject = false, want true")
+	}
+	if proj.TestFramework != "xunit" {
+		t.Errorf("TestFramework = %q, want %q (xUnit > MSTest)", proj.TestFramework, "xunit")
+	}
+}
+
+func TestParseFSharpEmbeddedResources(t *testing.T) {
+	data := []byte(`<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources/strings.resx" />
+    <EmbeddedResource Include="Resources/images.resx" />
+  </ItemGroup>
+</Project>`)
+
+	proj, err := parseProjectFileData(data, "FsLib.fsproj")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if proj.Language != "fsharp" {
+		t.Errorf("Language = %q, want %q", proj.Language, "fsharp")
+	}
+	if len(proj.EmbeddedResources) != 2 {
+		t.Fatalf("EmbeddedResources length = %d, want 2", len(proj.EmbeddedResources))
 	}
 }
 

@@ -7,6 +7,14 @@ Proto rules live in a separate load path from the core rules because they
 depend on `@protobuf`, which is an optional dependency -- projects that do not
 use proto/gRPC never pull it in.
 
+To use proto/gRPC rules, add these dependencies to your `MODULE.bazel`:
+
+```starlark
+bazel_dep(name = "protobuf", version = "29.3")
+bazel_dep(name = "rules_proto", version = "7.1.0")
+bazel_dep(name = "grpc", version = "1.71.0")  # only needed for gRPC
+```
+
 ```starlark
 load("@protobuf//bazel:proto_library.bzl", "proto_library")
 load("@rules_dotnet//dotnet:defs.bzl", "csharp_binary")
@@ -20,14 +28,14 @@ proto_library(
 csharp_proto_library(
     name = "greeter_csharp_proto",
     proto = ":greeter_proto",
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = ["@nuget//google.protobuf"],
 )
 
 csharp_grpc_library(
     name = "greeter_csharp_grpc",
     proto = ":greeter_proto",
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = [
         ":greeter_csharp_proto",
         "@nuget//grpc.core.api",
@@ -37,7 +45,7 @@ csharp_grpc_library(
 csharp_binary(
     name = "server",
     srcs = ["Server.cs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = [
         ":greeter_csharp_grpc",
         ":greeter_csharp_proto",
@@ -67,7 +75,7 @@ razor_library(
         "Shared/MainLayout.razor",
     ],
     srcs = ["App.cs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = [
         "@nuget//microsoft.aspnetcore.components.web",
         "@nuget//microsoft.net.sdk.razor.sourcegenerators",
@@ -93,7 +101,7 @@ Any NuGet package containing Roslyn analyzers works automatically:
 csharp_library(
     name = "mylib",
     srcs = ["Lib.cs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = ["@nuget//stylecop.analyzers"],
     run_analyzers = True,  # default
 )
@@ -138,14 +146,14 @@ load("@rules_dotnet//dotnet:defs.bzl", "csharp_library", "dotnet_project")
 csharp_library(
     name = "mylib",
     srcs = ["Foo.cs", "Bar.cs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
 )
 
 dotnet_project(
     name = "mylib.project",
     target = ":mylib",
     srcs = ["Foo.cs", "Bar.cs"],
-    target_framework = "net8.0",
+    target_framework = "net9.0",
 )
 ```
 
@@ -163,7 +171,7 @@ Remap PDB source paths so debuggers resolve files without manual configuration:
 csharp_binary(
     name = "myapp",
     srcs = ["Program.cs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     pathmap = {
         "/sandbox/workspace": "/home/dev/project",
     },
@@ -186,7 +194,7 @@ cc_library(
 csharp_binary(
     name = "myapp",
     srcs = ["Program.cs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     native_deps = [":native_math"],
 )
 ```
@@ -229,7 +237,7 @@ explicitly re-export a dependency:
 csharp_library(
     name = "wrapper",
     srcs = ["Wrapper.cs"],
-    target_frameworks = ["net8.0"],
+    target_frameworks = ["net9.0"],
     deps = ["@nuget//newtonsoft.json"],
     exports = ["@nuget//newtonsoft.json"],
 )
@@ -296,13 +304,13 @@ required.
 ### Configuration
 
 Remote execution is configured in `.bazelrc` under the `build:remote` config
-stanza. Any Bazel-compatible RE service works (BuildBuddy, EngFlow, Buildfarm,
-etc.).
-
-The `.bazelrc` ships with vendor-neutral defaults:
+stanza. The shipped configuration targets BuildBuddy Cloud, but any
+Bazel-compatible RE service works:
 
 ```
 # .bazelrc (already present in this repository)
+build:remote --remote_executor=grpcs://remote.buildbuddy.io
+build:remote --remote_cache=grpcs://remote.buildbuddy.io
 build:remote --jobs=50
 build:remote --remote_timeout=600
 build:remote --remote_default_exec_properties=container-image=docker://mcr.microsoft.com/dotnet/runtime-deps:8.0
@@ -320,13 +328,12 @@ The `bootstrap_impl=script` setting ensures that Python-based tools (e.g.,
 
 ### Usage
 
-Set your RE endpoint and credentials in `.bazelrc.user` (which is gitignored):
+Authentication is user-specific. Add your API key to `.bazelrc.user` (which is
+gitignored):
 
 ```
 # .bazelrc.user
-build:remote --remote_executor=grpcs://your-remote-executor:port
-build:remote --remote_cache=grpcs://your-remote-cache:port
-build:remote --remote_header=<auth-header>=<value>
+build:remote --remote_header=x-buildbuddy-api-key=YOUR_KEY
 ```
 
 Then pass `--config=remote`:
@@ -337,3 +344,7 @@ bazel test //... --config=remote
 
 All tests, builds, and publish actions execute remotely with full cache
 sharing across the team.
+
+**Coverage:** `bazel coverage` works with `--config=remote`. PDB files are
+included in runfiles so coverlet can instrument assemblies on the remote worker.
+See [Testing: Code coverage](testing.md#code-coverage) for details.
