@@ -1,0 +1,46 @@
+load("//dotnet:defs.bzl", "csharp_binary", "csharp_library", "dotnet_project", "dotnet_solution")
+
+csharp_library(
+    name = "integration_lib",
+    srcs = ["Lib.cs"],
+    target_frameworks = ["net6.0"],
+)
+
+csharp_binary(
+    name = "integration_app",
+    srcs = ["App.cs"],
+    target_frameworks = ["net6.0"],
+    deps = [":integration_lib"],
+)
+
+dotnet_project(
+    name = "integration_lib.project",
+    target = ":integration_lib",
+    target_framework = "net6.0",
+)
+
+dotnet_project(
+    name = "integration_app.project",
+    target = ":integration_app",
+    target_framework = "net6.0",
+)
+
+dotnet_solution(
+    name = "IntegrationTest",
+    projects = [
+        ":integration_lib",
+        ":integration_app",
+    ],
+    target_framework = "net6.0",
+)
+
+sh_test(
+    name = "ide_integration_test",
+    srcs = ["ide_integration_test.sh"],
+    data = [
+        ":integration_lib.project",
+        ":integration_app.project",
+        ":IntegrationTest",
+    ],
+    deps = ["@rules_shell//shell/runfiles"],
+)

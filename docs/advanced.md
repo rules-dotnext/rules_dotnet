@@ -137,8 +137,58 @@ Per-target attributes always take precedence over the global config.
 
 ## IDE integration
 
-`dotnet_project` generates `.csproj` files for OmniSharp, Rider, and VS Code
-IntelliSense. Bazel remains the build system.
+Get full IntelliSense, go-to-definition, and NuGet resolution in your editor
+while keeping Bazel as the build system. rules\_dotnet generates real `.csproj`
+files that your IDE already understands -- no plugins required.
+
+> **Quick start** -- add a `dotnet_project` next to any target and run it:
+>
+> ```sh
+> bazel run //src:mylib.project    # writes src/mylib.csproj
+> ```
+>
+> Your editor picks it up automatically. That's it.
+
+### VS Code + C# Dev Kit
+
+1. Add `dotnet_project` targets (see [below](#adding-dotnet_project-targets))
+2. Run `bazel run //src:mylib.project` for each project
+3. Open the folder in VS Code -- C# Dev Kit finds the `.csproj` files
+4. IntelliSense, go-to-definition, and NuGet types resolve immediately
+
+For multi-project repos, generate a full solution instead:
+
+```sh
+bazel run //:MySolution    # writes .sln + all .csproj files
+```
+
+Then open the `.sln` via **File > Open Workspace** or the
+C# Dev Kit solution explorer.
+
+### JetBrains Rider
+
+Same setup. Rider can open either individual `.csproj` files or the generated
+`.sln`. Rider will run `dotnet restore` on open and index all
+`PackageReference` and `ProjectReference` entries automatically.
+
+### Visual Studio (Windows)
+
+`dotnet_solution` generates everything VS needs in one command -- solution
+file, per-project `.csproj`, `Directory.Build.props`, `NuGet.config`, and
+`launchSettings.json` for debugger profiles:
+
+```sh
+bazel run //:MySolution
+# then: File > Open > Project/Solution > MySolution.sln
+```
+
+VS runs `dotnet restore` automatically. For debugging, use the generated
+**Attach to Process** launch profile under Properties/launchSettings.json.
+
+### Adding `dotnet_project` targets
+
+Generate a `.csproj` for a single target. Sources, nullable, langversion, and
+output type are all inferred automatically -- just point at your target:
 
 ```starlark
 load("@rules_dotnet//dotnet:defs.bzl", "csharp_library", "dotnet_project")
@@ -147,25 +197,91 @@ csharp_library(
     name = "mylib",
     srcs = ["Foo.cs", "Bar.cs"],
     target_frameworks = ["net9.0"],
+    deps = ["@nuget//newtonsoft.json"],
 )
 
 dotnet_project(
     name = "mylib.project",
     target = ":mylib",
-    srcs = ["Foo.cs", "Bar.cs"],
     target_framework = "net9.0",
 )
 ```
 
-Generate the `.csproj` into your source tree:
+```sh
+bazel run //src:mylib.project   # writes src/mylib.csproj
+```
+
+The generated `.csproj` includes:
+
+- `<Compile>` items for all source files
+- `<PackageReference>` entries for NuGet dependencies (with correct versions)
+- `<ProjectReference>` entries for Bazel project dependencies
+- `<Analyzer>` entries for Roslyn analyzer DLLs
+
+No need to pass `srcs` -- they're inferred from the target. Override any
+property (`nullable`, `langversion`, `output_type`, `project_sdk`) if the
+inferred value isn't what you want.
+
+### Generating a full solution: `dotnet_solution`
+
+For repos with multiple projects, generate a `.sln` that ties everything
+together:
+
+```starlark
+load("@rules_dotnet//dotnet:defs.bzl", "csharp_binary", "csharp_library", "dotnet_solution")
+
+csharp_library(
+    name = "mylib",
+    srcs = ["Lib.cs"],
+    target_frameworks = ["net9.0"],
+    deps = ["@nuget//newtonsoft.json"],
+)
+
+csharp_binary(
+    name = "myapp",
+    srcs = ["Program.cs"],
+    target_frameworks = ["net9.0"],
+    deps = [":mylib"],
+)
+
+dotnet_solution(
+    name = "MySolution",
+    projects = [":mylib", ":myapp"],
+    target_framework = "net9.0",
+)
+```
 
 ```sh
-bazel run //src:mylib.project
+bazel run //:MySolution
 ```
+
+One command writes all of these into your source tree:
+
+| File | Purpose |
+|------|---------|
+| `MySolution.sln` | Solution file with project entries and deterministic GUIDs |
+| Per-project `.csproj` | Full projects with PackageReference, ProjectReference, Analyzer items |
+| `Directory.Build.props` | Shared properties: disables assembly info gen, lock-file restore |
+| `Directory.Build.targets` | Stub to prevent accidental `dotnet build` |
+| `NuGet.config` | Package source configuration for `dotnet restore` |
+| `Properties/launchSettings.json` | Per-binary: debugger launch profiles |
+
+### How it works
+
+An aspect (`ide_info_aspect`) walks each target's dependency graph at analysis
+time. It classifies every dep as either a NuGet package or a project reference
+by checking `DotnetAssemblyRuntimeInfo.nuget_info`, then collects source files,
+analyzer DLLs, and build properties. `dotnet_project` and `dotnet_solution`
+consume this data to render complete `.csproj` and `.sln` files.
+
+The generated projects are for **IDE consumption only**. `dotnet restore`
+works (so IntelliSense can resolve NuGet types), but all building should go
+through Bazel.
 
 ### pathmap for debugging
 
-Remap PDB source paths so debuggers resolve files without manual configuration:
+Remap PDB source paths so debuggers (VS, Rider, VS Code) resolve files
+without manual `sourceFileMap` configuration:
 
 ```starlark
 csharp_binary(

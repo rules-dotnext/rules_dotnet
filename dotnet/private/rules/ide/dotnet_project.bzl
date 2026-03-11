@@ -1,10 +1,28 @@
-"""Rule for generating .csproj files for IDE support (OmniSharp, Rider, etc.).
+"""Rule for generating .csproj files for IDE support.
 
-Generates a .csproj file that IDE language servers can consume for IntelliSense,
-go-to-definition, and code navigation, while keeping Bazel as the build system.
+Generates complete .csproj files with NuGet PackageReferences, ProjectReferences,
+and analyzer entries by walking the build graph via ide_info_aspect.
 
 See https://github.com/bazel-contrib/rules_dotnet/issues/228
 """
+
+load(
+    "//dotnet/private:providers.bzl",
+    "DotnetAssemblyCompileInfo",
+    "DotnetAssemblyRuntimeInfo",
+)
+load(
+    "//dotnet/private/rules/ide:ide_info_aspect.bzl",
+    "ide_info_aspect",
+)
+load(
+    "//dotnet/private/rules/ide:providers.bzl",
+    "DotnetIdeInfo",
+)
+load(
+    "//dotnet/private/transitions:tfm_transition.bzl",
+    "tfm_transition",
+)
 
 _CSPROJ_TEMPLATE = """\
 <Project Sdk="{project_sdk}">
@@ -28,6 +46,7 @@ _CSPROJ_TEMPLATE = """\
   <ItemGroup>
 {compile_items}
   </ItemGroup>
+{package_references}{project_references}{analyzer_references}
 </Project>
 """
 
@@ -43,36 +62,107 @@ cp "${{CSPROJ_SOURCE}}" "${{CSPROJ_DEST}}"
 echo "Generated ${{CSPROJ_DEST}}"
 """
 
+def _relative_path(from_package, to_package, to_name):
+    """Compute relative path from one package to another's .csproj."""
+    from_parts = from_package.split("/") if from_package else []
+    to_parts = to_package.split("/") if to_package else []
+
+    # Go up from from_package to workspace root, then down to to_package
+    up = "../" * len(from_parts) if from_parts else ""
+    down = "/".join(to_parts) + "/" if to_parts else ""
+    return up + down + to_name + ".csproj"
+
+def _sdk_string(project_sdk):
+    """Map internal project_sdk value to MSBuild SDK string."""
+    if project_sdk == "web":
+        return "Microsoft.NET.Sdk.Web"
+    return "Microsoft.NET.Sdk"
+
 def _dotnet_project_impl(ctx):
-    """Generate a .csproj file from rule attributes for IDE consumption."""
+    """Generate a .csproj file from aspect data and optional overrides."""
 
-    # Build compile items from srcs
+    # cfg = tfm_transition on a singular attr.label wraps in a list
+    target = ctx.attr.target[0]
+    ide_info = target[DotnetIdeInfo]
+
+    # Sources: use explicit srcs if provided, otherwise fall back to aspect
+    srcs = ctx.files.srcs if ctx.files.srcs else ide_info.srcs
     src_items = []
-    for src in ctx.files.srcs:
+    for src in srcs:
         src_items.append("    <Compile Include=\"%s\" />" % src.short_path)
-
     compile_items = "\n".join(src_items) if src_items else ""
 
-    # Determine assembly name
+    # Assembly name
     assembly_name = ctx.attr.csproj_name if ctx.attr.csproj_name else ctx.attr.name.replace(".project", "")
 
-    # Substitute template values
+    # Properties: explicit attrs override aspect-inferred values
+    nullable = ctx.attr.nullable if ctx.attr.nullable else ide_info.nullable
+    langversion = ctx.attr.langversion if ctx.attr.langversion else ide_info.langversion
+    if not langversion:
+        langversion = "default"
+    allow_unsafe = ctx.attr.allow_unsafe_blocks or ide_info.allow_unsafe_blocks
+    output_type = ctx.attr.output_type if ctx.attr.output_type else ide_info.output_type
+    if not output_type:
+        output_type = "Library"
+
+    # Project SDK: explicit attr overrides aspect
+    project_sdk = ctx.attr.project_sdk
+    if not project_sdk or project_sdk == "Microsoft.NET.Sdk":
+        sdk_val = ide_info.project_sdk
+        if sdk_val:
+            project_sdk = _sdk_string(sdk_val)
+        else:
+            project_sdk = "Microsoft.NET.Sdk"
+
+    # Package references from NuGet deps
+    pkg_refs = ""
+    if ide_info.direct_nuget_deps:
+        lines = ["", "  <ItemGroup>"]
+        for dep in ide_info.direct_nuget_deps:
+            lines.append("    <PackageReference Include=\"%s\" Version=\"%s\" />" % (dep.id, dep.version))
+        lines.append("  </ItemGroup>")
+        pkg_refs = "\n".join(lines) + "\n"
+
+    # Project references from project deps
+    proj_refs = ""
+    if ide_info.direct_project_deps:
+        my_package = ctx.label.package
+        lines = ["", "  <ItemGroup>"]
+        for dep in ide_info.direct_project_deps:
+            rel = _relative_path(my_package, dep.label.package, dep.name)
+            lines.append("    <ProjectReference Include=\"%s\" />" % rel)
+        lines.append("  </ItemGroup>")
+        proj_refs = "\n".join(lines) + "\n"
+
+    # Analyzer references
+    analyzer_refs = ""
+    if ide_info.analyzers:
+        lines = ["", "  <ItemGroup>"]
+        for a in ide_info.analyzers:
+            lines.append("    <Analyzer Include=\"%s\" />" % a.short_path)
+        lines.append("  </ItemGroup>")
+        analyzer_refs = "\n".join(lines) + "\n"
+
+    # Render .csproj
     csproj_content = _CSPROJ_TEMPLATE.format(
-        project_sdk = ctx.attr.project_sdk,
+        project_sdk = project_sdk,
         target_framework = ctx.attr.target_framework,
         root_namespace = ctx.attr.root_namespace if ctx.attr.root_namespace else assembly_name,
         assembly_name = assembly_name,
-        langversion = ctx.attr.langversion if ctx.attr.langversion else "default",
-        nullable = ctx.attr.nullable,
-        allow_unsafe_blocks = "true" if ctx.attr.allow_unsafe_blocks else "false",
-        output_type = ctx.attr.output_type,
+        langversion = langversion,
+        nullable = nullable,
+        allow_unsafe_blocks = "true" if allow_unsafe else "false",
+        output_type = output_type,
         compile_items = compile_items,
+        package_references = pkg_refs,
+        project_references = proj_refs,
+        analyzer_references = analyzer_refs,
     )
 
     output = ctx.actions.declare_file(ctx.attr.name + ".csproj")
     ctx.actions.write(output, csproj_content)
 
-    # Generate a script that copies the .csproj to the workspace
+    # Generate copy script
     copy_script = ctx.actions.declare_file(ctx.attr.name + "_generate.sh")
     ctx.actions.write(
         output = copy_script,
@@ -100,39 +190,42 @@ _dotnet_project = rule(
     doc = """Generate a .csproj file for IDE support.
 
 Run with `bazel run` to copy the generated .csproj into the source tree
-where OmniSharp/Rider can discover it.
+where Visual Studio, Rider, or OmniSharp can discover it.
+
+The rule walks the target's dependency graph via an aspect to populate
+PackageReference, ProjectReference, and Analyzer entries automatically.
 """,
     attrs = {
         "target": attr.label(
             doc = "The csharp_binary or csharp_library target this project corresponds to.",
             mandatory = True,
-        ),
-        "srcs": attr.label_list(
-            doc = "Source files to include in the .csproj. Should match the srcs of the target.",
-            allow_files = [".cs"],
+            providers = [DotnetAssemblyCompileInfo, DotnetAssemblyRuntimeInfo],
+            aspects = [ide_info_aspect],
+            cfg = tfm_transition,
         ),
         "target_framework": attr.string(
             doc = "The target framework moniker (e.g., net8.0).",
             mandatory = True,
+        ),
+        "srcs": attr.label_list(
+            doc = "Source files to include in the .csproj. If omitted, inferred from the target via aspect.",
+            allow_files = [".cs"],
         ),
         "project_sdk": attr.string(
             doc = "The .NET project SDK.",
             default = "Microsoft.NET.Sdk",
         ),
         "output_type": attr.string(
-            doc = "The output type (Exe or Library).",
-            default = "Library",
-            values = ["Exe", "Library"],
+            doc = "The output type (Exe or Library). If omitted, inferred from target rule kind.",
         ),
         "root_namespace": attr.string(
             doc = "The root namespace. Defaults to the assembly name.",
         ),
         "langversion": attr.string(
-            doc = "The C# language version.",
+            doc = "The C# language version. If omitted, inferred from the target.",
         ),
         "nullable": attr.string(
-            doc = "Nullable context.",
-            default = "disable",
+            doc = "Nullable context. If omitted, inferred from the target.",
         ),
         "allow_unsafe_blocks": attr.bool(
             doc = "Whether to allow unsafe blocks.",
@@ -141,11 +234,14 @@ where OmniSharp/Rider can discover it.
         "csproj_name": attr.string(
             doc = "Override the generated .csproj file name.",
         ),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
     },
     executable = True,
 )
 
-def dotnet_project(name, target, srcs, target_framework, **kwargs):
+def dotnet_project(name, target, target_framework, srcs = None, **kwargs):
     """Macro that generates a .csproj for IDE support.
 
     Usage:
@@ -158,24 +254,25 @@ def dotnet_project(name, target, srcs, target_framework, **kwargs):
         dotnet_project(
             name = "mylib.project",
             target = ":mylib",
-            srcs = ["Foo.cs"],
             target_framework = "net8.0",
         )
 
     Then run: bazel run //path:mylib.project
-    This generates path/mylib.csproj that OmniSharp can consume.
+    This generates path/mylib.csproj that Visual Studio / Rider / OmniSharp can consume.
 
     Args:
         name: Name of the target. Convention: "{library_name}.project"
         target: The csharp_binary or csharp_library label.
-        srcs: Source files (should match the target's srcs).
         target_framework: Target framework moniker (e.g., "net8.0").
+        srcs: Source files (optional, inferred from target if omitted).
         **kwargs: Additional attributes passed to the underlying rule.
     """
+    extra = {}
+    if srcs != None:
+        extra["srcs"] = srcs
     _dotnet_project(
         name = name,
         target = target,
-        srcs = srcs,
         target_framework = target_framework,
-        **kwargs
+        **dict(extra, **kwargs)
     )

@@ -1,7 +1,41 @@
 load("@bazel_lib//:bzl_library.bzl", "bzl_library")
 
 bzl_library(
+    name = "providers",
+    srcs = ["providers.bzl"],
+    visibility = ["//dotnet:__subpackages__"],
+)
+
+bzl_library(
+    name = "ide_info_aspect",
+    srcs = ["ide_info_aspect.bzl"],
+    visibility = ["//dotnet:__subpackages__"],
+    deps = [
+        ":providers",
+        "//dotnet/private:providers",
+    ],
+)
+
+bzl_library(
     name = "dotnet_project",
     srcs = ["dotnet_project.bzl"],
     visibility = ["//dotnet:__subpackages__"],
+    deps = [
+        ":ide_info_aspect",
+        ":providers",
+        "//dotnet/private:providers",
+        "//dotnet/private/transitions:tfm_transition",
+    ],
+)
+
+bzl_library(
+    name = "dotnet_solution",
+    srcs = ["dotnet_solution.bzl"],
+    visibility = ["//dotnet:__subpackages__"],
+    deps = [
+        ":ide_info_aspect",
+        ":providers",
+        "//dotnet/private:providers",
+        "//dotnet/private/transitions:tfm_transition",
+    ],
 )

@@ -61,6 +61,14 @@ load(
     _dotnet_project = "dotnet_project",
 )
 load(
+    "//dotnet/private/rules/ide:dotnet_solution.bzl",
+    _dotnet_solution = "dotnet_solution",
+)
+load(
+    "//dotnet/private/rules/ide:providers.bzl",
+    _DotnetIdeInfo = "DotnetIdeInfo",
+)
+load(
     "//dotnet/private/rules/native_aot:native_aot_binary.bzl",
     _native_aot_binary = "native_aot_binary",
 )
@@ -108,6 +116,8 @@ load(
 )
 
 dotnet_project = _dotnet_project
+dotnet_solution = _dotnet_solution
+DotnetIdeInfo = _DotnetIdeInfo
 csharp_binary = _csharp_binary
 csharp_library = _csharp_library
 csharp_test = _csharp_test
