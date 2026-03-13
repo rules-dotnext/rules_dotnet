@@ -1,6 +1,5 @@
 # Cut a release whenever a new tag is pushed to the repo.
-# You should use an annotated tag, like `git tag -a v1.2.3`
-# and put the release notes into the commit message for the tag.
+# Cross-platform and E2E tests must pass before the release is created.
 name: Release
 
 on:
@@ -14,7 +13,103 @@ permissions:
   contents: write
 
 jobs:
+  cross-platform:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            label: macos
+            cache-path: ~/Library/Caches/bazel
+          - os: windows-latest
+            label: windows
+            cache-path: ~/.cache/bazel
+    runs-on: ${{ matrix.os }}
+    name: Test (${{ matrix.label }})
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Cache Bazel
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ matrix.cache-path }}
+            ~/.cache/bazelisk
+          key: bazel-${{ matrix.label }}-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock') }}
+          restore-keys: bazel-${{ matrix.label }}-
+
+      - name: Shorten Bazel output root (Windows MAX_PATH)
+        if: matrix.label == 'windows'
+        run: echo "startup --output_user_root=C:/_b" >> .bazelrc.user
+        shell: bash
+
+      - name: Unit and analysis tests
+        run: bazel test //dotnet/private/tests/... --test_output=errors
+        shell: bash
+
+  e2e:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        tfm: [smoke, net8.0, net9.0, net10.0, web_sdk]
+    runs-on: ${{ matrix.os }}
+    name: E2E (${{ matrix.os }} / ${{ matrix.tfm }})
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Cache Bazel
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/bazel
+            ~/.cache/bazelisk
+          key: bazel-e2e-${{ matrix.tfm }}-${{ matrix.os }}-${{ hashFiles('MODULE.bazel') }}
+          restore-keys: bazel-e2e-${{ matrix.tfm }}-${{ matrix.os }}-
+
+      - name: Shorten Bazel output root (Windows MAX_PATH)
+        if: contains(matrix.os, 'windows')
+        run: echo "startup --output_user_root=C:/_b" >> .bazelrc.user
+        shell: bash
+
+      - name: E2E tests (${{ matrix.tfm }})
+        run: cd e2e/${{ matrix.tfm }} && bazel test //... --test_output=errors
+        shell: bash
+
+  examples:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    name: Example (${{ matrix.os }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bazelbuild/setup-bazelisk@v3
+      - name: Cache Bazel
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/bazel
+            ~/.cache/bazelisk
+          key: bazel-example-${{ matrix.os }}-${{ hashFiles('MODULE.bazel') }}
+          restore-keys: bazel-example-${{ matrix.os }}-
+      - name: Shorten Bazel output root (Windows MAX_PATH)
+        if: contains(matrix.os, 'windows')
+        run: echo "startup --output_user_root=C:/_b" >> .bazelrc.user
+        shell: bash
+      - name: Example tests
+        run: cd examples/nuget_hello && bazel test //... --test_output=errors
+        shell: bash
+
   release:
+    needs: [cross-platform, e2e, examples]
     uses: bazel-contrib/.github/.github/workflows/release_ruleset.yaml@v7.2.3
     with:
       prerelease: false

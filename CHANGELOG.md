@@ -2,7 +2,7 @@
 
 ## [0.22.0] — 2026-03-14
 
-Extended from [bazel-contrib/rules_dotnet](https://github.com/bazel-contrib/rules_dotnet) v0.21.5.
+Inaugural release. Extended from [bazel-contrib/rules_dotnet](https://github.com/bazel-contrib/rules_dotnet) v0.21.5 with proto/gRPC, Roslyn analyzers, code coverage, publishing, Gazelle, native interop, Razor, IDE integration, and remote execution.
 
 ### Added
 
