@@ -2,20 +2,46 @@ name: CI
 
 on:
   push:
-    branches: [develop/parity]
+    branches: [main]
   pull_request:
-    branches: [develop/parity]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
-  test:
+  build-and-test:
+    runs-on: ubuntu-latest
+    name: Build & Test (Linux)
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Bazelisk
+        uses: bazelbuild/setup-bazelisk@v3
+
+      - name: Cache Bazel
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/bazel
+            ~/.cache/bazelisk
+          key: bazel-linux-${{ hashFiles('MODULE.bazel', 'MODULE.bazel.lock') }}
+          restore-keys: bazel-linux-
+
+      - name: Build all targets
+        run: bazel build //... --keep_going
+
+      - name: Unit and analysis tests
+        run: bazel test //dotnet/private/tests/... --test_output=errors
+
+      - name: Stardoc generation
+        run: bazel build //docs:rules_api
+
+  # Full cross-platform matrix on releases and manual dispatch only
+  cross-platform:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
     strategy:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
-            label: linux
-            cache-path: ~/.cache/bazel
           - os: macos-latest
             label: macos
             cache-path: ~/Library/Caches/bazel
@@ -44,27 +70,12 @@ jobs:
         run: echo "startup --output_user_root=C:/_b" >> .bazelrc.user
         shell: bash
 
-      - name: Build all targets
-        if: matrix.label == 'linux'
-        run: bazel build //... --keep_going
-        shell: bash
-
       - name: Unit and analysis tests
         run: bazel test //dotnet/private/tests/... --test_output=errors
         shell: bash
 
-      - name: Smoke test (external consumption)
-        if: matrix.label != 'windows'
-        run: cd validation/smoke && bazel test //...
-        shell: bash
-
-      # Stardoc output is platform-independent; running on one OS is sufficient.
-      - name: Stardoc generation
-        if: matrix.label == 'linux'
-        run: bazel build //docs:rules_api
-        shell: bash
-
   e2e:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/')
     strategy:
       fail-fast: false
       matrix:

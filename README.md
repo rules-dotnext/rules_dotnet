@@ -1,6 +1,10 @@
 # rules_dotnet
 
-Bazel rules for .NET. Hermetic toolchain, remote execution, remote caching, deterministic builds, cross-compilation, code coverage — plus C#/F# compilation, NuGet dependencies, proto/gRPC, NativeAOT, Roslyn analyzers, and Razor. bzlmod-native, tri-platform, `bazel test //...` and go.
+[![CI](https://github.com/rules-dotnext/rules_dotnet/actions/workflows/ci.yml/badge.svg)](https://github.com/rules-dotnext/rules_dotnet/actions/workflows/ci.yml)
+
+Bazel rules for .NET. Built on [bazel-contrib/rules_dotnet](https://github.com/bazel-contrib/rules_dotnet) — extends it with proto/gRPC, Roslyn analyzers, code coverage, publishing, Gazelle, native interop, Razor, and remote execution. Contributions welcome upstream; anything adopted there benefits everyone.
+
+Hermetic toolchain, remote execution, remote caching, deterministic builds, cross-compilation, code coverage. bzlmod-native, tri-platform, `bazel test //...` and go.
 
 ## Build Properties
 
@@ -19,7 +23,7 @@ Bazel rules for .NET. Hermetic toolchain, remote execution, remote caching, dete
 
 **MODULE.bazel**:
 ```starlark
-bazel_dep(name = "rules_dotnet", version = "0.0.0")  # Replace with latest release version
+bazel_dep(name = "rules_dotnet", version = "0.22.0")
 
 dotnet = use_extension("@rules_dotnet//dotnet:extensions.bzl", "dotnet")
 dotnet.toolchain(dotnet_version = "9.0.200")
