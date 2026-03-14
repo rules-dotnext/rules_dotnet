@@ -2,26 +2,14 @@
 
 [![CI](https://github.com/rules-dotnext/rules_dotnet/actions/workflows/ci.yml/badge.svg)](https://github.com/rules-dotnext/rules_dotnet/actions/workflows/ci.yml)
 
-Bazel rules for .NET. Built on [bazel-contrib/rules_dotnet](https://github.com/bazel-contrib/rules_dotnet) — extends it with proto/gRPC, Roslyn analyzers, code coverage, publishing, Gazelle, native interop, Razor, and remote execution. Contributions welcome upstream; anything adopted there benefits everyone.
+Bazel rules for .NET, built on [bazel-contrib/rules_dotnet](https://github.com/bazel-contrib/rules_dotnet). The .NET SDK is managed entirely by Bazel — no system installation required. Builds are deterministic, remote-cacheable, and run identically on Linux, macOS, and Windows.
 
-Hermetic toolchain, remote execution, remote caching, deterministic builds, cross-compilation, code coverage. bzlmod-native, tri-platform, `bazel test //...` and go.
-
-## Build Properties
-
-| Property | Detail |
-|----------|--------|
-| **Hermeticity** | .NET SDK downloaded as a repo rule. Zero host dependencies. `--incompatible_strict_action_env` enabled. |
-| **Remote execution** | All actions RE-compatible. Zero `local=True`. Container image declared in `build:remote`. `--config=remote` and go. |
-| **Remote caching** | Full cache compatibility. Clean rebuild from remote cache hits across machines. |
-| **Deterministic output** | `/deterministic+` passed to csc and fsc. `-pathmap:$PWD=.` eliminates host paths. |
-| **Cross-compilation** | `--platforms` flag, TFM transitions, runtime identifier (RID) selection. |
-| **Test protocol** | Sharding (`TEST_SHARD_STATUS_FILE`), XML output (`$XML_OUTPUT_FILE`), coverage (LCOV via coverlet). |
-| **bzlmod-native** | Module extensions for toolchain, NuGet, targeting packs, coverage. No WORKSPACE. |
-| **Tri-platform** | Linux x86_64, macOS arm64/x86_64, Windows x86_64. CI green on all three. |
+This fork extends upstream with proto/gRPC code generation, Roslyn analyzer integration, coverlet-based code coverage, `publish_binary` / NativeAOT publishing, a Gazelle extension for automatic BUILD file generation, Razor compilation, and native interop. Contributions welcome upstream; anything adopted there benefits everyone.
 
 ## Quick Start
 
-**MODULE.bazel**:
+Add rules_dotnet to your `MODULE.bazel`:
+
 ```starlark
 bazel_dep(name = "rules_dotnet", version = "0.22.0")
 
@@ -31,7 +19,8 @@ use_repo(dotnet, "dotnet_toolchains")
 register_toolchains("@dotnet_toolchains//:all")
 ```
 
-**BUILD.bazel**:
+Define targets in `BUILD.bazel` — a library, a binary that depends on it, and a test:
+
 ```starlark
 load("@rules_dotnet//dotnet:defs.bzl", "csharp_binary", "csharp_library", "csharp_nunit_test")
 
@@ -56,70 +45,45 @@ csharp_nunit_test(
 )
 ```
 
+Build, run, and test — the SDK is fetched automatically on first build:
+
 ```bash
-bazel build //:app          # compile
-bazel run //:app             # compile and run
-bazel test //:greeter_test   # run tests
-bazel coverage //:greeter_test  # test with LCOV coverage
+bazel build //:app
+bazel run //:app
+bazel test //:greeter_test
+bazel coverage //:greeter_test   # LCOV output
 ```
 
-The .NET SDK is downloaded automatically. No system-level .NET installation required.
+For IDE integration, `bazel run //:MySolution` generates `.sln` and `.csproj` files that VS Code, Rider, and Visual Studio can open directly. See [examples/nuget_hello](examples/nuget_hello/) for a complete working project with NuGet dependencies.
 
 ## Rules
 
-### Core
-
 | Rule | Description |
 |------|-------------|
-| `csharp_library` | Compile C# sources into a class library DLL |
-| `csharp_binary` | Compile C# sources into an executable |
-| `csharp_test` | Compile and run C# tests (xUnit, MSTest, or any test framework) |
-| `csharp_nunit_test` | NUnit test with auto-injected runner — no `Main()` needed |
-| `fsharp_library` | Compile F# sources into a class library DLL |
-| `fsharp_binary` | Compile F# sources into an executable |
-| `fsharp_test` | Compile and run F# tests |
-| `fsharp_nunit_test` | NUnit test for F# with auto-injected runner |
-
-### Publishing
-
-| Rule | Description |
-|------|-------------|
-| `publish_binary` | Framework-dependent or self-contained deployment with `deps.json` and runtime config |
-| `native_aot_binary` | Compile to a native executable via NativeAOT — no .NET runtime required at run time |
-| `publish_library` | Publish a library with transitive DLLs into a flat directory |
-| `dotnet_pack` | Create a `.nupkg` NuGet package |
-
-### Proto / gRPC
-
-| Rule | Description |
-|------|-------------|
-| `csharp_proto_library` | Generate C# bindings from `.proto` files |
-| `csharp_grpc_library` | Generate C# gRPC client/server stubs from `.proto` service definitions |
-
-### Utilities
-
-| Rule | Description |
-|------|-------------|
-| `resx_resource` | Compile `.resx` resource files for embedding |
-| `razor_library` | Compile Razor views (`.cshtml`) |
-| `dotnet_analysis_config` | Workspace-wide Roslyn analyzer configuration |
-| `dotnet_tool` | Run a pre-built .NET CLI tool hermetically via Bazel |
-| `dotnet_project` | Generate `.csproj` for IDE integration (OmniSharp, Rider, VS Code) |
+| `csharp_library` | C# class library |
+| `csharp_binary` | C# executable |
+| `csharp_test` | C# test (xUnit, MSTest) |
+| `csharp_nunit_test` | NUnit test — runner auto-injected, no `Main()` needed |
+| `fsharp_library` | F# class library |
+| `fsharp_binary` | F# executable |
+| `fsharp_test` | F# test |
+| `fsharp_nunit_test` | F# NUnit test — runner auto-injected |
+| `publish_binary` | Framework-dependent or self-contained deployment |
+| `native_aot_binary` | NativeAOT — no .NET runtime at run time |
+| `publish_library` | Flat directory with transitive DLLs |
+| `dotnet_pack` | `.nupkg` NuGet package |
+| `csharp_proto_library` | C# bindings from `.proto` files |
+| `csharp_grpc_library` | C# gRPC client/server stubs |
+| `resx_resource` | Compiled `.resx` resources |
+| `razor_library` | Compiled Razor views (`.cshtml`) |
+| `dotnet_tool` | Hermetic .NET CLI tool |
 
 ## NuGet Dependencies
 
-Two approaches, depending on your existing workflow:
+Two resolution paths, chosen by what already exists in your repo:
 
-**Paket** (recommended if you have `paket.lock`):
+**From a lock file** (if you have `packages.lock.json`):
 ```starlark
-# After running paket2bazel to generate deps/paket.main_extension.bzl:
-paket = use_extension("//:deps/paket.main_extension.bzl", "paket_main_extension")
-use_repo(paket, "paket.main")
-```
-
-**NuGet lock file** (if you have `packages.lock.json`):
-```starlark
-# MODULE.bazel
 nuget = use_extension("@rules_dotnet//dotnet:extensions.bzl", "nuget")
 nuget.from_lock(
     name = "nuget",
@@ -129,39 +93,32 @@ nuget.from_lock(
 use_repo(nuget, "nuget")
 ```
 
-Then reference packages in BUILD files:
+**From Paket** (if you have `paket.lock`):
 ```starlark
-csharp_library(
-    name = "mylib",
-    srcs = ["MyLib.cs"],
-    deps = ["@paket.main//newtonsoft.json"],
-    target_frameworks = ["net9.0"],
-)
+paket = use_extension("//:deps/paket.main_extension.bzl", "paket_main_extension")
+use_repo(paket, "paket.main")
 ```
 
-See [NuGet dependency management](docs/nuget.md) for private feeds, authentication, and direct package declarations.
+Then reference packages in BUILD files as `@nuget//newtonsoft.json` or `@paket.main//newtonsoft.json`. See [NuGet dependency management](docs/nuget.md) for private feeds, authentication, and direct package declarations.
 
 ## Documentation
 
-- **[Getting Started](docs/getting-started.md)** — setup, first library, first binary, first test
-- **[Rules Reference](docs/rules.md)** — all rules and attributes
-- **[NuGet Dependencies](docs/nuget.md)** — Paket, lock files, private feeds, authentication
-- **[Testing](docs/testing.md)** — test rules, NUnit, coverage, sharding, XML output
-- **[Publishing](docs/publishing.md)** — framework-dependent, self-contained, NativeAOT, NuGet packaging
-- **[Advanced Topics](docs/advanced.md)** — proto/gRPC, Razor, analyzers, IDE integration, native interop, multi-targeting, remote execution
-- **[Migration from MSBuild](docs/migration.md)** — step-by-step guide with .csproj attribute mapping
-- **[Gazelle](docs/gazelle.md)** — automatic BUILD file generation from .csproj/.fsproj
-- **[Architecture](docs/architecture.md)** — TFM transitions, publish pipeline, NuGet resolution, provider dataflow
-- **[Providers](docs/providers.md)** — public provider API for custom rules
-- **[Build Settings](docs/build-settings.md)** — strict deps, analysis config, NUnit defaults
-- **[Examples](e2e/)** — working projects across TFMs
+| Guide | |
+|-------|-|
+| [Getting Started](docs/getting-started.md) | Setup, first library, first binary, first test |
+| [Rules Reference](docs/rules.md) | All rules and attributes |
+| [NuGet Dependencies](docs/nuget.md) | Paket, lock files, private feeds, authentication |
+| [Testing](docs/testing.md) | NUnit, xUnit, MSTest, coverage, sharding |
+| [Publishing](docs/publishing.md) | Framework-dependent, self-contained, NativeAOT, NuGet packaging |
+| [Advanced Topics](docs/advanced.md) | Proto/gRPC, Razor, analyzers, IDE, native interop, multi-targeting, RE |
+| [Migration from MSBuild](docs/migration.md) | Step-by-step .csproj attribute mapping |
+| [Gazelle](docs/gazelle.md) | Automatic BUILD file generation |
+| [Architecture](docs/architecture.md) | TFM transitions, publish pipeline, provider dataflow |
 
 ## Requirements
 
 - **Bazel 8+** (via [Bazelisk](https://github.com/bazelbuild/bazelisk))
-- **bzlmod** enabled (default in Bazel 8)
-- .NET SDK downloaded automatically — no system installation required
-- Supported target frameworks: `net6.0` through `net10.0`, `netstandard2.0`, `netstandard2.1`, `net48`
+- Target frameworks: `net6.0` through `net10.0`, `netstandard2.0`/`2.1`, `net48`
 
 ## License
 

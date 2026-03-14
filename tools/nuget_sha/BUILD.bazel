@@ -1,0 +1,4 @@
+py_binary(
+    name = "nuget_sha",
+    srcs = ["nuget_sha.py"],
+)

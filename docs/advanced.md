@@ -266,6 +266,52 @@ One command writes all of these into your source tree:
 | `NuGet.config` | Package source configuration for `dotnet restore` |
 | `Properties/launchSettings.json` | Per-binary: debugger launch profiles |
 
+### Multi-targeting and IDE
+
+`dotnet_project` takes a single `target_framework`. If your library targets
+multiple TFMs (`target_frameworks = ["net8.0", "net9.0", "netstandard2.0"]`),
+pick the TFM you develop against for the project target:
+
+```starlark
+dotnet_project(
+    name = "mylib.project",
+    target = ":mylib",
+    target_framework = "net9.0",  # IDE uses this TFM; Bazel still builds all TFMs
+)
+```
+
+### `dotnet restore` behavior
+
+When you open a generated `.csproj` or `.sln`:
+
+- **VS Code** (C# Dev Kit) and **Rider** run `dotnet restore` automatically on project open.
+- **Visual Studio** prompts to restore; click "Restore" or it runs on first build.
+
+This is expected — `dotnet restore` downloads NuGet packages so IntelliSense
+can resolve types. All actual building still goes through Bazel.
+
+### Neovim / OmniSharp
+
+OmniSharp reads `.csproj` files natively. Generate the project with
+`bazel run //src:mylib.project`, open the directory in Neovim, and
+OmniSharp picks it up — no special configuration needed.
+
+### F# projects
+
+`dotnet_project` works for F# targets. The aspect reads source files
+(`.fs`, `.fsi`) the same way it reads `.cs` files. For IDE support:
+
+- **VS Code**: use [Ionide](https://ionide.io/) — it reads the generated `.fsproj`
+- **Rider**: native F# support, opens `.fsproj` or `.sln` directly
+
+### Troubleshooting: IntelliSense not working?
+
+1. Did you run `bazel run //src:mylib.project`? The `.csproj` must exist on disk.
+2. Did `dotnet restore` complete? Check the IDE's output panel for restore errors.
+3. Is the `.csproj` in the right directory? It should be next to your source files.
+4. Try reloading the window (VS Code: `Ctrl+Shift+P` → "Reload Window").
+5. Check that `target_framework` matches a TFM in your target's `target_frameworks` list.
+
 ### How it works
 
 An aspect (`ide_info_aspect`) walks each target's dependency graph at analysis

@@ -199,6 +199,32 @@ See the [examples/paket](../examples/paket) directory for a complete multi-group
 setup, and the [NuGet documentation](nuget.md) for all dependency management
 approaches.
 
+## Set up your editor
+
+rules\_dotnet generates real `.csproj` and `.sln` files that your IDE already understands — no plugins required.
+
+**VS Code** (with C# Dev Kit): add a `dotnet_project` target next to your library or binary, then run `bazel run //src:mylib.project`. C# Dev Kit picks up the generated `.csproj` automatically.
+
+**JetBrains Rider**: same as VS Code, or use `dotnet_solution` for multi-project repos — `bazel run //:MySolution` generates an `.sln` that Rider opens directly.
+
+**Visual Studio**: use `dotnet_solution` — it generates the `.sln`, per-project `.csproj` files, `NuGet.config`, and `launchSettings.json` in one command.
+
+```starlark
+load("@rules_dotnet//dotnet:defs.bzl", "dotnet_project")
+
+dotnet_project(
+    name = "greeter.project",
+    target = ":greeter",
+    target_framework = "net9.0",
+)
+```
+
+```sh
+bazel run //:greeter.project   # writes greeter.csproj — your editor picks it up
+```
+
+See [Advanced Topics: IDE integration](advanced.md#ide-integration) for full details, multi-project solutions, and troubleshooting.
+
 ## Debug vs Release builds
 
 Bazel's `--compilation_mode` flag controls optimization:

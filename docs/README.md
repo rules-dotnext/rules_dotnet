@@ -20,7 +20,7 @@
 | **[Providers](providers.md)** | Public provider API for writing custom rules |
 | **[Build Settings](build-settings.md)** | User-facing build settings: strict deps, analysis config, NUnit labels |
 | **[Architecture](architecture.md)** | Internals: TFM transitions, publish pipeline, NuGet resolution, provider flow |
-| **[Examples](../e2e/)** | Working projects for net8.0, net9.0, net10.0 |
+| **[Example](../examples/nuget_hello/)** | Copy-pasteable starter project with NuGet, build, and test |
 
 ## Design Decisions
 

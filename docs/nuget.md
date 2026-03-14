@@ -251,6 +251,21 @@ Requirements: `curl`, `jq`, `sha512sum`, `base64`.
 
 ---
 
+## Which approach should I use?
+
+| Situation | Recommended approach |
+|-----------|---------------------|
+| **Getting started / small projects** | `nuget.package()` tags directly in `MODULE.bazel`. Use `bazel run //tools/nuget_sha` to get SHA-512 hashes. See [examples/nuget_hello](../examples/nuget_hello/). |
+| **Migrating from MSBuild / large projects** | `nuget.from_lock()` with your existing `packages.lock.json` (from `dotnet restore --use-lock-file`). Same pattern as rules\_python's `requirements_lock.txt`. |
+| **Existing Paket users** | Keep using Paket + `paket2bazel`. Zero workflow change. |
+
+For projects with fewer than ~10 NuGet dependencies, `nuget.package()` tags are
+the simplest path — no lock file, no external tools, no `dotnet restore`. For
+larger dependency graphs where managing transitive deps by hand isn't practical,
+`from_lock` or Paket handle the closure automatically.
+
+---
+
 ## Package reference format
 
 All NuGet packages are referenced by their lowercased ID. The label prefix

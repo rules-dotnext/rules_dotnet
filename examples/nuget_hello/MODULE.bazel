@@ -1,0 +1,29 @@
+module(
+    name = "nuget_hello",
+    version = "0.0.0",
+)
+
+bazel_dep(name = "rules_dotnet", version = "0.0.0")
+local_path_override(
+    module_name = "rules_dotnet",
+    path = "../..",
+)
+
+dotnet = use_extension("@rules_dotnet//dotnet:extensions.bzl", "dotnet")
+dotnet.toolchain(dotnet_version = "9.0.200")
+use_repo(dotnet, "dotnet_toolchains")
+
+register_toolchains("@dotnet_toolchains//:all")
+
+nuget = use_extension("@rules_dotnet//dotnet:extensions.bzl", "nuget")
+nuget.package(
+    name = "nuget",
+    id = "Newtonsoft.Json",
+    version = "13.0.3",
+    sha512 = "sha512-mbJSvHfRxfX3tR/U6n1WU+mWHXswYc+SB/hkOpx8yZZe68hNZGfymJu0cjsaJEkVzCMqePiU6LdIyogqfIn7kg==",
+    tfms = ["net9.0"],
+    deps = {
+        "net9.0": [],
+    },
+)
+use_repo(nuget, "nuget")

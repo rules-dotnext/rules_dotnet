@@ -33,3 +33,6 @@ jobs:
 
       - name: Unit and analysis tests
         run: bazel test //dotnet/private/tests/... --test_output=errors
+
+      - name: Example integration test
+        run: cd examples/nuget_hello && bazel test //... --test_output=errors
